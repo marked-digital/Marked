@@ -1,7 +1,5 @@
+import HomeSignal from "@/components/home-signal";
+
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-semibold">hello world</h1>
-    </main>
-  );
+  return <HomeSignal />;
 }
