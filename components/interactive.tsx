@@ -5,7 +5,8 @@
 // final Signal theme (deep emerald, Plus Jakarta, radius 16).
 
 import React from "react";
-import { MD, C } from "@/lib/md";
+import { MD, C, STACK_TOOLS } from "@/lib/md";
+import { iconPath } from "@/lib/icons";
 import { money, useCountTo, hexToRgba } from "@/components/shared";
 
 const TRACK = "rgba(255,255,255,.10)";
@@ -234,5 +235,253 @@ export function ExpansionPlanner() {
         </div>
       </div>
     </>
+  );
+}
+
+/* ------------------------------------ EMBEDDED WORKFLOW (platform physics field)
+   A canvas "ball pit": every platform from the Tech Stack page (STACK_TOOLS)
+   becomes a chip that falls under gravity, collides, and scatters away from the
+   cursor — so the visual stays in sync with the stack data. */
+
+type Chip = {
+  mono: string;
+  color: string;
+  logo: Path2D | null;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  r: number;
+};
+
+export function WorkflowField() {
+  const wrapRef = React.useRef<HTMLDivElement | null>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const reduce =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const fontFamily =
+      getComputedStyle(document.body).fontFamily || "system-ui, sans-serif";
+
+    let W = 0;
+    let H = 0;
+    const chips: Chip[] = [];
+    const mouse = { x: 0, y: 0, on: false };
+
+    const measure = () => {
+      const rect = wrap.getBoundingClientRect();
+      W = Math.max(1, rect.width);
+      H = Math.max(1, rect.height);
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const build = () => {
+      // Radius scales to the available area so all platforms fit and settle.
+      const r = Math.max(19, Math.min(27, Math.sqrt((W * H) / (STACK_TOOLS.length * 7.2))));
+      chips.length = 0;
+      STACK_TOOLS.forEach((t, i) => {
+        const span = Math.max(1, W - 2 * r);
+        const vspan = Math.max(1, H - 2 * r);
+        const p = iconPath(t.icon);
+        chips.push({
+          mono: t.mono,
+          color: t.color,
+          logo: p ? new Path2D(p) : null,
+          r,
+          // Scatter across the field; a gentle pull to center then packs
+          // them into a floating cluster (collisions keep them apart).
+          x: reduce ? r + ((i * 97 + 31) % span) : r + Math.random() * span,
+          y: reduce ? r + ((i * 53 + 19) % vspan) : r + Math.random() * vspan,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+        });
+      });
+    };
+
+    const ATTRACT = 0.014; // pull toward center
+    const DAMP = 0.86; // velocity damping (settles the cluster)
+    const PUSH = 12; // cursor repel strength
+
+    const clampWalls = (c: Chip) => {
+      if (c.x < c.r) c.x = c.r;
+      else if (c.x > W - c.r) c.x = W - c.r;
+      if (c.y < c.r) c.y = c.r;
+      else if (c.y > H - c.r) c.y = H - c.r;
+    };
+
+    const step = () => {
+      const cx = W / 2;
+      const cy = H / 2;
+      for (const c of chips) {
+        c.vx += (cx - c.x) * ATTRACT;
+        c.vy += (cy - c.y) * ATTRACT;
+        if (mouse.on) {
+          const dx = c.x - mouse.x;
+          const dy = c.y - mouse.y;
+          const d2 = dx * dx + dy * dy;
+          const R = 130;
+          if (d2 < R * R && d2 > 0.01) {
+            const d = Math.sqrt(d2);
+            const f = (1 - d / R) * PUSH;
+            c.vx += (dx / d) * f;
+            c.vy += (dy / d) * f;
+          }
+        }
+        c.vx *= DAMP;
+        c.vy *= DAMP;
+        c.x += c.vx;
+        c.y += c.vy;
+      }
+      // chip-chip collisions + wall constraints (relaxation passes)
+      for (let pass = 0; pass < 6; pass++) {
+        for (let i = 0; i < chips.length; i++) {
+          for (let j = i + 1; j < chips.length; j++) {
+            const a = chips[i];
+            const b = chips[j];
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            let d2 = dx * dx + dy * dy;
+            const min = a.r + b.r;
+            if (d2 < min * min) {
+              // Break exact overlap so a normal direction always exists.
+              if (d2 < 0.0001) {
+                dx = (Math.random() - 0.5) * 0.5;
+                dy = (Math.random() - 0.5) * 0.5;
+                d2 = dx * dx + dy * dy;
+              }
+              const d = Math.sqrt(d2);
+              const overlap = (min - d) / 2;
+              const nx = dx / d;
+              const ny = dy / d;
+              a.x -= nx * overlap;
+              a.y -= ny * overlap;
+              b.x += nx * overlap;
+              b.y += ny * overlap;
+            }
+          }
+        }
+        for (const c of chips) clampWalls(c);
+      }
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      for (const c of chips) {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#141614"; // opaque base so overlaps stay readable
+        ctx.fill();
+        ctx.fillStyle = hexToRgba(c.color, 0.2);
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = hexToRgba(c.color, 0.55);
+        ctx.stroke();
+        if (c.logo) {
+          // Simple Icons glyphs use a 24×24 viewBox — center and scale to fit.
+          const s = (c.r * 1.15) / 24;
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.scale(s, s);
+          ctx.translate(-12, -12);
+          ctx.fillStyle = c.color;
+          ctx.fill(c.logo);
+          ctx.restore();
+        } else {
+          const fs = c.mono.length >= 3 ? c.r * 0.6 : c.mono.length === 2 ? c.r * 0.78 : c.r;
+          ctx.font = `800 ${fs}px ${fontFamily}`;
+          ctx.fillStyle = c.color;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(c.mono, c.x, c.y + 1);
+        }
+      }
+    };
+
+    measure();
+    build();
+
+    let raf = 0;
+    let running = false;
+    const loop = () => {
+      step();
+      draw();
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (running || reduce) return;
+      running = true;
+      raf = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    if (reduce) {
+      // Settle a static arrangement once; no animation.
+      for (let k = 0; k < 260; k++) step();
+      draw();
+    }
+
+    // Only animate while the field is on-screen.
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => (e.isIntersecting ? start() : stop()));
+      },
+      { threshold: 0.05 }
+    );
+    io.observe(wrap);
+
+    const onVis = () => (document.hidden ? stop() : start());
+    document.addEventListener("visibilitychange", onVis);
+
+    const ro = new ResizeObserver(() => {
+      measure();
+      for (const c of chips) {
+        c.x = Math.min(Math.max(c.r, c.x), W - c.r);
+        c.y = Math.min(Math.max(c.r, c.y), H - c.r);
+      }
+      if (reduce) draw();
+    });
+    ro.observe(wrap);
+
+    const onMove = (e: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.on = true;
+    };
+    const onLeave = () => {
+      mouse.on = false;
+    };
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerleave", onLeave);
+
+    return () => {
+      stop();
+      io.disconnect();
+      ro.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+      canvas.removeEventListener("pointermove", onMove);
+      canvas.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <div ref={wrapRef} className="sg-embed-canvas">
+      <canvas ref={canvasRef} />
+    </div>
   );
 }

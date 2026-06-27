@@ -242,3 +242,12 @@ export function hexToRgba(hex: string, a: number) {
   if (!m) return hex;
   return `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${a})`;
 }
+
+// Renders a Simple Icons single-path brand glyph (24×24 viewBox) in a color.
+export function BrandLogo({ path, color, size = 24 }: { path: string; color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true" focusable="false">
+      <path d={path} />
+    </svg>
+  );
+}

@@ -6,11 +6,13 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, hexToRgba } from "@/components/shared";
+import { iconPath } from "@/lib/icons";
+import { ArrowIcon, BrandLogo, CountUp, MarkLogo, hexToRgba } from "@/components/shared";
 
 type Tool = (typeof STACK_TOOLS)[number];
 
 function Tile({ t, i }: { t: Tool; i: number }) {
+  const logo = iconPath(t.icon);
   return (
     <div className="stk-tile stk-reveal" style={{ transitionDelay: (i % 4) * 50 + "ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -31,7 +33,7 @@ function Tile({ t, i }: { t: Tool; i: number }) {
             letterSpacing: "-0.02em",
           }}
         >
-          {t.mono}
+          {logo ? <BrandLogo path={logo} color={t.color} size={26} /> : t.mono}
         </div>
         <div style={{ minWidth: 0 }}>
           <div className="stk-disp" style={{ fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.name}</div>
@@ -80,7 +82,8 @@ function Section({ cat }: { cat: string }) {
 
 function Nav() {
   return (
-    <div className="stk-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
+    <header className="mk-topbar">
+      <div className="stk-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
       <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700 }}>
         <MarkLogo size={26} color={C.text} accent={C.accent} />
         <span>
@@ -99,7 +102,8 @@ function Nav() {
         </a>
       </nav>
       <button className="stk-btn">{MD.cta}</button>
-    </div>
+      </div>
+    </header>
   );
 }
 
