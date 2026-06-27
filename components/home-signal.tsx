@@ -6,9 +6,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C } from "@/lib/md";
+import { MD, C, STACK_TOOLS, STACK_CATS } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
-import { ExpansionPlanner, GrowthCalc } from "@/components/interactive";
+import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 
 // Signal atmosphere: glow 0.17 → hex alpha 2b
 const GLOW = `${C.accent}2b`;
@@ -201,6 +201,79 @@ function Services() {
   );
 }
 
+// Lead platforms for the "Embedded" blurb — one recognizable name per
+// category, pulled straight from the Tech Stack data so copy + animation
+// stay in sync with STACK_TOOLS.
+const EMBED_LEAD = ["Commerce", "Advertising", "Email & CRM", "Cloud & Infrastructure", "AI & Automation"]
+  .map((cat) => STACK_TOOLS.find((t) => t.cat === cat)?.name)
+  .filter(Boolean)
+  .slice(0, 5)
+  .join(", ");
+
+function Architecture() {
+  const [ref, seen] = useInView<HTMLDivElement>({ threshold: 0.15 });
+  return (
+    <section className="sg-wrap sg-arch" style={{ paddingTop: 40, paddingBottom: 110 }}>
+      <div className="sg-arch-grid">
+        <div>
+          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>ARCHITECTURE</h2>
+          <h3 className="sg-h2" style={{ fontWeight: 700, letterSpacing: "-0.03em", margin: "22px 0 0", lineHeight: 1.06 }}>
+            Built and optimized
+            <br />
+            to scale your operations.
+          </h3>
+          <p style={{ color: C.muted, fontSize: 17.5, lineHeight: 1.6, marginTop: 22, maxWidth: 460 }}>
+            We architect the systems underneath your growth — wiring {STACK_TOOLS.length} best-in-class platforms across {STACK_CATS.length} categories into
+            one connected stack, then tune it as you scale so adding markets, channels, and volume never means rebuilding from scratch.
+          </p>
+          <div style={{ display: "flex", gap: 36, marginTop: 36, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 34, fontWeight: 700, color: C.accent, letterSpacing: "-0.03em" }}>
+                <CountUp value={STACK_TOOLS.length} />
+              </div>
+              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>platforms integrated</div>
+            </div>
+            <div style={{ borderLeft: `1px solid ${C.line}`, paddingLeft: 36 }}>
+              <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.03em" }}>
+                <CountUp value={1} />
+              </div>
+              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>system, wired end-to-end</div>
+            </div>
+          </div>
+          <Link className="sg-navlink" href="/stack" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 34, color: C.text, fontSize: 15, fontWeight: 600 }}>
+            Explore the full stack
+            <ArrowIcon />
+          </Link>
+        </div>
+
+        <div
+          ref={ref}
+          className="sg-embed"
+          style={{
+            opacity: seen ? 1 : 0,
+            transform: seen ? "none" : "translateY(28px) skewY(1.5deg)",
+            transition: "opacity 0.6s, transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1)",
+            willChange: "transform, opacity",
+          }}
+        >
+          <WorkflowField />
+          <div className="sg-embed-meta">
+            <div className="sg-embed-title-row">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M12 2 2 7l10 5 10-5-10-5Z" />
+                <path d="m2 17 10 5 10-5" />
+                <path d="m2 12 10 5 10-5" />
+              </svg>
+              <span>Embedded in your workflow</span>
+            </div>
+            <p>{EMBED_LEAD}. We plug into whatever you already run — and operate it like part of your team.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Interactive() {
   return (
     <>
@@ -298,6 +371,7 @@ export default function HomeSignal() {
       <Hero />
       <Logos />
       <Services />
+      <Architecture />
       <Interactive />
       <Approach />
       <CTA />

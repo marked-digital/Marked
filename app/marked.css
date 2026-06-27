@@ -184,6 +184,62 @@
   font-size: 15.5px;
   line-height: 1.5;
 }
+/* ---------------------------------- Architecture / Embedded-workflow section */
+.sg-arch-grid {
+  display: grid;
+  grid-template-columns: 1fr 487px;
+  gap: 64px;
+  align-items: center;
+}
+.sg-embed {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 487px;
+  justify-self: end;
+}
+.sg-embed-canvas {
+  position: relative;
+  border-radius: 25px;
+  height: 440px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(31, 168, 95, 0.1), transparent 62%), #0f110f;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+}
+.sg-embed-canvas canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.sg-embed-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 437px;
+}
+.sg-embed-title-row {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.sg-embed-title-row span {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: #f3f5f2;
+}
+.sg-embed-meta p {
+  font-weight: 500;
+  font-size: 17px;
+  color: #8e948c;
+  line-height: 1.45;
+  margin: 0;
+}
 .sg-logo-row span {
   font-size: 22px;
   color: #5c625b;
@@ -436,6 +492,14 @@
   .sg-plan-grid {
     grid-template-columns: 1fr;
     gap: 36px;
+  }
+  .sg-arch-grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+  .sg-embed {
+    max-width: 487px;
+    justify-self: start;
   }
 }
 @media (max-width: 860px) {
