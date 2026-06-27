@@ -80,7 +80,8 @@ function Section({ cat }: { cat: string }) {
 
 function Nav() {
   return (
-    <div className="stk-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
+    <header className="mk-topbar">
+      <div className="stk-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
       <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700 }}>
         <MarkLogo size={26} color={C.text} accent={C.accent} />
         <span>
@@ -99,7 +100,8 @@ function Nav() {
         </a>
       </nav>
       <button className="stk-btn">{MD.cta}</button>
-    </div>
+      </div>
+    </header>
   );
 }
 

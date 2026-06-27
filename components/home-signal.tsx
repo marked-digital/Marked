@@ -15,7 +15,8 @@ const GLOW = `${C.accent}2b`;
 
 function Nav() {
   return (
-    <div className="sg-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
+    <header className="mk-topbar">
+      <div className="sg-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
         <MarkLogo size={26} color={C.text} accent={C.accent} />
         <span>
@@ -36,7 +37,8 @@ function Nav() {
       <button className="sg-btn sg-btn--p" style={{ padding: "11px 20px", fontSize: 15 }}>
         {MD.cta}
       </button>
-    </div>
+      </div>
+    </header>
   );
 }
 
