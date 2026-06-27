@@ -464,6 +464,376 @@
   transform: none;
 }
 
+/* ================================================ approach page (.apr)
+   An interactive cyan—no, *Signal*—blueprint. Same brand palette and type as
+   the rest of the site (deep emerald accent, Plus Jakarta), but the page reads
+   like a drawing set: graph-paper backdrop, drafting HUD, and a structure the
+   visitor assembles layer by layer as they scroll. Accent green = "alive / you
+   can touch this"; everything cool/white = structure. */
+.apr {
+  background: #0a0b0a;
+  color: #f3f5f2;
+  width: 100%;
+  --maxw: 1180px;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+.apr * {
+  box-sizing: border-box;
+}
+.apr a {
+  color: inherit;
+  text-decoration: none;
+}
+.apr-wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding-left: 56px;
+  padding-right: 56px;
+}
+.apr-mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+/* graph-paper backdrop — two grid scales (30px + 150px), faded top & bottom */
+.apr-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px, 30px 30px, 150px 150px, 150px 150px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.apr-stage-wrap {
+  position: relative;
+  z-index: 1;
+}
+.apr-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 620px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.apr-stage-grid {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 56px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.3fr;
+  gap: 44px;
+  align-items: center;
+}
+.apr-blueprint {
+  position: relative;
+  width: 100%;
+  height: 76vh;
+  max-height: 640px;
+}
+.apr-bp-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+  cursor: none;
+}
+.apr-blueprint svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* drafting cursor HUD — a grid-snapping crosshair that replaces the pointer */
+.apr-cross-v,
+.apr-cross-h {
+  position: absolute;
+  background: rgba(31, 168, 95, 0.42);
+  pointer-events: none;
+  z-index: 5;
+}
+.apr-cross-v {
+  width: 1px;
+  top: 0;
+  bottom: 0;
+}
+.apr-cross-h {
+  height: 1px;
+  left: 0;
+  right: 0;
+}
+.apr-cross-dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1px solid #1fa85f;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 6;
+  background: rgba(31, 168, 95, 0.16);
+}
+.apr-hud-read {
+  position: absolute;
+  z-index: 6;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #8e948c;
+  background: rgba(8, 9, 8, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 6px;
+  padding: 4px 9px;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* build rail 01–05 */
+.apr-rail {
+  position: fixed;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.apr-rail-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(8, 9, 8, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #8e948c;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  font-variant-numeric: tabular-nums;
+}
+.apr-rail-dot:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #f3f5f2;
+}
+.apr-rail-dot.on {
+  border-color: #1fa85f;
+  color: #f3f5f2;
+  box-shadow: 0 0 0 4px rgba(31, 168, 95, 0.12);
+}
+.apr-rail-dot.done {
+  background: #1fa85f;
+  border-color: #1fa85f;
+  color: #04140c;
+}
+
+/* stage copy cross-fade — replayed each stage via a remount key */
+@keyframes apr-fadeup {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.apr-stage-copy {
+  animation: apr-fadeup 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* title block, lower-left of the sheet */
+.apr-titleblock {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  color: #5c625b;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 8px;
+  padding: 7px 12px;
+  background: rgba(8, 9, 8, 0.5);
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* requirement / market chips */
+.apr-chip {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  background: transparent;
+  color: #8e948c;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.apr-chip:hover {
+  color: #f3f5f2;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.apr-chip.on {
+  background: rgba(31, 168, 95, 0.12);
+  color: #f3f5f2;
+  border-color: #1fa85f;
+}
+.apr-chip:focus-visible,
+.apr-rail-dot:focus-visible,
+.apr-nodebtn:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 2px;
+}
+
+/* node legend buttons (keyboard path for the wiring stage) */
+.apr-nodebtn {
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 11px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  background: transparent;
+  color: #8e948c;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.apr-nodebtn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.apr-nodebtn.pending {
+  border-color: #1fa85f;
+  background: rgba(31, 168, 95, 0.12);
+}
+
+/* blueprint stroke draw-in */
+.apr-draw {
+  transition: stroke-dashoffset 1s cubic-bezier(0.55, 0.1, 0.25, 1), opacity 0.6s;
+}
+
+/* travelling pulse along a wire */
+@keyframes apr-flow {
+  to {
+    stroke-dashoffset: -240;
+  }
+}
+.apr-pulse {
+  stroke-dasharray: 6 234;
+  animation: apr-flow var(--flow, 2.4s) linear infinite;
+}
+
+/* the .apr range slider — same proportions as the homepage .sg-range */
+.apr-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+.apr-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1fa85f;
+  cursor: grab;
+  border: 4px solid #0a0b0a;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.085), 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s;
+}
+.apr-range::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.08);
+}
+.apr-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1fa85f;
+  border: 4px solid #0a0b0a;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.085);
+  cursor: grab;
+}
+
+.apr-out {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: #8e948c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apr-draw {
+    transition: none;
+  }
+  .apr-pulse,
+  .apr-stage-copy {
+    animation: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .apr-stage-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 76px 24px 0;
+    align-content: center;
+  }
+  .apr-blueprint {
+    height: 40vh;
+    order: -1;
+  }
+  .apr-bp-canvas {
+    cursor: default;
+  }
+  .apr-rail {
+    flex-direction: row;
+    top: auto;
+    bottom: 16px;
+    right: 50%;
+    transform: translateX(50%);
+    gap: 9px;
+  }
+  .apr-rail-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+  .apr-titleblock {
+    display: none;
+  }
+}
+
 /* ------------------------------------------------ reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .sg .reveal {
