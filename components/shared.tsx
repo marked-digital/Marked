@@ -243,6 +243,30 @@ export function hexToRgba(hex: string, a: number) {
   return `rgba(${parseInt(m[1], 16)},${parseInt(m[2], 16)},${parseInt(m[3], 16)},${a})`;
 }
 
+// Custom brand logos live in /public/logos/<slug>.svg. We preload the file
+// and only return its URL once it loads — so a missing file simply falls
+// through to the next option with no broken-image flash.
+export function localLogoUrl(slug?: string) {
+  return slug ? `/logos/${slug}.svg` : undefined;
+}
+
+export function useLocalLogo(slug?: string): string | null {
+  const [url, setUrl] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    const href = localLogoUrl(slug);
+    if (!href) return; // no slug → stays on the null fallback
+    let alive = true;
+    const img = new Image();
+    img.onload = () => alive && setUrl(href);
+    img.onerror = () => alive && setUrl(null);
+    img.src = href;
+    return () => {
+      alive = false;
+    };
+  }, [slug]);
+  return url;
+}
+
 // Renders a Simple Icons single-path brand glyph (24×24 viewBox) in a color.
 export function BrandLogo({ path, color, size = 24 }: { path: string; color: string; size?: number }) {
   return (

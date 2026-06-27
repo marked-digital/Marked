@@ -7,11 +7,12 @@ import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
-import { ArrowIcon, BrandLogo, CountUp, MarkLogo, hexToRgba } from "@/components/shared";
+import { ArrowIcon, BrandLogo, CountUp, MarkLogo, hexToRgba, useLocalLogo } from "@/components/shared";
 
 type Tool = (typeof STACK_TOOLS)[number];
 
 function Tile({ t, i }: { t: Tool; i: number }) {
+  const localUrl = useLocalLogo(t.localLogo);
   const logo = iconPath(t.icon);
   return (
     <div className="stk-tile stk-reveal" style={{ transitionDelay: (i % 4) * 50 + "ms" }}>
@@ -33,7 +34,14 @@ function Tile({ t, i }: { t: Tool; i: number }) {
             letterSpacing: "-0.02em",
           }}
         >
-          {logo ? <BrandLogo path={logo} color={t.color} size={26} /> : t.mono}
+          {localUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={localUrl} alt="" width={28} height={28} style={{ objectFit: "contain" }} />
+          ) : logo ? (
+            <BrandLogo path={logo} color={t.color} size={26} />
+          ) : (
+            t.mono
+          )}
         </div>
         <div style={{ minWidth: 0 }}>
           <div className="stk-disp" style={{ fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.name}</div>

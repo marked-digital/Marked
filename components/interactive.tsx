@@ -247,6 +247,7 @@ type Chip = {
   mono: string;
   color: string;
   logo: Path2D | null;
+  img: HTMLImageElement | null; // custom /logos/<slug>.svg once it loads
   x: number;
   y: number;
   vx: number;
@@ -295,10 +296,11 @@ export function WorkflowField() {
         const span = Math.max(1, W - 2 * r);
         const vspan = Math.max(1, H - 2 * r);
         const p = iconPath(t.icon);
-        chips.push({
+        const chip: Chip = {
           mono: t.mono,
           color: t.color,
           logo: p ? new Path2D(p) : null,
+          img: null,
           r,
           // Scatter across the field; a gentle pull to center then packs
           // them into a floating cluster (collisions keep them apart).
@@ -306,7 +308,17 @@ export function WorkflowField() {
           y: reduce ? r + ((i * 53 + 19) % vspan) : r + Math.random() * vspan,
           vx: (Math.random() - 0.5) * 2,
           vy: (Math.random() - 0.5) * 2,
-        });
+        };
+        // A custom /logos/<slug>.svg, if present, wins over the vector glyph.
+        if (t.localLogo) {
+          const im = new Image();
+          im.onload = () => {
+            chip.img = im;
+            if (reduce) draw();
+          };
+          im.src = `/logos/${t.localLogo}.svg`;
+        }
+        chips.push(chip);
       });
     };
 
@@ -388,7 +400,11 @@ export function WorkflowField() {
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = hexToRgba(c.color, 0.55);
         ctx.stroke();
-        if (c.logo) {
+        if (c.img) {
+          // Custom logo image, drawn to fit inside the chip.
+          const sz = c.r * 1.5;
+          ctx.drawImage(c.img, c.x - sz / 2, c.y - sz / 2, sz, sz);
+        } else if (c.logo) {
           // Simple Icons glyphs use a 24×24 viewBox — center and scale to fit.
           const s = (c.r * 1.15) / 24;
           ctx.save();
