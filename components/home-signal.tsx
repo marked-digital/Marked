@@ -7,7 +7,7 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, Swap, useMagnetic, useReveal, useRotate } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc } from "@/components/interactive";
 
 // Signal atmosphere: glow 0.17 → hex alpha 2b
@@ -130,6 +130,8 @@ function Services() {
   const s = MD.services[active];
   const detRef = React.useRef<HTMLDivElement | null>(null);
   const firstRef = React.useRef(true);
+  // Slide the category list in from the left when the section scrolls into view.
+  const [listRef, listSeen] = useInView<HTMLDivElement>({ threshold: 0.2 });
   React.useEffect(() => {
     const el = detRef.current;
     if (!el) return;
@@ -160,13 +162,16 @@ function Services() {
         <p style={{ color: C.faint, fontSize: 14 }}>Five capabilities. One growth system.</p>
       </div>
       <div className="sg-svc-grid">
-        <div>
+        <div ref={listRef} className={"sg-svc-list" + (listSeen ? " is-in" : "")}>
           {MD.services.map((sv, i) => (
             <div
               key={sv.key}
               className={"sg-svc" + (i === active ? " is-on" : "")}
               onClick={() => setActive(i)}
-              style={{ borderBottom: i === MD.services.length - 1 ? `1px solid ${C.line}` : "none" }}
+              style={{
+                borderBottom: i === MD.services.length - 1 ? `1px solid ${C.line}` : "none",
+                transitionDelay: `${i * 90}ms`,
+              }}
             >
               <span className="sg-svc-n">{sv.n}</span>
               <span className="sg-svc-t">{sv.title}</span>
