@@ -6,6 +6,7 @@
 
 import React from "react";
 import { MD, C, STACK_TOOLS } from "@/lib/md";
+import { iconPath } from "@/lib/icons";
 import { money, useCountTo, hexToRgba } from "@/components/shared";
 
 const TRACK = "rgba(255,255,255,.10)";
@@ -245,6 +246,7 @@ export function ExpansionPlanner() {
 type Chip = {
   mono: string;
   color: string;
+  logo: Path2D | null;
   x: number;
   y: number;
   vx: number;
@@ -292,9 +294,11 @@ export function WorkflowField() {
       STACK_TOOLS.forEach((t, i) => {
         const span = Math.max(1, W - 2 * r);
         const vspan = Math.max(1, H - 2 * r);
+        const p = iconPath(t.icon);
         chips.push({
           mono: t.mono,
           color: t.color,
+          logo: p ? new Path2D(p) : null,
           r,
           // Scatter across the field; a gentle pull to center then packs
           // them into a floating cluster (collisions keep them apart).
@@ -384,12 +388,24 @@ export function WorkflowField() {
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = hexToRgba(c.color, 0.55);
         ctx.stroke();
-        const fs = c.mono.length >= 3 ? c.r * 0.6 : c.mono.length === 2 ? c.r * 0.78 : c.r;
-        ctx.font = `800 ${fs}px ${fontFamily}`;
-        ctx.fillStyle = c.color;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(c.mono, c.x, c.y + 1);
+        if (c.logo) {
+          // Simple Icons glyphs use a 24×24 viewBox — center and scale to fit.
+          const s = (c.r * 1.15) / 24;
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.scale(s, s);
+          ctx.translate(-12, -12);
+          ctx.fillStyle = c.color;
+          ctx.fill(c.logo);
+          ctx.restore();
+        } else {
+          const fs = c.mono.length >= 3 ? c.r * 0.6 : c.mono.length === 2 ? c.r * 0.78 : c.r;
+          ctx.font = `800 ${fs}px ${fontFamily}`;
+          ctx.fillStyle = c.color;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(c.mono, c.x, c.y + 1);
+        }
       }
     };
 

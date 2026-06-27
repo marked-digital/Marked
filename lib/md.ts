@@ -132,38 +132,48 @@ export const STACK_CATS = [
   "Support",
 ];
 
-export const STACK_TOOLS = [
-  { name: "Claude", cat: "AI & Automation", mono: "C", color: "#D97757", role: "LLM copilots", why: "Drafts ad creative, briefs, and on-site copy at scale." },
-  { name: "Ada", cat: "AI & Automation", mono: "A", color: "#6B5BFF", role: "AI support", why: "Resolves customer questions automatically, around the clock." },
+export type StackTool = {
+  name: string;
+  cat: string;
+  mono: string;
+  color: string;
+  role: string;
+  why: string;
+  icon?: string; // simple-icons slug; omitted tools fall back to the monogram
+};
+
+export const STACK_TOOLS: StackTool[] = [
+  { name: "Claude", cat: "AI & Automation", mono: "C", color: "#D97757", role: "LLM copilots", why: "Drafts ad creative, briefs, and on-site copy at scale.", icon: "claude" },
+  { name: "Ada", cat: "AI & Automation", mono: "A", color: "#6B5BFF", role: "AI support", why: "Resolves customer questions automatically, around the clock.", icon: "ada" },
   { name: "OpenAI", cat: "AI & Automation", mono: "O", color: "#10A37F", role: "LLM models", why: "Embeddings and generation wired into our pipelines." },
-  { name: "Zapier", cat: "AI & Automation", mono: "Z", color: "#FF4F00", role: "Workflow automation", why: "Connects the stack end-to-end without custom code." },
-  { name: "Make", cat: "AI & Automation", mono: "Mk", color: "#B16EFF", role: "Visual automation", why: "Complex multi-step workflows, built and shipped visually." },
-  { name: "Shopify", cat: "Commerce", mono: "S", color: "#95BF47", role: "DTC commerce", why: "Fast, conversion-built storefronts for growing brands." },
-  { name: "BigCommerce", cat: "Commerce", mono: "B", color: "#9BA7B4", role: "Enterprise commerce", why: "Headless, multi-market catalogs built to scale." },
-  { name: "WooCommerce", cat: "Commerce", mono: "W", color: "#96588A", role: "WordPress commerce", why: "Flexible storefronts on the open web." },
+  { name: "Zapier", cat: "AI & Automation", mono: "Z", color: "#FF4F00", role: "Workflow automation", why: "Connects the stack end-to-end without custom code.", icon: "zapier" },
+  { name: "Make", cat: "AI & Automation", mono: "Mk", color: "#B16EFF", role: "Visual automation", why: "Complex multi-step workflows, built and shipped visually.", icon: "make" },
+  { name: "Shopify", cat: "Commerce", mono: "S", color: "#95BF47", role: "DTC commerce", why: "Fast, conversion-built storefronts for growing brands.", icon: "shopify" },
+  { name: "BigCommerce", cat: "Commerce", mono: "B", color: "#9BA7B4", role: "Enterprise commerce", why: "Headless, multi-market catalogs built to scale.", icon: "bigcommerce" },
+  { name: "WooCommerce", cat: "Commerce", mono: "W", color: "#96588A", role: "WordPress commerce", why: "Flexible storefronts on the open web.", icon: "woocommerce" },
   { name: "Adobe Commerce", cat: "Commerce", mono: "AC", color: "#F26322", role: "B2B & B2C commerce", why: "Complex catalogs and multi-store setups at scale." },
   { name: "Amazon Marketplace", cat: "Commerce", mono: "A", color: "#FF9900", role: "Marketplace", why: "Beachhead launches on the local marketplace in new markets." },
   { name: "AWS", cat: "Cloud & Infrastructure", mono: "AWS", color: "#FF9900", role: "Cloud infra", why: "Scalable hosting, storage, and data pipelines." },
-  { name: "Google Cloud", cat: "Cloud & Infrastructure", mono: "GC", color: "#4285F4", role: "Cloud & data", why: "BigQuery analytics and ML workloads." },
+  { name: "Google Cloud", cat: "Cloud & Infrastructure", mono: "GC", color: "#4285F4", role: "Cloud & data", why: "BigQuery analytics and ML workloads.", icon: "googlecloud" },
   { name: "Microsoft Azure", cat: "Cloud & Infrastructure", mono: "Az", color: "#3AB6F0", role: "Enterprise cloud", why: "Secure cloud for enterprise integrations." },
-  { name: "Vercel", cat: "Cloud & Infrastructure", mono: "▲", color: "#F3F5F2", role: "Edge hosting", why: "Instant global delivery for headless frontends." },
-  { name: "GitHub", cat: "Development", mono: "GH", color: "#F3F5F2", role: "Version control", why: "Source of truth and CI/CD for every build." },
-  { name: "Bitbucket", cat: "Development", mono: "B", color: "#2684FF", role: "Repos & pipelines", why: "Git workflows and automated deployments." },
-  { name: "Google Analytics", cat: "Analytics & Tags", mono: "GA", color: "#E8710A", role: "Behavioral analytics", why: "GA4 event tracking across the funnel." },
-  { name: "Google Tag Manager", cat: "Analytics & Tags", mono: "GTM", color: "#8AB4F8", role: "Tag management", why: "Deploy tracking without touching code." },
-  { name: "Google Ads", cat: "Advertising", mono: "Ads", color: "#FBBC04", role: "Search & PMax", why: "Intent capture across Search and Shopping." },
-  { name: "Meta Ads", cat: "Advertising", mono: "M", color: "#0866FF", role: "Paid social", why: "Full-funnel prospecting and retargeting." },
-  { name: "TikTok Ads", cat: "Advertising", mono: "TT", color: "#25F4EE", role: "Short-form video", why: "Creator-style creative that stops the scroll and converts." },
+  { name: "Vercel", cat: "Cloud & Infrastructure", mono: "▲", color: "#F3F5F2", role: "Edge hosting", why: "Instant global delivery for headless frontends.", icon: "vercel" },
+  { name: "GitHub", cat: "Development", mono: "GH", color: "#F3F5F2", role: "Version control", why: "Source of truth and CI/CD for every build.", icon: "github" },
+  { name: "Bitbucket", cat: "Development", mono: "B", color: "#2684FF", role: "Repos & pipelines", why: "Git workflows and automated deployments.", icon: "bitbucket" },
+  { name: "Google Analytics", cat: "Analytics & Tags", mono: "GA", color: "#E8710A", role: "Behavioral analytics", why: "GA4 event tracking across the funnel.", icon: "googleanalytics" },
+  { name: "Google Tag Manager", cat: "Analytics & Tags", mono: "GTM", color: "#8AB4F8", role: "Tag management", why: "Deploy tracking without touching code.", icon: "googletagmanager" },
+  { name: "Google Ads", cat: "Advertising", mono: "Ads", color: "#FBBC04", role: "Search & PMax", why: "Intent capture across Search and Shopping.", icon: "googleads" },
+  { name: "Meta Ads", cat: "Advertising", mono: "M", color: "#0866FF", role: "Paid social", why: "Full-funnel prospecting and retargeting.", icon: "meta" },
+  { name: "TikTok Ads", cat: "Advertising", mono: "TT", color: "#25F4EE", role: "Short-form video", why: "Creator-style creative that stops the scroll and converts.", icon: "tiktok" },
   { name: "Amazon Ads", cat: "Advertising", mono: "AMZ", color: "#FF9900", role: "Retail media", why: "Sponsored placements where buyers are already shopping." },
   { name: "Microsoft Ads", cat: "Advertising", mono: "MS", color: "#00A4EF", role: "Search ads", why: "Bing intent capture at lower CPCs." },
-  { name: "Pinterest Ads", cat: "Advertising", mono: "P", color: "#E60023", role: "Discovery ads", why: "High-intent visual discovery for DTC brands." },
+  { name: "Pinterest Ads", cat: "Advertising", mono: "P", color: "#E60023", role: "Discovery ads", why: "High-intent visual discovery for DTC brands.", icon: "pinterest" },
   { name: "Klaviyo", cat: "Email & CRM", mono: "K", color: "#23856D", role: "Email & SMS", why: "Lifecycle flows that turn buyers into repeat customers." },
-  { name: "HubSpot", cat: "Email & CRM", mono: "H", color: "#FF7A59", role: "CRM & automation", why: "Pipeline, nurture, and attribution in one place." },
-  { name: "Mailchimp", cat: "Email & CRM", mono: "MC", color: "#FFE01B", role: "Email marketing", why: "Fast campaigns and audience management for growing lists." },
+  { name: "HubSpot", cat: "Email & CRM", mono: "H", color: "#FF7A59", role: "CRM & automation", why: "Pipeline, nurture, and attribution in one place.", icon: "hubspot" },
+  { name: "Mailchimp", cat: "Email & CRM", mono: "MC", color: "#FFE01B", role: "Email marketing", why: "Fast campaigns and audience management for growing lists.", icon: "mailchimp" },
   { name: "Salesforce", cat: "Email & CRM", mono: "SF", color: "#00A1E0", role: "Enterprise CRM", why: "A single customer record across every market." },
   { name: "Ahrefs", cat: "SEO & Content", mono: "Ah", color: "#054ADA", role: "SEO research", why: "Backlink and keyword intelligence in every language." },
-  { name: "Semrush", cat: "SEO & Content", mono: "SEM", color: "#FF642D", role: "Search intelligence", why: "Competitor and keyword research across markets." },
+  { name: "Semrush", cat: "SEO & Content", mono: "SEM", color: "#FF642D", role: "Search intelligence", why: "Competitor and keyword research across markets.", icon: "semrush" },
   { name: "Screaming Frog", cat: "SEO & Content", mono: "ScF", color: "#8DC63F", role: "Technical SEO", why: "Site crawls that catch issues before Google does." },
-  { name: "WordPress", cat: "SEO & Content", mono: "WP", color: "#72AEE6", role: "Content CMS", why: "Editorial publishing for programmatic content engines." },
-  { name: "Zendesk", cat: "Support", mono: "Z", color: "#49C5B1", role: "Support desk", why: "Unified customer support and ticketing." },
+  { name: "WordPress", cat: "SEO & Content", mono: "WP", color: "#72AEE6", role: "Content CMS", why: "Editorial publishing for programmatic content engines.", icon: "wordpress" },
+  { name: "Zendesk", cat: "Support", mono: "Z", color: "#49C5B1", role: "Support desk", why: "Unified customer support and ticketing.", icon: "zendesk" },
 ];
