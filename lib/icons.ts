@@ -28,6 +28,9 @@ import {
   siSemrush,
   siWordpress,
   siZendesk,
+  siSap,
+  siSage,
+  siIntuit,
 } from "simple-icons";
 
 // slug -> SVG path data (viewBox 0 0 24 24)
@@ -54,6 +57,9 @@ export const ICON_PATHS: Record<string, string> = {
   semrush: siSemrush.path,
   wordpress: siWordpress.path,
   zendesk: siZendesk.path,
+  sap: siSap.path,
+  sage: siSage.path,
+  intuit: siIntuit.path,
 };
 
 export function iconPath(slug?: string): string | undefined {
