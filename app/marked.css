@@ -8,7 +8,10 @@
   background: #0a0b0a;
   color: #f3f5f2;
   width: 100%;
-  --maxw: 1080px;
+  /* Fluid content width: unchanged on laptops (~1080), grows with the
+     viewport on larger monitors so wide screens aren't mostly padding,
+     capped so line lengths stay readable. */
+  --maxw: clamp(1080px, 90vw, 1680px);
   -webkit-font-smoothing: antialiased;
   letter-spacing: normal;
 }
