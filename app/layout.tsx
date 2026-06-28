@@ -12,7 +12,10 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Marked Digital — Make your mark in any market",
+  title: {
+    default: "Marked. | Make your mark in any market",
+    template: "Marked. | %s",
+  },
   description:
     "Marked Digital is the growth partner for e-commerce brands going global — international expansion, AI-run advertising, and conversion-built sites, operated as one compounding system.",
 };
