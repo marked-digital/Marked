@@ -17,7 +17,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C } from "@/lib/md";
+import { MD, C, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, MarkLogo, useCountTo, money } from "@/components/shared";
 
@@ -844,17 +844,11 @@ function Nav() {
           </span>
         </Link>
         <nav className="sg-nav-links">
-          {MD.nav.map((n) =>
-            n === "Approach" ? (
-              <Link key={n} className="sg-navlink" href="/approach" style={{ color: C.text }}>
-                {n}
-              </Link>
-            ) : (
-              <a key={n} className="sg-navlink" href="#">
-                {n}
-              </a>
-            )
-          )}
+          {MD.nav.map((n) => (
+            <Link key={n} className="sg-navlink" href={navHref(n)} style={n === "Approach" ? { color: C.text } : undefined}>
+              {n}
+            </Link>
+          ))}
           <Link className="sg-navlink" href="/stack">
             Stack
           </Link>

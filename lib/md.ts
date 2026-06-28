@@ -105,6 +105,15 @@ export const MD = {
   },
 };
 
+// Nav destinations. "Approach" and "Stack" are real routes; the remaining
+// nav items (Services, Work, About) are sections of the homepage, reached via
+// hash anchors that match the section ids set in home-signal.tsx.
+export function navHref(n: string): string {
+  if (n === "Approach") return "/approach";
+  if (n === "Stack") return "/stack";
+  return "/#" + n.toLowerCase();
+}
+
 // Signal palette — baked-in final theme from the design handoff.
 export const C = {
   bg: "#0A0B0A",
