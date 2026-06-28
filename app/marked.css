@@ -249,8 +249,8 @@
 /* ---------------------------------- Architecture / Embedded-workflow section */
 .sg-arch-grid {
   display: grid;
-  grid-template-columns: 1fr 487px;
-  gap: 64px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 48px;
   align-items: center;
 }
 .sg-embed {
@@ -258,13 +258,12 @@
   flex-direction: column;
   gap: 18px;
   width: 100%;
-  max-width: 487px;
-  justify-self: end;
+  justify-self: stretch;
 }
 .sg-embed-canvas {
   position: relative;
   border-radius: 25px;
-  height: 440px;
+  height: 580px;
   overflow: hidden;
   flex-shrink: 0;
   background: radial-gradient(120% 90% at 50% 0%, rgba(31, 168, 95, 0.1), transparent 62%), #0f110f;
@@ -282,7 +281,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 437px;
+  max-width: 520px;
 }
 .sg-embed-title-row {
   display: flex;
@@ -930,7 +929,7 @@
     gap: 44px;
   }
   .sg-embed {
-    max-width: 487px;
+    max-width: 640px;
     justify-self: start;
   }
 }
