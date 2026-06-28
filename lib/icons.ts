@@ -36,6 +36,7 @@ import {
   siPaypal,
   siLighthouse,
   siHotjar,
+  siCloudflare,
 } from "simple-icons";
 
 // slug -> SVG path data (viewBox 0 0 24 24)
@@ -70,6 +71,7 @@ export const ICON_PATHS: Record<string, string> = {
   paypal: siPaypal.path,
   lighthouse: siLighthouse.path,
   hotjar: siHotjar.path,
+  cloudflare: siCloudflare.path,
 };
 
 export function iconPath(slug?: string): string | undefined {
