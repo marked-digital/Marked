@@ -77,6 +77,71 @@
 .sg-hero {
   position: relative;
   overflow: hidden;
+  z-index: 1;
+}
+/* Full-width stage for the hero so the scroll-globe can scale and bleed to
+   the viewport edge — overflow-x: clip trims the horizontal spill without
+   clipping vertically or breaking the sticky topbar (which lives outside). */
+.sg-hero-shell {
+  position: relative;
+  overflow-x: clip;
+}
+/* ---- Hero scroll-globe (replaces the old fixed radial glow) ---- */
+.mk-globe {
+  position: absolute;
+  top: 50%;
+  right: clamp(-90px, -4vw, 0px);
+  transform: translateY(-48%);
+  width: clamp(380px, 46vw, 760px);
+  aspect-ratio: 1 / 1;
+  perspective: 1200px;
+  pointer-events: none;
+  z-index: 0;
+}
+.mk-globe-halo {
+  position: absolute;
+  inset: -34%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(31, 168, 95, 0.2),
+    rgba(31, 168, 95, 0.05) 40%,
+    transparent 70%
+  );
+}
+.mk-globe-outline {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(31, 168, 95, 0.85);
+  box-shadow: 0 0 46px rgba(31, 168, 95, 0.22), inset 0 0 70px rgba(31, 168, 95, 0.07);
+}
+.mk-globe-rot {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-18deg) rotateY(var(--spin, 0deg));
+  will-change: transform;
+}
+.mk-globe-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(31, 168, 95, 0.3);
+}
+@media (max-width: 980px) {
+  .mk-globe {
+    width: clamp(340px, 58vw, 560px);
+    opacity: 0.85;
+  }
+}
+@media (max-width: 720px) {
+  .mk-globe {
+    top: 32%;
+    right: 50%;
+    width: clamp(300px, 86vw, 460px);
+    transform: translate(50%, -50%);
+    opacity: 0.5;
+  }
 }
 .sg-h1 {
   font-size: clamp(48px, 7.2vw, 90px);
