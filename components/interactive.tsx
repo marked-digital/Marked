@@ -7,7 +7,7 @@
 import React from "react";
 import { MD, C, STACK_TOOLS } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
-import { money, useCountTo, hexToRgba } from "@/components/shared";
+import { money, useCountTo, hexToRgba, useInView } from "@/components/shared";
 
 const TRACK = "rgba(255,255,255,.10)";
 
@@ -80,13 +80,17 @@ export function GrowthCalc() {
     ["With Marked", marked, 100, C.accent],
   ];
 
+  const [revRef, revSeen] = useInView<HTMLDivElement>({ threshold: 0.18 });
   return (
-    <>
-      <Heading
-        kicker="Growth modeler"
-        title="See what compounding looks like."
-        sub="Drag the dials. We model the lift our clients see when media, AI, and site work as one system."
-      />
+    <div ref={revRef} className={"mk-reveal" + (revSeen ? " is-in" : "")}>
+      <div className="mk-reveal-l">
+        <Heading
+          kicker="Growth modeler"
+          title="See what compounding looks like."
+          sub="Drag the dials. We model the lift our clients see when media, AI, and site work as one system."
+        />
+      </div>
+      <div className="mk-reveal-r">
       <div className="sg-calc-grid" style={{ background: C.panel, border: `1px solid ${C.line}`, borderRadius: 16, padding: 44 }}>
         <div>
           <Slider label="Monthly ad spend" val={spend} display={money(spend)} min={5000} max={500000} step={5000} pct={spendPct} onChange={setSpend} />
@@ -118,7 +122,8 @@ export function GrowthCalc() {
           </div>
         </div>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 
@@ -153,13 +158,17 @@ export function ExpansionPlanner() {
   const oppShown = useCountTo(totalOpp);
   const sorted = [...chosen].sort((a, b) => b.opp - a.opp);
 
+  const [revRef, revSeen] = useInView<HTMLDivElement>({ threshold: 0.18 });
   return (
-    <>
-      <Heading
-        kicker="Expansion planner"
-        title="Map your next market."
-        sub="Select the markets you're eyeing. We size the first-year opportunity and the path in — instantly."
-      />
+    <div ref={revRef} className={"mk-reveal" + (revSeen ? " is-in" : "")}>
+      <div className="mk-reveal-l">
+        <Heading
+          kicker="Expansion planner"
+          title="Map your next market."
+          sub="Select the markets you're eyeing. We size the first-year opportunity and the path in — instantly."
+        />
+      </div>
+      <div className="mk-reveal-r">
       <div className="sg-plan-grid" style={{ background: C.panel, border: `1px solid ${C.line}`, borderRadius: 16, padding: 40 }}>
         <div>
           <div style={{ color: C.muted, fontSize: 13, marginBottom: 16 }}>
@@ -234,7 +243,8 @@ export function ExpansionPlanner() {
           </div>
         </div>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
 

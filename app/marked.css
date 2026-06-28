@@ -8,6 +8,10 @@
   background: #0a0b0a;
   color: #f3f5f2;
   width: 100%;
+  /* Guard against the brief horizontal overshoot of the slide-in reveals
+     (clip, not hidden, so it doesn't create a scroll container / break the
+     sticky topbar). */
+  overflow-x: clip;
   /* Fluid content width: unchanged on laptops (~1080), grows with the
      viewport on larger monitors so wide screens aren't mostly padding,
      capped so line lengths stay readable. */
@@ -206,6 +210,35 @@
     opacity: 1;
     transform: none;
     transition: padding-left 0.3s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+}
+/* Scroll-reveal for the interactive modules + approach band — the headline
+   slides in from the left, its supporting content from the right, once the
+   block scrolls into view (mirrors the WHAT WE DO list entrance). */
+.mk-reveal-l,
+.mk-reveal-r {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+  will-change: transform, opacity;
+}
+.mk-reveal-l {
+  transform: translateX(-44px);
+}
+.mk-reveal-r {
+  transform: translateX(44px);
+  transition-delay: 0.08s;
+}
+.mk-reveal.is-in .mk-reveal-l,
+.mk-reveal.is-in .mk-reveal-r {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-reveal-l,
+  .mk-reveal-r {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 .sg-svc-t {

@@ -276,13 +276,14 @@ function Interactive() {
 }
 
 function Approach() {
+  const [ref, seen] = useInView<HTMLDivElement>({ threshold: 0.18 });
   return (
     <section style={{ background: C.panel, borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}` }}>
-      <div className="sg-wrap" style={{ paddingTop: 92, paddingBottom: 92 }}>
-        <h2 className="sg-h2" style={{ fontWeight: 600, letterSpacing: "-0.03em", margin: 0, maxWidth: 620 }}>
+      <div ref={ref} className={"sg-wrap mk-reveal" + (seen ? " is-in" : "")} style={{ paddingTop: 92, paddingBottom: 92 }}>
+        <h2 className="sg-h2 mk-reveal-l" style={{ fontWeight: 600, letterSpacing: "-0.03em", margin: 0, maxWidth: 620 }}>
           A system that compounds — not a campaign that ends.
         </h2>
-        <div className="sg-approach-grid" style={{ marginTop: 64 }}>
+        <div className="sg-approach-grid mk-reveal-r" style={{ marginTop: 64 }}>
           {MD.approach.map((a) => (
             <div key={a.n}>
               <div style={{ fontSize: 18, color: C.accent, fontWeight: 500 }}>{a.n}</div>
