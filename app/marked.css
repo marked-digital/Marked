@@ -108,25 +108,12 @@
     transparent 70%
   );
 }
-.mk-globe-outline {
+.mk-globe-canvas {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  border: 1.5px solid rgba(31, 168, 95, 0.85);
-  box-shadow: 0 0 46px rgba(31, 168, 95, 0.22), inset 0 0 70px rgba(31, 168, 95, 0.07);
-}
-.mk-globe-rot {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transform: rotateX(-18deg) rotateY(var(--spin, 0deg));
-  will-change: transform;
-}
-.mk-globe-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(31, 168, 95, 0.3);
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 40px rgba(31, 168, 95, 0.18));
 }
 @media (max-width: 980px) {
   .mk-globe {

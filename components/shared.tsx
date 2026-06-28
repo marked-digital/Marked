@@ -5,6 +5,9 @@
 // design-tool preview/env workarounds.
 
 import React from "react";
+import { geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
+import { feature } from "topojson-client";
+import landTopo from "world-atlas/land-110m.json";
 
 /* ------------------------------------------------------------- HOOKS */
 
@@ -207,58 +210,102 @@ export function CountUp({
 
 /* ------------------------------------------------------------ VISUAL BITS */
 
-// Wireframe globe for the hero — an outline of the earth in the brand green
-// whose meridians/parallels spin around the vertical axis as you scroll.
-// Built from CSS 3D so the whole spin is a single GPU transform (one CSS
-// var updated per scroll frame); the silhouette circle stays static so the
-// "outline of the earth" reads cleanly at any rotation.
+// Spinning earth for the hero — continent outlines + a graticule rendered to
+// canvas with an orthographic projection, in the brand green. Rotation is
+// driven by scroll: scrolling advances the projection's longitude so the
+// globe turns. Land data is a low-res world coastline (~55KB topojson)
+// bundled at build time, so there's no runtime fetch.
+const GLOBE_GREEN = "31, 168, 95"; // brand accent #1FA85F as rgb triple
+
 export function ScrollGlobe() {
-  const rotRef = React.useRef<HTMLDivElement | null>(null);
+  const wrapRef = React.useRef<HTMLDivElement | null>(null);
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
   React.useEffect(() => {
-    const el = rotRef.current;
-    if (!el) return;
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const topo = landTopo as any;
+    const land = feature(topo, topo.objects.land);
+    const graticule = geoGraticule10();
+    const sphere = { type: "Sphere" } as const;
+    const projection = geoOrthographic().clipAngle(90).precision(0.4);
+    const path = geoPath(projection, ctx);
+    const tilt = 18; // northward tilt, degrees
+
+    let size = 0;
+    let dpr = 1;
+    const draw = () => {
+      projection.rotate([window.scrollY * 0.15, -tilt]);
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, size, size);
+      // faint sphere fill so the front hemisphere reads as a solid earth
+      ctx.beginPath();
+      path(sphere);
+      ctx.fillStyle = `rgba(${GLOBE_GREEN}, 0.05)`;
+      ctx.fill();
+      // graticule (meridians + parallels)
+      ctx.beginPath();
+      path(graticule);
+      ctx.strokeStyle = `rgba(${GLOBE_GREEN}, 0.2)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // continents
+      ctx.beginPath();
+      path(land);
+      ctx.fillStyle = `rgba(${GLOBE_GREEN}, 0.13)`;
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${GLOBE_GREEN}, 0.85)`;
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+      // crisp silhouette
+      ctx.beginPath();
+      path(sphere);
+      ctx.strokeStyle = `rgba(${GLOBE_GREEN}, 0.9)`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const resize = () => {
+      size = wrap.clientWidth;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(size * dpr);
+      canvas.height = Math.round(size * dpr);
+      canvas.style.width = `${size}px`;
+      canvas.style.height = `${size}px`;
+      projection.scale(size / 2 - 2).translate([size / 2, size / 2]);
+      draw();
+    };
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
-    const apply = () => {
-      raf = 0;
-      el.style.setProperty("--spin", `${window.scrollY * 0.15}deg`);
-    };
     const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
+      if (!raf)
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          draw();
+        });
     };
-    apply();
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(wrap);
     if (!reduce) window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
+      ro.disconnect();
       window.removeEventListener("scroll", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 
-  // Meridians: full great-circles through the poles, evenly spaced around Y.
-  const meridians = Array.from({ length: 9 }, (_, i) => (i * 180) / 9);
-  // Parallels: horizontal rings at fixed latitudes (these don't move as the
-  // globe spins around its vertical axis, so they stay at a constant size).
-  const parallels = [-60, -30, 0, 30, 60];
-
   return (
-    <div className="mk-globe" aria-hidden="true">
+    <div className="mk-globe" aria-hidden="true" ref={wrapRef}>
       <div className="mk-globe-halo" />
-      <div className="mk-globe-outline" />
-      <div className="mk-globe-rot" ref={rotRef}>
-        {meridians.map((deg) => (
-          <span key={`m${deg}`} className="mk-globe-ring" style={{ transform: `rotateY(${deg}deg)` }} />
-        ))}
-        {parallels.map((lat) => {
-          const rad = (lat * Math.PI) / 180;
-          return (
-            <span
-              key={`p${lat}`}
-              className="mk-globe-ring"
-              style={{ transform: `translateY(${-Math.sin(rad) * 50}%) rotateX(90deg) scale(${Math.cos(rad)})` }}
-            />
-          );
-        })}
-      </div>
+      <canvas className="mk-globe-canvas" ref={canvasRef} />
     </div>
   );
 }
