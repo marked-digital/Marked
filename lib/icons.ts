@@ -37,6 +37,17 @@ import {
   siLighthouse,
   siHotjar,
   siCloudflare,
+  siPostman,
+  siDocker,
+  siJira,
+  siFigma,
+  siContentful,
+  siPrismic,
+  siDrupal,
+  siSanity,
+  siGooglebigquery,
+  siAirtable,
+  siConfluence,
 } from "simple-icons";
 
 // slug -> SVG path data (viewBox 0 0 24 24)
@@ -72,6 +83,17 @@ export const ICON_PATHS: Record<string, string> = {
   lighthouse: siLighthouse.path,
   hotjar: siHotjar.path,
   cloudflare: siCloudflare.path,
+  postman: siPostman.path,
+  docker: siDocker.path,
+  jira: siJira.path,
+  figma: siFigma.path,
+  contentful: siContentful.path,
+  prismic: siPrismic.path,
+  drupal: siDrupal.path,
+  sanity: siSanity.path,
+  googlebigquery: siGooglebigquery.path,
+  airtable: siAirtable.path,
+  confluence: siConfluence.path,
 };
 
 export function iconPath(slug?: string): string | undefined {
