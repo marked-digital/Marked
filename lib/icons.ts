@@ -31,6 +31,9 @@ import {
   siSap,
   siSage,
   siIntuit,
+  siStripe,
+  siAdyen,
+  siPaypal,
 } from "simple-icons";
 
 // slug -> SVG path data (viewBox 0 0 24 24)
@@ -60,6 +63,9 @@ export const ICON_PATHS: Record<string, string> = {
   sap: siSap.path,
   sage: siSage.path,
   intuit: siIntuit.path,
+  stripe: siStripe.path,
+  adyen: siAdyen.path,
+  paypal: siPaypal.path,
 };
 
 export function iconPath(slug?: string): string | undefined {
