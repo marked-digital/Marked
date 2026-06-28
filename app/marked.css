@@ -8,7 +8,10 @@
   background: #0a0b0a;
   color: #f3f5f2;
   width: 100%;
-  --maxw: 1080px;
+  /* Fluid content width: unchanged on laptops (~1080), grows with the
+     viewport on larger monitors so wide screens aren't mostly padding,
+     capped so line lengths stay readable. */
+  --maxw: clamp(1080px, 90vw, 1680px);
   -webkit-font-smoothing: antialiased;
   letter-spacing: normal;
 }
@@ -77,6 +80,58 @@
 .sg-hero {
   position: relative;
   overflow: hidden;
+  z-index: 1;
+}
+/* Full-width stage for the hero so the scroll-globe can scale and bleed to
+   the viewport edge — overflow-x: clip trims the horizontal spill without
+   clipping vertically or breaking the sticky topbar (which lives outside). */
+.sg-hero-shell {
+  position: relative;
+  overflow-x: clip;
+}
+/* ---- Hero scroll-globe (replaces the old fixed radial glow) ---- */
+.mk-globe {
+  position: absolute;
+  top: 50%;
+  right: clamp(-90px, -4vw, 0px);
+  transform: translateY(-48%);
+  width: clamp(380px, 46vw, 760px);
+  aspect-ratio: 1 / 1;
+  perspective: 1200px;
+  pointer-events: none;
+  z-index: 0;
+}
+.mk-globe-halo {
+  position: absolute;
+  inset: -34%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(31, 168, 95, 0.2),
+    rgba(31, 168, 95, 0.05) 40%,
+    transparent 70%
+  );
+}
+.mk-globe-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 40px rgba(31, 168, 95, 0.18));
+}
+@media (max-width: 980px) {
+  .mk-globe {
+    width: clamp(340px, 58vw, 560px);
+    opacity: 0.85;
+  }
+}
+@media (max-width: 720px) {
+  .mk-globe {
+    top: 32%;
+    right: 50%;
+    width: clamp(300px, 86vw, 460px);
+    transform: translate(50%, -50%);
+    opacity: 0.5;
+  }
 }
 .sg-h1 {
   font-size: clamp(48px, 7.2vw, 90px);
@@ -194,8 +249,8 @@
 /* ---------------------------------- Architecture / Embedded-workflow section */
 .sg-arch-grid {
   display: grid;
-  grid-template-columns: 1fr 487px;
-  gap: 64px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 48px;
   align-items: center;
 }
 .sg-embed {
@@ -203,13 +258,12 @@
   flex-direction: column;
   gap: 18px;
   width: 100%;
-  max-width: 487px;
-  justify-self: end;
+  justify-self: stretch;
 }
 .sg-embed-canvas {
   position: relative;
   border-radius: 25px;
-  height: 440px;
+  height: 580px;
   overflow: hidden;
   flex-shrink: 0;
   background: radial-gradient(120% 90% at 50% 0%, rgba(31, 168, 95, 0.1), transparent 62%), #0f110f;
@@ -227,7 +281,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 437px;
+  max-width: 520px;
 }
 .sg-embed-title-row {
   display: flex;
@@ -875,7 +929,7 @@
     gap: 44px;
   }
   .sg-embed {
-    max-width: 487px;
+    max-width: 640px;
     justify-self: start;
   }
 }

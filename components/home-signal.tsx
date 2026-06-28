@@ -7,11 +7,8 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, STACK_CATS, navHref } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
-
-// Signal atmosphere: glow 0.17 → hex alpha 2b
-const GLOW = `${C.accent}2b`;
 
 function Nav() {
   return (
@@ -47,19 +44,9 @@ function Hero() {
   const mag = useMagnetic(0.3);
   const mk = useRotate(MD.markets.length);
   return (
-    <header className="sg-wrap sg-hero" style={{ paddingTop: 100, paddingBottom: 64 }}>
-      <div
-        style={{
-          position: "absolute",
-          top: -160,
-          right: -90,
-          width: 640,
-          height: 640,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${GLOW}, transparent 62%)`,
-          pointerEvents: "none",
-        }}
-      ></div>
+    <div className="sg-hero-shell">
+      <ScrollGlobe />
+      <header className="sg-wrap sg-hero" style={{ paddingTop: 100, paddingBottom: 64 }}>
       <div
         className="reveal"
         style={{
@@ -106,7 +93,8 @@ function Hero() {
           </div>
         ))}
       </div>
-    </header>
+      </header>
+    </div>
   );
 }
 
