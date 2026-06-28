@@ -5,7 +5,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C, STACK_CATS, STACK_TOOLS } from "@/lib/md";
+import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, BrandLogo, CountUp, MarkLogo, hexToRgba, useLocalLogo } from "@/components/shared";
 
@@ -101,13 +101,13 @@ function Nav() {
       </Link>
       <nav className="stk-nav-links">
         {MD.nav.map((n) => (
-          <Link key={n} className="stk-navlink" href="/">
+          <Link key={n} className="stk-navlink" href={navHref(n)}>
             {n}
           </Link>
         ))}
-        <a className="stk-navlink" style={{ color: C.text }} href="#">
+        <Link className="stk-navlink" style={{ color: C.text }} href="/stack">
           Stack
-        </a>
+        </Link>
       </nav>
       <button className="stk-btn">{MD.cta}</button>
       </div>

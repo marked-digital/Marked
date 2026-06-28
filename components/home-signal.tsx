@@ -6,7 +6,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C, STACK_TOOLS, STACK_CATS } from "@/lib/md";
+import { MD, C, STACK_TOOLS, STACK_CATS, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 
@@ -26,9 +26,9 @@ function Nav() {
       </div>
       <nav className="sg-nav-links">
         {MD.nav.map((n) => (
-          <a key={n} className="sg-navlink" href="#">
+          <Link key={n} className="sg-navlink" href={navHref(n)}>
             {n}
-          </a>
+          </Link>
         ))}
         <Link className="sg-navlink" href="/stack">
           Stack
@@ -112,7 +112,7 @@ function Hero() {
 
 function Logos() {
   return (
-    <section className="sg-wrap" style={{ paddingTop: 56, paddingBottom: 16 }}>
+    <section id="work" className="sg-wrap" style={{ paddingTop: 56, paddingBottom: 16, scrollMarginTop: 96 }}>
       <p style={{ color: C.faint, fontSize: 13.5, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 26 }}>
         Trusted by brands scaling across 47 markets
       </p>
@@ -156,7 +156,7 @@ function Services() {
     };
   }, [active]);
   return (
-    <section className="sg-wrap" style={{ paddingTop: 108, paddingBottom: 108 }}>
+    <section id="services" className="sg-wrap" style={{ paddingTop: 108, paddingBottom: 108, scrollMarginTop: 96 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 46 }}>
         <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>WHAT WE DO</h2>
         <p style={{ color: C.faint, fontSize: 14 }}>Five capabilities. One growth system.</p>
@@ -213,7 +213,7 @@ const EMBED_LEAD = ["Commerce", "Advertising", "Email & CRM", "Cloud & Infrastru
 function Architecture() {
   const [ref, seen] = useInView<HTMLDivElement>({ threshold: 0.15 });
   return (
-    <section className="sg-wrap sg-arch" style={{ paddingTop: 40, paddingBottom: 110 }}>
+    <section id="about" className="sg-wrap sg-arch" style={{ paddingTop: 40, paddingBottom: 110, scrollMarginTop: 96 }}>
       <div className="sg-arch-grid">
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>ARCHITECTURE</h2>
