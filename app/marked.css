@@ -154,10 +154,17 @@
   }
 }
 .sg-svc-t {
-  font-size: 26px;
+  font-size: 22px;
   letter-spacing: -0.02em;
   transition: color 0.25s;
   color: #5c625b;
+}
+/* Keep each category on a single line on desktop — the hover padding-left
+   nudge would otherwise tip the longest titles onto a second line. */
+@media (min-width: 721px) {
+  .sg-svc-t {
+    white-space: nowrap;
+  }
 }
 .sg-svc.is-on .sg-svc-t {
   color: #f3f5f2;
