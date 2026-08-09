@@ -6,43 +6,15 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
-import { iconPath } from "@/lib/icons";
-import { ArrowIcon, BrandLogo, CountUp, MarkLogo, hexToRgba, useLocalLogo } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, ToolLogo, hexToRgba } from "@/components/shared";
 
 type Tool = (typeof STACK_TOOLS)[number];
 
 function Tile({ t, i }: { t: Tool; i: number }) {
-  const localUrl = useLocalLogo(t.localLogo);
-  const logo = iconPath(t.icon);
   return (
     <div className="stk-tile stk-reveal" style={{ transitionDelay: (i % 4) * 50 + "ms" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 13,
-            flex: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: hexToRgba(t.color, 0.14),
-            border: `1px solid ${hexToRgba(t.color, 0.3)}`,
-            color: t.color,
-            fontWeight: 800,
-            fontSize: t.mono.length >= 3 ? 14 : t.mono.length === 2 ? 19 : 24,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {localUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={localUrl} alt="" width={28} height={28} style={{ objectFit: "contain" }} />
-          ) : logo ? (
-            <BrandLogo path={logo} color={t.color} size={26} />
-          ) : (
-            t.mono
-          )}
-        </div>
+        <ToolLogo tool={t} />
         <div style={{ minWidth: 0 }}>
           <div className="stk-disp" style={{ fontSize: 18, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.name}</div>
           <div style={{ color: C.faint, fontSize: 13, marginTop: 3 }}>{t.role}</div>

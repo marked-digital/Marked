@@ -20,8 +20,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C, navHref } from "@/lib/md";
-import { MarkLogo } from "@/components/shared";
+import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
+import { MarkLogo, ToolLogo } from "@/components/shared";
 import { OEO, type PageBuild } from "@/lib/oeo";
 
 const EASE = "cubic-bezier(0.2, 0.7, 0.3, 1)"; // the site's easing, used everywhere
@@ -111,11 +111,13 @@ function CountStat({
   value,
   prefix = "",
   suffix = "",
+  decimals = 0,
   duration = 1800,
 }: {
   value: number;
   prefix?: string;
   suffix?: string;
+  decimals?: number;
   duration?: number;
 }) {
   const ref = React.useRef<HTMLSpanElement | null>(null);
@@ -152,7 +154,7 @@ function CountStat({
   return (
     <span ref={ref}>
       {prefix}
-      {Math.round(shown ?? value).toLocaleString("en-US")}
+      {(shown ?? value).toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
       {suffix}
     </span>
   );
@@ -346,14 +348,14 @@ function Results() {
       <div className="oeo-wrap">
         <Kicker>/ 02 — The results</Kicker>
         <h2 data-rev data-delay={80} className="oeo-h2">
-          Eighteen months in.
+          Seven months in.
         </h2>
         <div className="oeo-results">
           {OEO.results.map((r, i) => (
             <div key={r.label} data-rev data-delay={i * 60}>
               <Label style={{ color: C.muted }}>{r.label}</Label>
               <div className="oeo-stat" style={r.lead ? { color: C.accent } : undefined}>
-                <CountStat value={r.value} prefix={r.prefix} suffix={r.suffix} />
+                <CountStat value={r.value} prefix={r.prefix} suffix={r.suffix} decimals={r.decimals} />
               </div>
               <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.5, color: C.muted }}>{r.sub}</div>
             </div>
@@ -367,15 +369,19 @@ function Results() {
 /* ---------------------------------------------------------- 03 the revenue */
 
 // Chart geometry. The series drives the path, so real monthly numbers drop
-// straight into lib/oeo.ts without touching any coordinates here.
-const CH = { w: 1000, h: 388, base: 340, top: 66, max: 120 };
-const yFor = (v: number) => CH.base - (v * (CH.base - CH.top)) / CH.max;
+// straight into lib/oeo.ts without touching any coordinates here. The vertical
+// scale is pinned to the top gridline, so changing `gridlines` rescales the
+// plot; values above the top gridline use the headroom, as the final month does.
+const CH = { w: 1000, h: 388, base: 340, top: 66 };
+const yFor = (v: number, max: number) => CH.base - (v * (CH.base - CH.top)) / max;
 const xFor = (i: number, n: number) => (i * CH.w) / (n - 1);
 
 function RevenueChart() {
-  const { series, engagementIndex: ei, gridlines, rangeLabel, title, body } = OEO.revenue;
+  const { series, engagementIndex: ei, gridlines, rangeLabel, title, body, indexBase, growthPct } = OEO.revenue;
+  const scaleMax = gridlines[gridlines.length - 1];
+  const yAt = (v: number) => yFor(v, scaleMax);
   const n = series.length;
-  const pt = (p: { value: number }, i: number) => `${xFor(i, n).toFixed(1)},${yFor(p.value).toFixed(1)}`;
+  const pt = (p: { value: number }, i: number) => `${xFor(i, n).toFixed(1)},${yAt(p.value).toFixed(1)}`;
 
   const pre = series.slice(0, ei + 1).map((p, i) => pt(p, i));
   const post = series.slice(ei).map((p, i) => pt(p, i + ei));
@@ -401,11 +407,13 @@ function RevenueChart() {
         </div>
 
         <div data-rev data-delay={160} className="oeo-chart-card">
+          {/* Indexed, not absolute — the client's monthly revenue figures are
+              not published. The index carries the same curve and growth rate. */}
           <div className="oeo-chart-head oeo-mono">
-            <span>Online revenue / month</span>
+            <span>Online revenue — indexed, engagement start = {indexBase}</span>
             <span>{rangeLabel}</span>
           </div>
-          <svg viewBox={`0 0 ${CH.w} ${CH.h}`} role="img" aria-label={`Monthly online revenue, ${rangeLabel}: $${series[0].value}K rising to $${last.value}K per month.`}>
+          <svg viewBox={`0 0 ${CH.w} ${CH.h}`} role="img" aria-label={`Monthly online revenue indexed to ${indexBase} at the January 2026 engagement start, ${rangeLabel}, rising to +${growthPct}% by ${last.month}.`}>
             <defs>
               <linearGradient id="oeoRev" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor={C.accent} stopOpacity="0.22" />
@@ -414,12 +422,12 @@ function RevenueChart() {
             </defs>
 
             {gridlines.map((g) => (
-              <line key={g} x1="0" y1={yFor(g)} x2={CH.w} y2={yFor(g)} style={{ stroke: C.line }} />
+              <line key={g} x1="0" y1={yAt(g)} x2={CH.w} y2={yAt(g)} style={{ stroke: C.line }} />
             ))}
             <line x1="0" y1={CH.base} x2={CH.w} y2={CH.base} style={{ stroke: "rgba(255,255,255,0.16)" }} />
             {gridlines.map((g) => (
-              <text key={g} x="0" y={yFor(g) - 8} style={{ ...mono, fontSize: 12, fill: C.faint }}>
-                ${g}K
+              <text key={g} x="0" y={yAt(g) - 8} style={{ ...mono, fontSize: 12, fill: C.faint }}>
+                {g}
               </text>
             ))}
 
@@ -432,13 +440,13 @@ function RevenueChart() {
             <path data-draw data-delay={200} d={preD} style={{ fill: "none", stroke: C.faint, strokeWidth: 2.5 }} />
             <path data-draw data-delay={600} d={postD} style={{ fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinejoin: "round" }} />
 
-            <text x="4" y={yFor(series[0].value) - 17} style={{ ...mono, fontSize: 12, fill: C.faint }}>
-              ${series[0].value}K / MO
+            <text x={markerX + 11} y={yAt(series[ei].value) + 26} style={{ ...mono, fontSize: 12, fill: C.faint }}>
+              INDEX {indexBase}
             </text>
-            <circle className="oeo-pulse" cx={CH.w} cy={yFor(last.value)} r="5.5" style={{ fill: C.accent }} />
-            <circle cx={CH.w} cy={yFor(last.value)} r="5.5" style={{ fill: C.accent }} />
-            <text x={CH.w - 10} y={yFor(last.value) - 19} textAnchor="end" style={{ ...mono, fontSize: 13, fontWeight: 600, fill: C.text }}>
-              ${last.value}K / MO
+            <circle className="oeo-pulse" cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
+            <circle cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
+            <text x={CH.w - 10} y={yAt(last.value) - 19} textAnchor="end" style={{ ...mono, fontSize: 13, fontWeight: 600, fill: C.text }}>
+              +{growthPct}%
             </text>
 
             <text x="0" y="380" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
@@ -528,18 +536,24 @@ function Stack() {
             {s.body}
           </p>
         </div>
+        {/* Same tile anatomy as /stack — brand-tinted logo chip, name, role —
+            resolved from STACK_TOOLS so a platform looks identical on both. */}
         <div className="oeo-chips">
-          {s.platforms.map((p, i) => (
-            <div key={p.name} data-rev data-delay={i * 40} className="oeo-chip">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 600 }}>{p.name}</span>
-                <span className="oeo-mono" style={{ fontSize: 10, color: C.faint }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+          {s.platforms.map((name, i) => {
+            const tool = STACK_TOOLS.find((t) => t.name === name);
+            if (!tool) return null;
+            return (
+              <div key={name} data-rev data-delay={i * 40} className="oeo-chip oeo-chip--tool">
+                <ToolLogo tool={tool} size={44} />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {tool.name}
+                  </div>
+                  <div style={{ color: C.faint, fontSize: 13, marginTop: 3 }}>{tool.role}</div>
+                </div>
               </div>
-              <Label style={{ marginTop: 6, letterSpacing: "0.12em" }}>{p.cat}</Label>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
