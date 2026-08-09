@@ -129,9 +129,10 @@ export const C = {
   accentInk: "#04140C",
 };
 
-// Homepage "Selected work" — the scroll-stacked case-study cards. Placeholder
-// case studies for now: swap title / tags / metric / href for the real ones and
-// the section needs no other change.
+// Homepage "Selected work" — the scroll-stacked case-study cards. The first is
+// the real Ontario Education Online engagement and links to its case study; the
+// rest are still placeholders. Swap title / tags / metric / href for the real
+// ones and the section needs no other change.
 //
 // `bg` is the temporary card artwork — a CSS gradient in the Signal palette
 // standing in for 1920×1080 case photography. When real photos land, replace it
@@ -146,10 +147,12 @@ export type WorkItem = {
 
 export const WORK: WorkItem[] = [
   {
-    title: "NORTHWIND",
-    tags: ["DACH launch", "Paid media", "Localization"],
-    metric: "+212% ROAS",
-    href: "/work/northwind",
+    // Real engagement — the badges mirror the case study's hero: the market
+    // motion from its H1, the SERVICES line, and the headline YoY revenue stat.
+    title: "ONTARIO EDUCATION ONLINE",
+    tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
+    metric: "+738% revenue",
+    href: "/work/ontario-education-online",
     bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
   },
   {
