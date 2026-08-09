@@ -5,6 +5,7 @@
 // design-tool preview/env workarounds.
 
 import React from "react";
+import { iconPath } from "@/lib/icons";
 import { geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import landTopo from "world-atlas/land-110m.json";
@@ -376,5 +377,50 @@ export function BrandLogo({ path, color, size = 24 }: { path: string; color: str
     <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden="true" focusable="false">
       <path d={path} />
     </svg>
+  );
+}
+
+// The platform logo chip: a brand-tinted rounded square holding the vendor's
+// mark, falling back through local SVG → Simple Icons glyph → monogram. Shared
+// by the stack page and the case studies so a platform looks the same wherever
+// it appears. Proportions are derived from `size`, which keeps the 52px tile
+// (stack page) and smaller variants visually identical.
+export function ToolLogo({
+  tool,
+  size = 52,
+}: {
+  tool: { color: string; mono: string; icon?: string; localLogo?: string };
+  size?: number;
+}) {
+  const localUrl = useLocalLogo(tool.localLogo);
+  const logo = iconPath(tool.icon);
+  const monoSize = tool.mono.length >= 3 ? size * 0.27 : tool.mono.length === 2 ? size * 0.37 : size * 0.46;
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size / 4),
+        flex: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: hexToRgba(tool.color, 0.14),
+        border: `1px solid ${hexToRgba(tool.color, 0.3)}`,
+        color: tool.color,
+        fontWeight: 800,
+        fontSize: Math.round(monoSize),
+        letterSpacing: "-0.02em",
+      }}
+    >
+      {localUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={localUrl} alt="" width={Math.round(size * 0.54)} height={Math.round(size * 0.54)} style={{ objectFit: "contain" }} />
+      ) : logo ? (
+        <BrandLogo path={logo} color={tool.color} size={Math.round(size * 0.5)} />
+      ) : (
+        tool.mono
+      )}
+    </div>
   );
 }
