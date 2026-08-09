@@ -221,7 +221,10 @@ function SelectedWork() {
             <span className="sg-work-shade" aria-hidden="true" />
             <span className="sg-work-body">
               <span className="sg-work-n">{String(i + 1).padStart(2, "0")}</span>
-              <span className="sg-work-title">{item.title}</span>
+              {/* The display size is tuned for short wordmarks. A full company
+                  name set at that scale wraps to three lines and swallows the
+                  card, so long titles step down a size. */}
+              <span className={"sg-work-title" + (item.title.length > 12 ? " sg-work-title--long" : "")}>{item.title}</span>
               <span className="sg-work-meta">
                 {item.tags.map((t) => (
                   <span key={t} className="sg-work-pill">

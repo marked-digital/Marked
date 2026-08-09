@@ -443,6 +443,13 @@
   font-weight: 700;
   color: #f3f5f2;
 }
+/* Applied by SelectedWork to titles over ~12 characters — full company names
+   rather than short wordmarks. Two lines here carry about the same visual mass
+   as a one-line wordmark at the size above. */
+.sg-work-title--long {
+  font-size: clamp(32px, 5vw, 82px);
+  line-height: 1;
+}
 .sg-work-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1810,6 +1817,9 @@
   }
   .sg-work-title {
     font-size: clamp(38px, 13vw, 72px);
+  }
+  .sg-work-title--long {
+    font-size: clamp(24px, 7.4vw, 42px);
   }
   .sg-work-meta {
     margin-top: 20px;
