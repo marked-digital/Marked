@@ -91,9 +91,9 @@ function Section({ cat }: { cat: string }) {
 function Nav() {
   return (
     <header className="mk-topbar">
-      <div className="stk-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
-      <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700 }}>
-        <MarkLogo size={26} color={C.text} accent={C.accent} />
+      <div className="stk-wrap mk-topbar-inner">
+      <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700 }}>
+        <MarkLogo size={22} color={C.text} accent={C.accent} />
         <span>
           {MD.brand}
           <span style={{ color: C.accent }}>.</span>
@@ -109,7 +109,10 @@ function Nav() {
           Stack
         </Link>
       </nav>
-      <button className="stk-btn">{MD.cta}</button>
+      {/* Compact nav variant of .stk-btn — matches the .sg-btn--p nav sizing. */}
+      <Link className="stk-btn" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
+        {MD.cta}
+      </Link>
       </div>
     </header>
   );
@@ -192,10 +195,10 @@ export default function StackPage() {
           We&apos;ll architect, integrate, and run the whole system — so you don&apos;t have to.
         </p>
         <div style={{ display: "flex", justifyContent: "center", marginTop: 30 }}>
-          <button className="stk-btn" style={{ fontSize: 16, padding: "15px 26px" }}>
+          <Link className="stk-btn" href={MD.ctaHref} style={{ fontSize: 16, padding: "15px 26px" }}>
             {MD.cta}
             <ArrowIcon />
-          </button>
+          </Link>
         </div>
       </section>
       {/* footer */}
