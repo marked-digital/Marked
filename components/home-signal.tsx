@@ -6,16 +6,16 @@
 
 import React from "react";
 import Link from "next/link";
-import { MD, C, STACK_TOOLS, STACK_CATS, navHref } from "@/lib/md";
+import { MD, C, STACK_TOOLS, STACK_CATS, WORK, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 
 function Nav() {
   return (
     <header className="mk-topbar">
-      <div className="sg-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
-        <MarkLogo size={26} color={C.text} accent={C.accent} />
+      <div className="sg-wrap mk-topbar-inner">
+      <div style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>
+        <MarkLogo size={22} color={C.text} accent={C.accent} />
         <span>
           {MD.brand}
           <span style={{ color: C.accent }}>.</span>
@@ -31,9 +31,9 @@ function Nav() {
           Stack
         </Link>
       </nav>
-      <button className="sg-btn sg-btn--p" style={{ padding: "11px 20px", fontSize: 15 }}>
+      <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
         {MD.cta}
-      </button>
+      </Link>
       </div>
     </header>
   );
@@ -41,7 +41,7 @@ function Nav() {
 
 function Hero() {
   const h = MD.hero;
-  const mag = useMagnetic(0.3);
+  const mag = useMagnetic<HTMLAnchorElement>(0.3);
   const mk = useRotate(MD.markets.length);
   return (
     <div className="sg-hero-shell">
@@ -73,11 +73,13 @@ function Hero() {
         {h.sub}
       </p>
       <div className="reveal d3" style={{ position: "relative", display: "flex", gap: 14, marginTop: 38, flexWrap: "wrap" }}>
-        <button ref={mag} className="sg-btn sg-btn--p">
+        <Link ref={mag} className="sg-btn sg-btn--p" href={MD.ctaHref}>
           {MD.cta}
           <ArrowIcon />
-        </button>
-        <button className="sg-btn sg-btn--g">See our work</button>
+        </Link>
+        <Link className="sg-btn sg-btn--g" href="/#work">
+          See our work
+        </Link>
       </div>
       <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 10, marginTop: 22, color: C.faint, fontSize: 14.5 }}>
         <span style={{ width: 6, height: 6, borderRadius: 6, background: C.accent }}></span>
@@ -98,15 +100,141 @@ function Hero() {
   );
 }
 
-function Logos() {
+// Depth cue for the stacked cards. Blurring 80vh layers janks low-end phones,
+// so it's desktop-only — small screens get the scale alone.
+const WORK_MAX_BLUR = 5; // px
+const WORK_BLUR_MIN_W = 768; // px
+
+// Selected work — a scroll-stacking card section, and the homepage's social
+// proof (work, not logos). The stacking itself is pure CSS: every card is
+// sticky at the same offset, so each new card scrolls up and over the pinned
+// one. This effect only adds the depth cue — as card i+1 covers card i, card i
+// scales 1 → 0.8 and blurs 0 → 5px linearly with coverage. The last card is
+// never covered, so it's left alone.
+function SelectedWork() {
+  const cardsRef = React.useRef<(HTMLAnchorElement | null)[]>([]);
+  const [headRef, headSeen] = useInView<HTMLDivElement>({ threshold: 0.25 });
+
+  React.useEffect(() => {
+    // Reduced motion: the cards still stack via sticky, they just don't
+    // scale or blur.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // The sticky offset lives in CSS (.sg-work-card) and shifts responsively,
+    // so read it back instead of duplicating the number here — the two can't
+    // drift out of sync.
+    let stickyTop = 0;
+    let maxBlur = 0;
+    const measure = () => {
+      const first = cardsRef.current[0];
+      stickyTop = first ? parseFloat(getComputedStyle(first).top) || 0 : 0;
+      maxBlur = window.innerWidth > WORK_BLUR_MIN_W ? WORK_MAX_BLUR : 0;
+    };
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const cards = cardsRef.current;
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        if (!card) continue;
+        const next = cards[i + 1];
+        if (!next) {
+          card.style.transform = "";
+          card.style.filter = "";
+          continue;
+        }
+        // offsetHeight, not the rect — the rect is already scaled by us.
+        const h = card.offsetHeight;
+        // The next card's top travels from (stickyTop + h) down to stickyTop as
+        // it slides over this one; that ratio is how covered this card is.
+        const p = Math.min(1, Math.max(0, (stickyTop + h - next.getBoundingClientRect().top) / h));
+        card.style.transform = `scale(${(1 - p * 0.2).toFixed(4)})`;
+        card.style.filter = maxBlur ? `blur(${(p * maxBlur).toFixed(2)}px)` : "";
+      }
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+
+    measure();
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Cursor-following "View" pill. Mouse only — the pill is hidden on touch by
+  // the (hover: hover) media query, so there's nothing to move there.
+  const trackCursor = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    // The card may be mid-scale, so map viewport px back into its own space.
+    const k = el.offsetWidth ? r.width / el.offsetWidth : 1;
+    el.style.setProperty("--wx", `${(e.clientX - r.left) / k}px`);
+    el.style.setProperty("--wy", `${(e.clientY - r.top) / k}px`);
+  };
+
   return (
-    <section id="work" className="sg-wrap" style={{ paddingTop: 56, paddingBottom: 16, scrollMarginTop: 96 }}>
-      <p style={{ color: C.faint, fontSize: 13.5, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 26 }}>
-        Trusted by brands scaling across 47 markets
-      </p>
-      <div className="sg-logo-row" style={{ display: "flex", flexWrap: "wrap", gap: "26px 48px", alignItems: "center" }}>
-        {MD.logos.map((l) => (
-          <span key={l}>{l}</span>
+    <section id="work" className="sg-wrap" style={{ paddingTop: 96, paddingBottom: 96, scrollMarginTop: 96 }}>
+      <div
+        ref={headRef}
+        className={"mk-reveal" + (headSeen ? " is-in" : "")}
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 32, flexWrap: "wrap", marginBottom: 46 }}
+      >
+        <div className="mk-reveal-l">
+          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>SELECTED WORK · 47 MARKETS</h2>
+          <h3 className="sg-h2" style={{ fontWeight: 700, letterSpacing: "-0.03em", margin: "22px 0 0", lineHeight: 1.06 }}>
+            Proof, in any market.
+          </h3>
+        </div>
+        <p className="mk-reveal-r" style={{ color: C.faint, fontSize: 14, maxWidth: 340, margin: 0 }}>
+          Brands we&apos;ve taken global — and the systems underneath them.
+        </p>
+      </div>
+
+      <div className="sg-work-stack">
+        {WORK.map((item, i) => (
+          <Link
+            key={item.title}
+            href={item.href}
+            prefetch={false}
+            className="sg-work-card"
+            ref={(el) => {
+              cardsRef.current[i] = el;
+            }}
+            style={{ background: item.bg }}
+            onPointerMove={trackCursor}
+            aria-label={`${item.title} — ${item.tags.join(", ")} — ${item.metric}`}
+          >
+            <span className="sg-work-texture" aria-hidden="true" />
+            {/* Kept in the DOM so real case photography drops in behind it. */}
+            <span className="sg-work-shade" aria-hidden="true" />
+            <span className="sg-work-body">
+              <span className="sg-work-n">{String(i + 1).padStart(2, "0")}</span>
+              <span className="sg-work-title">{item.title}</span>
+              <span className="sg-work-meta">
+                {item.tags.map((t) => (
+                  <span key={t} className="sg-work-pill">
+                    {t}
+                  </span>
+                ))}
+                <span className="sg-work-metric">{item.metric}</span>
+              </span>
+            </span>
+            <span className="sg-work-cursor" aria-hidden="true">
+              View →
+            </span>
+          </Link>
         ))}
       </div>
     </section>
@@ -309,10 +437,10 @@ function CTA() {
       </h2>
       <p style={{ color: C.muted, fontSize: 19, lineHeight: 1.55, maxWidth: 520, margin: "26px auto 0" }}>{c.sub}</p>
       <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 38 }}>
-        <button className="sg-btn sg-btn--p">
+        <Link className="sg-btn sg-btn--p" href={MD.ctaHref}>
           {MD.cta}
           <ArrowIcon />
-        </button>
+        </Link>
       </div>
     </section>
   );
@@ -358,7 +486,7 @@ export default function HomeSignal() {
     <div className="sg" ref={root}>
       <Nav />
       <Hero />
-      <Logos />
+      <SelectedWork />
       <Services />
       <Architecture />
       <Interactive />

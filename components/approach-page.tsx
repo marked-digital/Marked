@@ -835,9 +835,9 @@ function GhostModule() {
 function Nav() {
   return (
     <header className="mk-topbar">
-      <div className="sg-wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 84 }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
-          <MarkLogo size={26} color={C.text} accent={C.accent} />
+      <div className="sg-wrap mk-topbar-inner">
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>
+          <MarkLogo size={22} color={C.text} accent={C.accent} />
           <span>
             {MD.brand}
             <span style={{ color: C.accent }}>.</span>
@@ -853,9 +853,9 @@ function Nav() {
             Stack
           </Link>
         </nav>
-        <button className="sg-btn sg-btn--p" style={{ padding: "11px 20px", fontSize: 15 }}>
+        <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
           {MD.cta}
-        </button>
+        </Link>
       </div>
     </header>
   );
@@ -895,10 +895,10 @@ function CTA() {
       </h2>
       <p style={{ color: C.muted, fontSize: 19, lineHeight: 1.55, maxWidth: 520, margin: "26px auto 0" }}>{c.sub}</p>
       <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 38 }}>
-        <button className="sg-btn sg-btn--p">
+        <Link className="sg-btn sg-btn--p" href={MD.ctaHref}>
           {MD.cta}
           <ArrowIcon />
-        </button>
+        </Link>
       </div>
     </section>
   );

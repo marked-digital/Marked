@@ -5,6 +5,9 @@ export const MD = {
   brandFull: "Marked Digital",
   nav: ["Services", "Work", "Approach", "About"],
   cta: "Book a strategy call",
+  // Every "Book a strategy call" button across the site points here — the
+  // booking page, which embeds the Google Calendar appointment scheduler.
+  ctaHref: "/book",
 
   hero: {
     eyebrow: "Global growth, engineered",
@@ -18,8 +21,6 @@ export const MD = {
     { prefix: "$", value: 240, suffix: "M", label: "revenue influenced" },
     { value: 3.8, suffix: "×", decimals: 1, label: "pipeline growth" },
   ],
-
-  logos: ["NORTHWIND", "Lumen", "VELA", "Halcyon", "MERIDIAN", "Kit&Co"],
 
   markets: ["Berlin", "Tokyo", "Dubai", "São Paulo", "London", "Singapore", "Seoul", "Sydney", "Mexico City", "Toronto"],
 
@@ -127,6 +128,52 @@ export const C = {
   accentHover: "#27BE6E",
   accentInk: "#04140C",
 };
+
+// Homepage "Selected work" — the scroll-stacked case-study cards. Placeholder
+// case studies for now: swap title / tags / metric / href for the real ones and
+// the section needs no other change.
+//
+// `bg` is the temporary card artwork — a CSS gradient in the Signal palette
+// standing in for 1920×1080 case photography. When real photos land, replace it
+// with the image (the 0.3 dark shade layer already sits above it in the DOM).
+export type WorkItem = {
+  title: string;
+  tags: string[];
+  metric: string;
+  href: string;
+  bg: string;
+};
+
+export const WORK: WorkItem[] = [
+  {
+    title: "NORTHWIND",
+    tags: ["DACH launch", "Paid media", "Localization"],
+    metric: "+212% ROAS",
+    href: "/work/northwind",
+    bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
+  },
+  {
+    title: "LUMEN",
+    tags: ["UK → APAC", "AI marketing", "CRO"],
+    metric: "3.1× revenue",
+    href: "/work/lumen",
+    bg: "radial-gradient(105% 90% at 82% 12%, rgba(243,245,242,0.07), transparent 55%), linear-gradient(205deg, #10120F 0%, #0A0B0A 78%)",
+  },
+  {
+    title: "VELA",
+    tags: ["LATAM entry", "Storefront build", "Logistics"],
+    metric: "7-week launch",
+    href: "/work/vela",
+    bg: "radial-gradient(120% 100% at 50% 108%, rgba(31,168,95,0.13), transparent 62%), linear-gradient(180deg, #0F110F 0%, #0A0B0A 100%)",
+  },
+  {
+    title: "HALCYON",
+    tags: ["MENA", "Lifecycle & retention", "Paid + organic"],
+    metric: "+168% AOV",
+    href: "/work/halcyon",
+    bg: "radial-gradient(90% 120% at 78% 82%, rgba(39,190,110,0.2), transparent 60%), radial-gradient(80% 70% at 12% 0%, rgba(31,168,95,0.1), transparent 60%), linear-gradient(150deg, #141614 0%, #0A0B0A 70%)",
+  },
+];
 
 // The Stack page data — ported from stack-page.jsx.
 export const STACK_CATS = [
