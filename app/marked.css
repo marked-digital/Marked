@@ -450,6 +450,17 @@
   font-size: clamp(32px, 5vw, 82px);
   line-height: 1;
 }
+/* Sector eyebrow under the title — deliberately small so it reads as a label
+   on the name above, not a second headline. */
+.sg-work-industry {
+  display: block;
+  margin-top: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #27be6e;
+}
 .sg-work-meta {
   display: flex;
   flex-wrap: wrap;
@@ -498,10 +509,10 @@
     padding: 9px 16px;
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    border: 1px solid rgba(31, 168, 95, 0.55);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    color: #f3f5f2;
+    color: #27be6e;
     font-size: 12.5px;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -693,10 +704,108 @@
   color: #04140c;
   border-color: #1fa85f;
 }
+/* Category filter. Pins below the topbar (.mk-topbar-inner, 64px at every
+   breakpoint) rather than at 0, where the topbar's higher z-index used to
+   cover its first row. All 18 chips wrapped is ~4 rows of viewport, so once
+   the bar is actually stuck it drops to a single scrolling row; the toggle
+   restores the full set without scrolling back to the top. */
+.stk-filter {
+  position: sticky;
+  top: 64px;
+  z-index: 20;
+  /* Near-opaque rather than glassy. The blur below is dropped by some engines
+     (and the @supports fallback can't catch it, since the property still
+     reports as supported), and expanded the bar sits over four rows of tiles
+     where bleed-through reads as a rendering fault, not as depth. */
+  background: rgba(10, 11, 10, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.085);
+}
+.stk-filter-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  transition: padding 0.28s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.stk-filter-rail {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.stk-filter.is-collapsed .stk-filter-inner {
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+/* One row, swipe/trackpad scrollable — every category stays reachable
+   collapsed, so the toggle is a convenience rather than the only way back. */
+.stk-filter.is-collapsed .stk-filter-rail {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Fade the cut-off chip at the rail's edge so the row reads as scrollable
+     rather than as a chip clipped by the toggle. */
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 34px), transparent);
+}
+.stk-filter.is-collapsed .stk-filter-rail::-webkit-scrollbar {
+  display: none;
+}
+.stk-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  background: rgba(255, 255, 255, 0.03);
+  color: #8e948c;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.stk-filter-toggle:hover {
+  color: #f3f5f2;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.stk-filter-toggle svg {
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.stk-filter.is-collapsed .stk-filter-toggle svg {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stk-filter-inner,
+  .stk-filter-toggle svg {
+    transition: none;
+  }
+}
 .stk-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+}
+/* Selection / untangling notes under the grid. */
+.stk-note-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 44px;
+}
+@media (max-width: 900px) {
+  .stk-note-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
 }
 .stk-tile {
   position: relative;
@@ -1830,6 +1939,11 @@
   }
   .sg-work-title--long {
     font-size: clamp(24px, 7.4vw, 42px);
+  }
+  .sg-work-industry {
+    margin-top: 11px;
+    font-size: 11px;
+    letter-spacing: 0.13em;
   }
   .sg-work-meta {
     margin-top: 20px;

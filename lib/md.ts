@@ -12,14 +12,14 @@ export const MD = {
   hero: {
     eyebrow: "Global growth, engineered",
     h1: ["Make your mark", "in any market."],
-    sub: "Marked Digital is the growth partner for e-commerce brands going global — international expansion, AI-run advertising, and conversion-built sites, operated as one compounding system.",
+    sub: "Marked Digital is the growth partner for e-commerce brands going global. International expansion, AI-run advertising, and conversion-built sites, operated as one compounding system.",
   },
 
   metrics: [
-    { prefix: "+", value: 312, suffix: "%", label: "avg. ROAS lift" },
+    { prefix: "+", value: 412, suffix: "%", label: "avg. ROAS lift" },
     { value: 47, suffix: "", label: "markets launched" },
-    { prefix: "$", value: 240, suffix: "M", label: "revenue influenced" },
-    { value: 3.8, suffix: "×", decimals: 1, label: "pipeline growth" },
+    { prefix: "$", value: 1.4, suffix: "B", decimals: 1, label: "revenue generated" },
+    { value: 13, suffix: "", label: "years in ecommerce industry" },
   ],
 
   markets: ["Berlin", "Tokyo", "Dubai", "São Paulo", "London", "Singapore", "Seoul", "Sydney", "Mexico City", "Toronto"],
@@ -42,7 +42,7 @@ export const MD = {
       n: "01",
       title: "International Ecommerce Expansion",
       tag: "Sell everywhere your customers already are.",
-      desc: "We take proven brands into new markets — the strategy, storefronts, payments and logistics — so launching in Berlin or Bogotá feels as native as your home market.",
+      desc: "We take proven brands into new markets, handling the strategy, storefronts, payments and logistics, so launching in Berlin or Bogotá feels as native as your home market.",
       bullets: ["Market prioritization & sizing", "Localized storefronts & checkout", "Cross-border logistics & tax", "Local paid + organic launch"],
       stat: ["47", "markets launched"],
     },
@@ -51,16 +51,16 @@ export const MD = {
       n: "02",
       title: "Digital Advertising & Paid Media",
       tag: "Performance media that compounds.",
-      desc: "Full-funnel paid across Meta, Google, TikTok, Amazon and retail media — engineered around incrementality, not vanity metrics, with creative tested at scale.",
+      desc: "Full-funnel paid across Meta, Google, TikTok, Amazon and retail media, engineered around incrementality, not vanity metrics, with creative tested at scale.",
       bullets: ["Full-funnel paid strategy", "Creative testing at scale", "Bidding & budget automation", "Incrementality measurement"],
-      stat: ["+312%", "avg. ROAS lift"],
+      stat: ["+412%", "avg. ROAS lift"],
     },
     {
       key: "ai",
       n: "03",
       title: "AI Marketing Systems",
       tag: "Put AI to work across the funnel.",
-      desc: "We build the AI layer for your marketing org — creative pipelines, predictive audiences, and agents that run the busywork so your team compounds output, not headcount.",
+      desc: "We build the AI layer for your marketing org: creative pipelines, predictive audiences, and agents that run the busywork so your team compounds output, not headcount.",
       bullets: ["AI creative pipelines", "Predictive audience models", "Workflow & agent automation", "LLM-powered personalization"],
       stat: ["9×", "creative throughput"],
     },
@@ -69,7 +69,7 @@ export const MD = {
       n: "04",
       title: "Website Development",
       tag: "Sites built to convert and scale.",
-      desc: "Headless, composable commerce builds that load instantly and convert — engineered with CRO baked in from the first wireframe to the last A/B test.",
+      desc: "Headless, composable commerce builds that load instantly and convert, engineered with CRO baked in from the first wireframe to the last A/B test.",
       bullets: ["Headless / composable builds", "Core Web Vitals & speed", "Conversion-rate optimization", "Design systems & CMS"],
       stat: ["0.9s", "median load time"],
     },
@@ -78,14 +78,14 @@ export const MD = {
       n: "05",
       title: "SEO & Content",
       tag: "Own the demand before it searches.",
-      desc: "Technical, international and programmatic SEO paired with a content engine that earns authority — so you capture intent in every language you sell in.",
+      desc: "Technical, international and programmatic SEO paired with a content engine that earns authority, so you capture intent in every language you sell in.",
       bullets: ["Technical & international SEO", "Programmatic content engines", "Editorial & thought leadership", "Digital PR & link building"],
       stat: ["6.4×", "organic traffic"],
     },
   ],
 
   approach: [
-    { n: "01", title: "Diagnose", body: "We audit your funnel, markets and data to find where growth is leaking — and where it could compound." },
+    { n: "01", title: "Diagnose", body: "We audit your funnel, markets and data to find where growth is leaking, and where it could compound." },
     { n: "02", title: "Engineer", body: "We build media, AI, site and content as one connected system, instrumented end-to-end." },
     { n: "03", title: "Compound", body: "We optimize relentlessly, reinvesting every win so performance accelerates quarter over quarter." },
   ],
@@ -93,7 +93,7 @@ export const MD = {
   ctaBand: {
     kicker: "Let's talk",
     title: ["Ready to put a mark", "on your market?"],
-    sub: "Book a 30-minute strategy call. We'll map the fastest path to your next market — no decks, no fluff.",
+    sub: "Book a 30-minute strategy call. We'll map the fastest path to your next market. No decks, no fluff.",
   },
 
   footer: {
@@ -139,6 +139,8 @@ export const C = {
 // with the image (the 0.3 dark shade layer already sits above it in the DOM).
 export type WorkItem = {
   title: string;
+  // The client's sector, set as a small accent eyebrow under the card title.
+  industry: string;
   tags: string[];
   metric: string;
   href: string;
@@ -150,6 +152,7 @@ export const WORK: WorkItem[] = [
     // Real engagement — the badges mirror the case study's hero: the market
     // motion from its H1, the SERVICES line, and the headline YoY revenue stat.
     title: "ONTARIO EDUCATION ONLINE",
+    industry: "Online Educational Services",
     tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
     metric: "+738% revenue",
     href: "/work/ontario-education-online",
@@ -157,6 +160,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: "LUMEN",
+    industry: "Beauty & Personal Care",
     tags: ["UK → APAC", "AI marketing", "CRO"],
     metric: "3.1× revenue",
     href: "/work/lumen",
@@ -164,6 +168,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: "VELA",
+    industry: "Outdoor & Apparel",
     tags: ["LATAM entry", "Storefront build", "Logistics"],
     metric: "7-week launch",
     href: "/work/vela",
@@ -171,6 +176,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: "HALCYON",
+    industry: "Home & Lifestyle",
     tags: ["MENA", "Lifecycle & retention", "Paid + organic"],
     metric: "+168% AOV",
     href: "/work/halcyon",
