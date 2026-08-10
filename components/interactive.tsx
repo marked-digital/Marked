@@ -165,7 +165,7 @@ export function ExpansionPlanner() {
         <Heading
           kicker="Expansion planner"
           title="Map your next market."
-          sub="Select the markets you're eyeing. We size the first-year opportunity and the path in — instantly."
+          sub="Select the markets you're eyeing. We size the first-year opportunity and the path in, instantly."
         />
       </div>
       <div className="mk-reveal-r">

@@ -198,7 +198,7 @@ function SelectedWork() {
           </h3>
         </div>
         <p className="mk-reveal-r" style={{ color: C.faint, fontSize: 14, maxWidth: 340, margin: 0 }}>
-          Brands we&apos;ve taken global — and the systems underneath them.
+          Growth engineered through expansion, paid media, web builds, and marketing systems.
         </p>
       </div>
 
@@ -214,7 +214,7 @@ function SelectedWork() {
             }}
             style={{ background: item.bg }}
             onPointerMove={trackCursor}
-            aria-label={`${item.title} — ${item.tags.join(", ")} — ${item.metric}`}
+            aria-label={`${item.title}. ${item.industry}. ${item.tags.join(", ")}. ${item.metric}`}
           >
             <span className="sg-work-texture" aria-hidden="true" />
             {/* Kept in the DOM so real case photography drops in behind it. */}
@@ -225,6 +225,7 @@ function SelectedWork() {
                   name set at that scale wraps to three lines and swallows the
                   card, so long titles step down a size. */}
               <span className={"sg-work-title" + (item.title.length > 12 ? " sg-work-title--long" : "")}>{item.title}</span>
+              <span className="sg-work-industry">{item.industry}</span>
               <span className="sg-work-meta">
                 {item.tags.map((t) => (
                   <span key={t} className="sg-work-pill">
@@ -342,7 +343,7 @@ function Architecture() {
             to scale your operations.
           </h3>
           <p style={{ color: C.muted, fontSize: 17.5, lineHeight: 1.6, marginTop: 22, maxWidth: 460 }}>
-            We architect the systems underneath your growth — wiring {STACK_TOOLS.length} best-in-class platforms across {STACK_CATS.length} categories into
+            We architect the systems underneath your growth, wiring {STACK_TOOLS.length} best-in-class platforms across {STACK_CATS.length} categories into
             one connected stack, then tune it as you scale so adding markets, channels, and volume never means rebuilding from scratch.
           </p>
           <div style={{ display: "flex", gap: 36, marginTop: 36, flexWrap: "wrap" }}>
@@ -385,7 +386,7 @@ function Architecture() {
               </svg>
               <span>Embedded in your workflow</span>
             </div>
-            <p>{EMBED_LEAD}. We plug into whatever you already run — and operate it like part of your team.</p>
+            <p>{EMBED_LEAD}. We plug into whatever you already run, and operate it like part of your team.</p>
           </div>
         </div>
       </div>
@@ -412,7 +413,7 @@ function Approach() {
     <section style={{ background: C.panel, borderTop: `1px solid ${C.line}`, borderBottom: `1px solid ${C.line}` }}>
       <div ref={ref} className={"sg-wrap mk-reveal" + (seen ? " is-in" : "")} style={{ paddingTop: 92, paddingBottom: 92 }}>
         <h2 className="sg-h2 mk-reveal-l" style={{ fontWeight: 600, letterSpacing: "-0.03em", margin: 0, maxWidth: 620 }}>
-          A system that compounds — not a campaign that ends.
+          A system that compounds, not a campaign that ends.
         </h2>
         <div className="sg-approach-grid mk-reveal-r" style={{ marginTop: 64 }}>
           {MD.approach.map((a) => (

@@ -6,9 +6,13 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, ToolLogo, hexToRgba } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
 
 type Tool = (typeof STACK_TOOLS)[number];
+
+// Height of .mk-topbar-inner — the filter bar pins directly under it, and the
+// sentinel has to clear the same distance to know when the bar went sticky.
+const TOPBAR_H = 64;
 
 function Tile({ t, i }: { t: Tool; i: number }) {
   return (
@@ -90,6 +94,88 @@ function Nav() {
   );
 }
 
+// The sticky category filter. Expanded (all chips wrapped) while the hero is
+// still on screen; collapsed to one scrolling row once the bar pins, so it
+// costs ~56px of viewport instead of ~230px on the way down the page.
+function FilterBar({ filter, setFilter }: { filter: string; setFilter: (c: string) => void }) {
+  const [stuck, setStuck] = React.useState(false);
+  const [open, setOpen] = React.useState(false); // manual override while stuck
+  const barRef = React.useRef<HTMLDivElement | null>(null);
+  const railRef = React.useRef<HTMLDivElement | null>(null);
+
+  // The bar is pinned exactly when its own top has reached the sticky offset,
+  // so measure that directly. An IntersectionObserver on a marker above the bar
+  // is the usual trick, but a zero-height target gives the observer an empty
+  // rect and it stops reporting crossings, which leaves the bar stuck open.
+  React.useEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const pinned = el.getBoundingClientRect().top <= TOPBAR_H + 0.5;
+      setStuck(pinned);
+      if (!pinned) setOpen(false); // back at the top: forget the override
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const collapsed = stuck && !open;
+
+  // Collapsing hides everything past the first row, so pull the selected chip
+  // into view rather than leaving it somewhere off to the right. The chip is
+  // looked up by attribute rather than held in a ref — one ref shared across
+  // chips lands on whichever element React attaches last, which is not
+  // reliably the selected one. Instant, not smooth: picking a category also
+  // reflows the page, and that cancels an in-flight smooth scroll.
+  React.useEffect(() => {
+    const rail = railRef.current;
+    if (!collapsed || !rail) return;
+    const chip = rail.querySelector<HTMLElement>(`[data-cat="${CSS.escape(filter)}"]`);
+    if (!chip) return;
+    const left = rail.scrollLeft + chip.getBoundingClientRect().left - rail.getBoundingClientRect().left;
+    rail.scrollTo({ left: Math.max(0, left - (rail.clientWidth - chip.offsetWidth) / 2), behavior: "auto" });
+  }, [collapsed, filter]);
+
+  return (
+    <div ref={barRef} className={"stk-filter" + (collapsed ? " is-collapsed" : "")}>
+      <div className="stk-wrap stk-filter-inner">
+        <div ref={railRef} className="stk-filter-rail">
+          {["All", ...STACK_CATS].map((c) => (
+            <button
+              key={c}
+              data-cat={c}
+              className={"stk-chip" + (filter === c ? " on" : "")}
+              onClick={() => setFilter(c)}
+              aria-pressed={filter === c}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        {stuck && (
+          <button className="stk-filter-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={!collapsed}>
+            {collapsed ? "All filters" : "Collapse"}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 15l6-6 6 6" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function StackPage() {
   const [filter, setFilter] = React.useState("All");
   const shown = filter === "All" ? STACK_CATS : [filter];
@@ -111,60 +197,76 @@ export default function StackPage() {
           }}
         >
           <span style={{ width: 7, height: 7, borderRadius: 9, background: C.accent }}></span>
-          <span style={{ color: C.muted, fontSize: 13.5, fontWeight: 500 }}>The stack behind the growth</span>
+          <span style={{ color: C.muted, fontSize: 13.5, fontWeight: 500 }}>Platforms we work in every day</span>
         </div>
         <h1 className="stk-disp stk-h1" style={{ lineHeight: 0.98, fontWeight: 700, margin: 0, maxWidth: 900 }}>
-          Best-in-class tools,
+          The right stack,
           <br />
-          <span style={{ color: C.muted }}>wired into one system.</span>
+          <span style={{ color: C.muted }}>not the biggest one.</span>
         </h1>
-        <p style={{ color: C.muted, fontSize: 20, lineHeight: 1.55, maxWidth: 600, marginTop: 30 }}>
-          We don&apos;t reinvent the wheel — we orchestrate the best platforms in commerce, cloud, AI, and analytics so your growth runs on proven
-          infrastructure.
+        <p style={{ color: C.muted, fontSize: 20, lineHeight: 1.55, maxWidth: 640, marginTop: 30 }}>
+          These are the platforms we have hands-on, in-production experience with. The work isn&apos;t running all of them. It&apos;s identifying the
+          short list of best-in-class tools that actually fit your business requirements, and cutting the ones that don&apos;t earn their place.
         </p>
         <div style={{ display: "flex", gap: 40, marginTop: 44, flexWrap: "wrap" }}>
           <div>
             <div className="stk-disp" style={{ fontSize: 44, fontWeight: 700, color: C.accent }}>
               <CountUp value={STACK_TOOLS.length} />
             </div>
-            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>platforms</div>
+            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>platforms we know</div>
           </div>
           <div style={{ borderLeft: `1px solid ${C.line}`, paddingLeft: 40 }}>
             <div className="stk-disp" style={{ fontSize: 44, fontWeight: 700 }}>
               <CountUp value={STACK_CATS.length} />
             </div>
-            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>categories</div>
+            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>categories covered</div>
           </div>
           <div style={{ borderLeft: `1px solid ${C.line}`, paddingLeft: 40 }}>
             <div className="stk-disp" style={{ fontSize: 44, fontWeight: 700 }}>
               <CountUp value={1} />
-              <span style={{ fontSize: 44, fontWeight: 700 }}> system</span>
+              <span style={{ fontSize: 44, fontWeight: 700 }}> stack</span>
             </div>
-            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>connected end-to-end</div>
+            <div style={{ color: C.muted, fontSize: 14, marginTop: 4 }}>scoped to your requirements</div>
           </div>
         </div>
       </header>
       {/* filter bar */}
-      <div style={{ position: "sticky", top: 0, zIndex: 20, background: hexToRgba("#0A0B0A", 0.82), backdropFilter: "blur(12px)", borderBottom: `1px solid ${C.line}` }}>
-        <div className="stk-wrap" style={{ display: "flex", gap: 10, paddingTop: 16, paddingBottom: 16, flexWrap: "wrap" }}>
-          {["All", ...STACK_CATS].map((c) => (
-            <button key={c} className={"stk-chip" + (filter === c ? " on" : "")} onClick={() => setFilter(c)}>
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
+      <FilterBar filter={filter} setFilter={setFilter} />
       {/* sections */}
       <main className="stk-wrap" style={{ paddingTop: 56, paddingBottom: 40 }}>
         {shown.map((cat) => (
           <Section key={cat} cat={cat} />
         ))}
       </main>
+      {/* how the stack gets chosen — selection first, then the legacy cleanup
+          that usually has to happen before any of it can scale */}
+      <section className="stk-wrap" style={{ paddingTop: 30, paddingBottom: 20 }}>
+        <div className="stk-note-grid">
+          <div>
+            <div style={{ fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: C.accent, fontWeight: 600 }}>Selection</div>
+            <h2 className="stk-disp" style={{ fontSize: 26, fontWeight: 700, margin: "14px 0 0" }}>Fit before feature count.</h2>
+            <p style={{ color: C.muted, fontSize: 16.5, lineHeight: 1.6, marginTop: 12 }}>
+              Every category above has three or four credible options, and the right one depends entirely on your catalog, margins, markets, and team.
+              We start from your business requirements and work back to the shortest list of tools that meets them. Fewer platforms, each one
+              genuinely earning its licence.
+            </p>
+          </div>
+          <div>
+            <div style={{ fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: C.accent, fontWeight: 600 }}>Untangling</div>
+            <h2 className="stk-disp" style={{ fontSize: 26, fontWeight: 700, margin: "14px 0 0" }}>Most stacks arrive inherited.</h2>
+            <p style={{ color: C.muted, fontSize: 16.5, lineHeight: 1.6, marginTop: 12 }}>
+              Overlapping subscriptions, half-finished migrations, integrations nobody owns. We&apos;ve spent years unpicking legacy setups and
+              rebuilding the operational systems underneath them, so the stack you keep is one that scales with volume, markets, and headcount
+              instead of fighting all three.
+            </p>
+          </div>
+        </div>
+      </section>
       {/* cta */}
       <section className="stk-wrap" style={{ paddingTop: 50, paddingBottom: 100, textAlign: "center", borderTop: `1px solid ${C.line}` }}>
-        <h2 className="stk-disp" style={{ fontSize: 40, fontWeight: 700, margin: "60px 0 0", letterSpacing: "-0.03em" }}>Want this stack working for you?</h2>
-        <p style={{ color: C.muted, fontSize: 18, marginTop: 16, maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
-          We&apos;ll architect, integrate, and run the whole system — so you don&apos;t have to.
+        <h2 className="stk-disp" style={{ fontSize: 40, fontWeight: 700, margin: "60px 0 0", letterSpacing: "-0.03em" }}>Not sure what belongs in yours?</h2>
+        <p style={{ color: C.muted, fontSize: 18, marginTop: 16, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+          We&apos;ll audit what you&apos;re running today, map it against what you actually need, and build the stack that gets you there.
         </p>
         <div style={{ display: "flex", justifyContent: "center", marginTop: 30 }}>
           <Link className="stk-btn" href={MD.ctaHref} style={{ fontSize: 16, padding: "15px 26px" }}>
