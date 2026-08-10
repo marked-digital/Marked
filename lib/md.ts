@@ -100,7 +100,18 @@ export const MD = {
     cols: [
       { h: "Services", items: ["International expansion", "Paid media", "AI systems", "Web development", "SEO & content"] },
       { h: "Company", items: ["Work", "Approach", "About", "Careers", "Contact"] },
-      { h: "Connect", items: ["LinkedIn", "Instagram", "X / Twitter", "Newsletter"] },
+      // Footer items are plain labels until they have somewhere real to go —
+      // give one an href and it renders as a live link (external ones open in
+      // a new tab). See the Footer in home-signal.tsx.
+      {
+        h: "Connect",
+        items: [
+          { label: "LinkedIn", href: "https://www.linkedin.com/company/markeddigital/" },
+          { label: "Instagram", href: "https://www.instagram.com/marked__digital/" },
+          "X / Twitter",
+          "Newsletter",
+        ],
+      },
     ],
     address: "Toronto · London · Singapore",
   },

@@ -216,6 +216,16 @@
 .sg-svc:hover {
   padding-left: 10px;
 }
+/* Hover glow — the title lifts to full white with a soft halo, the index
+   picks up an accent-tinted glow. Subtle enough to read as light, not blur. */
+.sg-svc:hover .sg-svc-t {
+  color: #f3f5f2;
+  text-shadow: 0 0 16px rgba(243, 245, 242, 0.3), 0 0 40px rgba(31, 168, 95, 0.18);
+}
+.sg-svc:hover .sg-svc-n {
+  color: #1fa85f;
+  text-shadow: 0 0 14px rgba(31, 168, 95, 0.45);
+}
 /* Scroll-triggered slide-in for the "What we do" category list.
    Each row starts shifted left + faded, then eases into place when the
    list enters the viewport (staggered via inline transition-delay).
@@ -270,7 +280,7 @@
 .sg-svc-t {
   font-size: 22px;
   letter-spacing: -0.02em;
-  transition: color 0.25s;
+  transition: color 0.25s, text-shadow 0.25s;
   color: #5c625b;
 }
 /* Keep each category on a single line on desktop — the hover padding-left
@@ -291,7 +301,7 @@
   color: #5c625b;
   width: 28px;
   flex: none;
-  transition: color 0.25s;
+  transition: color 0.25s, text-shadow 0.25s;
 }
 .sg-detail {
   opacity: 1;
