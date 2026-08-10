@@ -2,8 +2,13 @@
 //
 // REAL, client-provided. Do not reword without sign-off:
 //   · the four objective titles (OBJECTIVES[].title)
-//   · the four year-over-year results (RESULTS): revenue +738%, orders +880%,
+//   · the four year-over-year results (RESULTS): revenue +548%, orders +618%,
 //     sessions +1,400%, qualified leads +713%
+//
+// The reporting window for every YoY figure is Jan — Jul 2026 vs. the same
+// months in 2025. Revenue (+548%) is the single headline number and must read
+// the same in the hero, the results grid, the revenue chart and the homepage
+// work slider (lib/md.ts → WORK[0].metric).
 //
 // PLACEHOLDER. Everything else numeric on the page lives in this file and is
 // marked below — the revenue series, the market/channel splits, the platform
@@ -61,7 +66,7 @@ export const OEO = {
   sub: "Ontario Education Online launched its first digital marketing program with Marked — and went from provincial course provider to international brand in seven months.",
 
   // REAL — the headline number, repeated as the first cell of RESULTS.
-  headlineStat: { value: 738, prefix: "+", suffix: "%", label: ["REVENUE", "YEAR OVER YEAR"] },
+  headlineStat: { value: 548, prefix: "+", suffix: "%", label: ["REVENUE", "YEAR OVER YEAR"] },
 
   objectives: [
     {
@@ -92,23 +97,26 @@ export const OEO = {
 
   // REAL — all four figures are client-reported, year over year.
   results: [
-    { label: "REVENUE", value: 738, prefix: "+", suffix: "%", sub: "Year over year, all markets", lead: true },
-    { label: "ORDERS", value: 880, prefix: "+", suffix: "%", sub: "Course enrolments, year over year" },
+    { label: "REVENUE", value: 548, prefix: "+", suffix: "%", sub: "Jan — Jul 2026 vs. 2025, all markets", lead: true },
+    { label: "ORDERS", value: 618, prefix: "+", suffix: "%", sub: "Course enrolments, Jan — Jul 2026 vs. 2025" },
     // Same figure as +1,400%, abbreviated: the full form overflowed its cell.
     { label: "SESSIONS", value: 1.4, prefix: "+", suffix: "K%", decimals: 1, sub: "Sitewide traffic, year over year" },
     { label: "QUALIFIED LEADS", value: 713, prefix: "+", suffix: "%", sub: "Marketing-qualified, year over year" },
   ] satisfies Result[],
 
   revenue: {
-    // REAL — +538% between Jan 2026 and Jul 2026, the engagement to date.
-    growthPct: 538,
-    title: "Revenue up 538% in seven months.",
-    body: "January 2026: first paid campaigns live, course pages rebuilt, AI-run optimization switched on. Monthly revenue ran at 6.4× its pre-engagement baseline by July.",
+    // REAL — +548% between Jan 2026 and Jul 2026, the engagement to date. Same
+    // number as the headline stat and RESULTS[0]; the chart must not tell a
+    // different story from the grid above it.
+    growthPct: 548,
+    title: "Revenue up 548% in seven months.",
+    body: "January 2026: first paid campaigns live, course pages rebuilt, AI-run optimization switched on. Monthly revenue ran at 6.5× its pre-engagement baseline by July.",
     rangeLabel: "JUL 2025 — JUL 2026",
     // Indexed, not absolute — 100 is the monthly run rate at engagement start
     // (Jan 2026, index 6). Everything before it is the flat baseline. The final
-    // point is 638, i.e. +538%. To publish real figures, keep them indexed:
-    // divide each month by the Jan 2026 month and multiply by 100.
+    // point is 648, i.e. +548% — it must stay equal to `growthPct` + 100. To
+    // publish real figures, keep them indexed: divide each month by the
+    // Jan 2026 month and multiply by 100.
     indexBase: 100,
     engagementIndex: 6,
     gridlines: [200, 400, 600],
@@ -123,9 +131,9 @@ export const OEO = {
       { month: "FEB '26", value: 128 },
       { month: "MAR '26", value: 172 },
       { month: "APR '26", value: 244 },
-      { month: "MAY '26", value: 350 },
-      { month: "JUN '26", value: 470 },
-      { month: "JUL '26", value: 638 },
+      { month: "MAY '26", value: 352 },
+      { month: "JUN '26", value: 476 },
+      { month: "JUL '26", value: 648 },
     ] satisfies RevenuePoint[],
   },
 

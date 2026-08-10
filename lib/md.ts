@@ -154,7 +154,8 @@ export const WORK: WorkItem[] = [
     title: "ONTARIO EDUCATION ONLINE",
     industry: "Online Educational Services",
     tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
-    metric: "+738% revenue",
+    // Must match OEO.headlineStat / OEO.results[0] in lib/oeo.ts.
+    metric: "+548% revenue",
     href: "/work/ontario-education-online",
     bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
   },
