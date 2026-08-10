@@ -153,8 +153,19 @@ export function ExpansionPlanner() {
   const chosen = data.filter((_, i) => sel.has(i));
   const totalOppRaw = chosen.reduce((a, m) => a + m.opp, 0);
   const totalOpp = totalOppRaw * 1e6;
-  const avgWeeks = chosen.length ? Math.round(chosen.reduce((a, m) => a + m.weeks, 0) / chosen.length) : 0;
   const regions = new Set(chosen.map((m) => m.region)).size;
+  // Two honest timings instead of one average. An average of the per-market
+  // weeks barely moves as markets are added (every value sits in a 5-9 band),
+  // so three markets and all nine both read ~7 weeks.
+  //   first live  — the soonest market goes live: the fastest one selected.
+  //   rollout     — markets inside a region launch in parallel, since they
+  //                 share the tax, payments, and 3PL groundwork, so a region
+  //                 costs its slowest market. Each new region adds its own
+  //                 lift on top, which is where the time actually goes.
+  const firstLive = chosen.length ? Math.min(...chosen.map((m) => m.weeks)) : 0;
+  const byRegion = new Map<string, number>();
+  chosen.forEach((m) => byRegion.set(m.region, Math.max(byRegion.get(m.region) ?? 0, m.weeks)));
+  const rolloutWeeks = [...byRegion.values()].reduce((a, b) => a + b, 0);
   const oppShown = useCountTo(totalOpp);
   const sorted = [...chosen].sort((a, b) => b.opp - a.opp);
 
@@ -181,6 +192,7 @@ export function ExpansionPlanner() {
                 <button
                   key={m.country}
                   onClick={() => toggle(i)}
+                  aria-pressed={on}
                   className="sg-chip"
                   style={{
                     textAlign: "left",
@@ -229,10 +241,11 @@ export function ExpansionPlanner() {
             )}
           </div>
           <div style={{ color: C.faint, fontSize: 12.5, marginBottom: 24 }}>Opportunity weighting by market</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             <StatTile value={sel.size} label="markets" />
-            <StatTile value={avgWeeks ? avgWeeks + " wks" : "—"} label="avg. launch" />
             <StatTile value={regions} label="regions" />
+            <StatTile value={firstLive ? firstLive + " wks" : "—"} label="first market live" />
+            <StatTile value={rolloutWeeks ? rolloutWeeks + " wks" : "—"} label="to full rollout" />
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 22 }}>
             {["Localized storefronts", "Local paid media", "Cross-border logistics"].map((t) => (

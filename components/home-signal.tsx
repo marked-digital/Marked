@@ -338,26 +338,31 @@ function Architecture() {
         <div>
           <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>ARCHITECTURE</h2>
           <h3 className="sg-h2" style={{ fontWeight: 700, letterSpacing: "-0.03em", margin: "22px 0 0", lineHeight: 1.06 }}>
-            Built and optimized
+            The right stack,
             <br />
-            to scale your operations.
+            not the biggest one.
           </h3>
           <p style={{ color: C.muted, fontSize: 17.5, lineHeight: 1.6, marginTop: 22, maxWidth: 460 }}>
-            We architect the systems underneath your growth, wiring {STACK_TOOLS.length} best-in-class platforms across {STACK_CATS.length} categories into
-            one connected stack, then tune it as you scale so adding markets, channels, and volume never means rebuilding from scratch.
+            Every category has three or four credible options, and the right one depends entirely on your catalog, margins, markets, and team. We have
+            hands-on experience with {STACK_TOOLS.length} platforms across {STACK_CATS.length} categories. The work isn&apos;t running all of them &mdash;
+            it&apos;s cutting back to the short list that fits your requirements.
+          </p>
+          <p style={{ color: C.muted, fontSize: 17.5, lineHeight: 1.6, marginTop: 18, maxWidth: 460 }}>
+            Most stacks arrive inherited: overlapping subscriptions, half-finished migrations, integrations nobody owns. We unpick that and rebuild the
+            operational systems underneath, so what you keep scales with volume, markets, and headcount instead of fighting all three.
           </p>
           <div style={{ display: "flex", gap: 36, marginTop: 36, flexWrap: "wrap" }}>
             <div>
               <div style={{ fontSize: 34, fontWeight: 700, color: C.accent, letterSpacing: "-0.03em" }}>
                 <CountUp value={STACK_TOOLS.length} />
               </div>
-              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>platforms integrated</div>
+              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>platforms we know</div>
             </div>
             <div style={{ borderLeft: `1px solid ${C.line}`, paddingLeft: 36 }}>
               <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.03em" }}>
                 <CountUp value={1} />
               </div>
-              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>system, wired end-to-end</div>
+              <div style={{ color: C.muted, fontSize: 13.5, marginTop: 4 }}>stack, scoped to your requirements</div>
             </div>
           </div>
           <Link className="sg-navlink" href="/stack" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 34, color: C.text, fontSize: 15, fontWeight: 600 }}>
@@ -468,11 +473,22 @@ function Footer() {
         {f.cols.map((col) => (
           <div key={col.h}>
             <div style={{ fontSize: 13, color: C.faint, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 16 }}>{col.h}</div>
-            {col.items.map((it) => (
-              <a key={it} className="sg-navlink" href="#" style={{ display: "block", marginBottom: 11 }}>
-                {it}
-              </a>
-            ))}
+            {col.items.map((it) => {
+              const label = typeof it === "string" ? it : it.label;
+              const href = typeof it === "string" ? "#" : it.href;
+              const external = href.startsWith("http");
+              return (
+                <a
+                  key={label}
+                  className="sg-navlink"
+                  href={href}
+                  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  style={{ display: "block", marginBottom: 11 }}
+                >
+                  {label}
+                </a>
+              );
+            })}
           </div>
         ))}
       </div>
