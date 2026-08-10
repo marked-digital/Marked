@@ -1,89 +1,125 @@
 "use client";
 
-// Marked Digital — "The Approach" interactive blueprint.
+// Marked Digital — "The Approach" drawing set.
 //
-// One shared SVG coordinate space (1000 × 720) onto which a growth system is
-// *assembled by the visitor* across five scroll stages. Each stage draws a new
-// layer on top of the last, and the choices carry forward: requirement chips
-// stamp footings → footings raise the frame → the frame hosts the platform
-// nodes you wire → the wired system carries load you apply → the finished
-// module replicates across markets. Earlier layers persist (dimmed); the active
-// one is bright and interactive.
+// One shared SVG sheet (1000 × 720) onto which a growth system draws itself
+// across five pinned scroll stages: footings → frame → wiring → load test →
+// replication. Earlier layers persist (dimmed); the active one is bright.
 //
-// Same brand system as the rest of the site — deep emerald #1FA85F as the only
-// warm/"alive" colour, Plus Jakarta Sans, dark Signal canvas. No new deps: the
-// scroll choreography rides the site's existing Lenis smooth scroll via plain
-// scroll math, the same hand-rolled approach used elsewhere in the repo.
+// Scroll position is the only input. Nothing here is clicked, dragged, toggled
+// or "completed" by the visitor — the drawing is a drawing, not a toy.
+//
+// How the motion works: the scroll listener writes one custom property per
+// stage onto the page root (--s0…--s4, each ramping 0→1 as that stage passes),
+// and every stroke on the sheet derives its own draw-in from those via CSS
+// calc(). React re-renders only when the *integer* stage changes — for the
+// copy, the rail and the sheet number — so the whole sheet animates without a
+// single per-frame React render.
+//
+// Same brand system as the rest of the site: deep emerald #1FA85F as the only
+// warm/"alive" colour, Plus Jakarta Sans, dark Signal canvas, no new deps.
 
 import React from "react";
 import Link from "next/link";
+import { useLenis } from "lenis/react";
 import { MD, C, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
-import { ArrowIcon, MarkLogo, useCountTo, money } from "@/components/shared";
+import { ArrowIcon, MarkLogo } from "@/components/shared";
 
 /* ------------------------------------------------------------------ copy
-   Final, verbatim from the build brief. Single source of truth. */
+   Single source of truth for the five sheets. `spec` is the small drafting
+   readout under each stage's outputs — a fixed schedule of values, not a
+   control panel. */
 const STAGES = [
   {
     eyebrow: "Fig.01 · Foundation",
     heading: "Setting the foundations",
-    body: "We identify the right architecture, platforms and systems to scale your e-commerce operations — mapped to your specific requirements, never a template dropped on top of your business.",
-    outputs: ["Architecture & platform selection", "Requirements & constraints mapped", "Data & measurement groundwork"],
+    body: "First we work out what you actually need to scale: the platform, the architecture, and the systems that have to talk to each other. That comes from your catalogue, your markets and your fulfilment setup, not from whatever we built for the last client.",
+    outputs: ["Platform and architecture selected", "Requirements and constraints mapped", "Measurement and data groundwork"],
+    spec: [
+      ["Datum", "Established"],
+      ["Footings", "06"],
+      ["Architecture", "Composable"],
+    ],
   },
   {
     eyebrow: "Fig.02 · Framework",
     heading: "Framing the structure",
-    body: "We turn requirements into a blueprint — the data flows, automation logic and integration map the build will follow. The load-bearing decisions get made here, on paper, before a single line of it ships.",
-    outputs: ["System & data blueprint", "Automation & logic design", "Integration map across the stack"],
+    body: "Requirements become a blueprint: the data flows, the automation logic, and how each platform connects to the rest. We make the load-bearing decisions here, on paper, while they're still cheap to change.",
+    outputs: ["System and data blueprint", "Automation and workflow logic", "Integration map across the stack"],
+    spec: [
+      ["Bays", "05"],
+      ["Load path", "Resolved"],
+      ["Blueprint", "Signed off"],
+    ],
   },
   {
     eyebrow: "Fig.03 · Implementation",
     heading: "Connecting the dots",
-    body: "End-to-end implementation. We wire best-in-class platforms into one connected stack — media, AI, site and content operating as a single system, not a drawer of disconnected tools.",
-    outputs: ["End-to-end build & integration", "Media, AI, site & content unified", "One operating system, fully wired"],
+    body: "Then we build it. Media, AI, site and content get wired into one stack that shares the same data, instead of six tools that each know part of the story.",
+    outputs: ["Full build and integration", "One shared data layer", "One operating system, fully wired"],
+    spec: [
+      ["Platforms", "06"],
+      ["Connections", "06"],
+      ["Systems", "01"],
+    ],
   },
   {
     eyebrow: "Fig.04 · Validation",
     heading: "Pressure-testing the system",
-    body: "We instrument everything end-to-end, then optimize under real load — proving performance compounds before we scale it. Nothing gets handed forward until the structure holds.",
-    outputs: ["Instrumented end-to-end", "Optimized under real load", "Performance proven to compound"],
+    body: "We instrument everything before we scale anything. Then it runs under real spend, we find where it bends, and we fix that first. Performance has to hold up under load, not in a slide.",
+    outputs: ["Instrumented end to end", "Tuned under real spend", "Results that hold over time"],
+    spec: [
+      ["Load applied", "100%"],
+      ["ROAS lift", "+1.8×"],
+      ["Structure", "Holds"],
+    ],
   },
   {
     eyebrow: "Fig.05 · Scale",
     heading: "Self-serve scale",
-    body: "Systems built to be uncapped. Unlimited potential to enter newer markets and build forward — the structure replicates itself, so growth never means starting over from the ground.",
-    outputs: ["Uncapped, self-serve systems", "Replicable across new markets", "Built to keep building forward"],
+    body: "The point of building it this way is that you can do it again. New market, new channel, same structure. You're not rebuilding from the ground every time you expand, and you're not waiting on us to do it.",
+    outputs: ["Systems you can run yourself", "Repeatable in a new market", "No rebuild required to expand"],
+    spec: [
+      ["Markets", "Uncapped"],
+      ["Replication", "Self-serve"],
+      ["Scale", "∞"],
+    ],
   },
 ];
 const N = STAGES.length;
 
+// Fraction of each stage's scroll spent drawing. The remainder is a hold, so a
+// finished layer sits still and readable before the next one starts.
+const DRAW = 0.7;
+
 /* ------------------------------------------------------------- geometry
-   Shared blueprint coordinate space. */
+   Shared sheet coordinate space. The bands are laid out so the five layers
+   nest instead of colliding: replication along the top, load onto the roof,
+   the frame and its wiring in the middle, the datum and its dimension below. */
 const VB = { w: 1000, h: 720 };
-const BASE_Y = 560; // ground / datum line
+const BASE_Y = 560; // datum / ground line
 const TOP_Y = 244; // top beam
 const APEX = { x: 500, y: 188 }; // roof apex
 const FX = [210, 326, 442, 558, 674, 790]; // the six footing / column positions
+const SPAN_L = FX[0];
+const SPAN_R = FX[FX.length - 1];
 
-// Requirement chips → each lights one footing, turning "your requirements"
-// into the literal footprint of the build.
-const REQS = ["Markets", "Catalog size", "Channels", "Fulfilment", "Data / CDP", "Headless?"];
-
-// Stage 3 platform nodes — real tools from the Marked stack, arranged as a
-// ring inside the frame. Wiring the ring closes the loop into one system.
-type Node = { name: string; role: string; color: string; icon?: string; mono: string; x: number; y: number };
-const RX = 200; // ring radii about the centre
-const RY = 130;
-const CEN = { x: 500, y: 404 };
+// Stage 3 platform nodes — the real Marked stack, arranged as a ring inside the
+// frame. The ring closing is what turns six tools into one system.
+type Node = { name: string; color: string; icon?: string; mono: string; x: number; y: number };
+const CEN = { x: 500, y: 400 };
+const RX = 155;
+const RY = 100;
 const NODES: Node[] = [
-  { name: "Shopify", role: "Storefront & checkout", color: "#95BF47", icon: "shopify", mono: "S", x: CEN.x, y: CEN.y - RY - 14 },
-  { name: "Claude / AI", role: "Creative & automation", color: "#D97757", icon: "claude", mono: "C", x: CEN.x + RX, y: CEN.y - RY / 2 },
-  { name: "GA4", role: "Measurement & attribution", color: "#E8710A", icon: "googleanalytics", mono: "GA", x: CEN.x + RX, y: CEN.y + RY / 2 },
-  { name: "Klaviyo", role: "Lifecycle & retention", color: "#23856D", mono: "K", x: CEN.x, y: CEN.y + RY + 14 },
-  { name: "Meta", role: "Paid social & retargeting", color: "#0866FF", icon: "meta", mono: "M", x: CEN.x - RX, y: CEN.y + RY / 2 },
-  { name: "Google Ads", role: "Search & shopping demand", color: "#FBBC04", icon: "googleads", mono: "Ads", x: CEN.x - RX, y: CEN.y - RY / 2 },
+  { name: "Shopify", color: "#95BF47", icon: "shopify", mono: "S", x: CEN.x, y: CEN.y - RY },
+  { name: "Claude / AI", color: "#D97757", icon: "claude", mono: "C", x: CEN.x + RX, y: CEN.y - RY / 2 },
+  { name: "GA4", color: "#E8710A", icon: "googleanalytics", mono: "GA", x: CEN.x + RX, y: CEN.y + RY / 2 },
+  { name: "Klaviyo", color: "#23856D", mono: "K", x: CEN.x, y: CEN.y + RY },
+  { name: "Meta", color: "#0866FF", icon: "meta", mono: "M", x: CEN.x - RX, y: CEN.y + RY / 2 },
+  { name: "Google Ads", color: "#FBBC04", icon: "googleads", mono: "Ads", x: CEN.x - RX, y: CEN.y - RY / 2 },
 ];
-// Target wiring map: the ring (adjacent neighbours) — six connections.
+// The ring: each node to its neighbour, six connections, loop closed.
 const EDGES: [number, number][] = [
   [0, 1],
   [1, 2],
@@ -93,71 +129,76 @@ const EDGES: [number, number][] = [
   [5, 0],
 ];
 const NR = 31; // node radius
-const ekey = (a: number, b: number) => (a < b ? `${a}-${b}` : `${b}-${a}`);
-const EDGE_SET = new Set(EDGES.map(([a, b]) => ekey(a, b)));
 
-// Stage 4 — reuse the homepage Growth modeler's math so the numbers match.
-const LIFT = 1.8;
+// Stage 5 — the replicated copies, on their own datum above the sheet. Each is
+// 80 wide at the scale they're drawn, and GhostModule's ground sits 64 below
+// its origin, so GHOST_Y is where all three land.
+const GHOST_X = [300, 460, 620];
+const GHOST_Y = 104;
+
+// Stage 4 — the load arrows that press down onto the roof.
+const LOAD_X = [300, 400, 500, 600, 700];
+// Height of the roof slope at a given x, so each arrow stops just short of it.
+const roofY = (x: number) => TOP_Y - (TOP_Y - APEX.y) * (1 - Math.abs(x - APEX.x) / (APEX.x - SPAN_L));
 
 const LINE = "rgba(255,255,255,0.34)";
 const LINE_DIM = "rgba(255,255,255,0.15)";
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
+/* ---------------------------------------------------------------- CSS ramps
+   `ramp(2, .35, .85)` reads "0 → 1 across the 35–85% slice of stage 3", as a
+   CSS expression off that stage's progress property. Feed it to opacity, to a
+   scale factor, to a rotation, or through `undrawn()` to a stroke-dashoffset
+   on a pathLength={1} stroke to make a line draw itself. */
+const ramp = (stage: number, a: number, b: number) => `clamp(0, calc((var(--s${stage}) - ${a}) / ${+(b - a).toFixed(4)}), 1)`;
+// The dash offset that leaves a pathLength={1} stroke undrawn until its slice.
+// Multiplied out to a length: CSS rejects a bare calc() number for a property
+// that wants <length>, and 1px is one user unit inside the viewBox.
+const undrawn = (stage: number, a: number, b: number) => `calc((1 - ${ramp(stage, a, b)}) * 1px)`;
+// The i-th of n items drawing in sequence across [a,b], each over `span`.
+const slice = (i: number, n: number, a: number, b: number, span = 0.18) => {
+  const start = n > 1 ? a + ((b - a - span) * i) / (n - 1) : a;
+  return [start, start + span] as const;
+};
+
 /* =============================================================== component */
 export default function ApproachPage() {
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
-
-  // scroll-driven stage
   const [active, setActive] = React.useState(0);
-  const [reached, setReached] = React.useState(0);
-
-  // per-stage build state (persists + feeds forward)
-  const [reqs, setReqs] = React.useState<Set<number>>(() => new Set([0, 1, 2, 3]));
-  const [frame, setFrame] = React.useState(0); // 0..1 raise
-  const [conns, setConns] = React.useState<Set<string>>(() => new Set());
-  const [pending, setPending] = React.useState<number | null>(null);
-  const [spend, setSpend] = React.useState(50000);
-  const [roas, setRoas] = React.useState(2.0);
-  const [validated, setValidated] = React.useState(false);
-  const [markets, setMarkets] = React.useState<Set<number>>(() => new Set());
-
-  // a11y: announce stage changes
-  const wired = conns.size >= EDGES.length;
 
   /* --------------------------------------------------- scroll controller
-     Active stage is derived from scroll position. As the visitor passes a
-     stage we mark it "reached" (so its layer persists) and auto-complete any
-     interaction they skipped — the page never traps anyone who'd rather read.
-     This lives in the scroll event (not an effect) so the cumulative state is
-     updated as a side-effect of the user action, not a cascading re-render. */
-  const lastIdx = React.useRef(0);
+     Writes --s0…--s4 on the root every animation frame the page moves, and
+     lifts the integer stage into React state only when it actually changes.
+     Under prefers-reduced-motion the stages snap to drawn/undrawn instead of
+     ramping, so the sheet is always complete rather than mid-stroke. */
   React.useEffect(() => {
+    const root = rootRef.current;
     const wrap = wrapRef.current;
-    if (!wrap) return;
+    if (!root || !wrap) return;
+    const still = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const rect = wrap.getBoundingClientRect();
-        const vh = window.innerHeight;
-        const total = rect.height - vh;
-        const p = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
-        const idx = Math.min(N - 1, Math.floor(p * N));
-        if (idx === lastIdx.current) return;
-        lastIdx.current = idx;
+    let lastIdx = -1;
+    const apply = () => {
+      raf = 0;
+      const rect = wrap.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      const p = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
+      const scaled = p * N;
+      const idx = Math.min(N - 1, Math.floor(scaled));
+      for (let i = 0; i < N; i++) {
+        const v = still ? (i <= idx ? 1 : 0) : clamp((scaled - i) / DRAW, 0, 1);
+        root.style.setProperty(`--s${i}`, v.toFixed(4));
+      }
+      if (idx !== lastIdx) {
+        lastIdx = idx;
         setActive(idx);
-        setReached((r) => Math.max(r, idx));
-        for (let k = 0; k < idx; k++) {
-          if (k === 0) setReqs((s) => (s.size === 0 ? new Set([0, 1, 2, 3]) : s));
-          if (k === 1) setFrame((f) => (f < 0.98 ? 1 : f));
-          if (k === 2) setConns((s) => (s.size < EDGES.length ? new Set(EDGES.map(([a, b]) => ekey(a, b))) : s));
-          if (k === 3) setValidated(true);
-          if (k === 4) setMarkets((s) => (s.size === 0 ? new Set([0, 1, 2]) : s));
-        }
-      });
+      }
     };
-    onScroll();
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    apply();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
@@ -167,51 +208,39 @@ export default function ApproachPage() {
     };
   }, []);
 
+  // Land mid-stage so the layer is drawn and holding, not caught mid-stroke.
+  // The jump has to go through Lenis: it owns the document scroll position and
+  // its rAF loop overwrites a native smooth scrollTo mid-animation, which is
+  // why the rail used to look inert on click.
+  const lenis = useLenis();
   const jump = (k: number) => {
     const wrap = wrapRef.current;
     if (!wrap) return;
     const total = wrap.offsetHeight - window.innerHeight;
-    const top = wrap.offsetTop + ((k + 0.5) / N) * total;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  const stageDone = [reqs.size >= 1, frame >= 0.98, wired, validated, markets.size >= 1];
-
-  /* ---------------------------------------------------------------- wiring */
-  const connect = (a: number, b: number) => {
-    if (a === b) return false;
-    const k = ekey(a, b);
-    if (!EDGE_SET.has(k) || conns.has(k)) return false;
-    setConns((s) => new Set(s).add(k));
-    return true;
-  };
-  const onNodeKeyPick = (i: number) => {
-    if (pending == null) setPending(i);
-    else if (pending === i) setPending(null);
-    else {
-      connect(pending, i);
-      setPending(null);
-    }
+    const top = wrap.offsetTop + ((k + DRAW + (1 - DRAW) / 2) / N) * total;
+    if (lenis) lenis.scrollTo(top, { duration: 1.1 });
+    else window.scrollTo({ top, behavior: "smooth" });
   };
 
   return (
-    <div className="apr">
+    <div className="apr" ref={rootRef}>
       <div className="apr-grid" aria-hidden="true" />
       <Nav />
 
       {/* live region for stage changes */}
       <div aria-live="polite" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
-        {`Stage ${active + 1} of ${N}: ${STAGES[active].heading}`}
+        {`Sheet ${active + 1} of ${N}: ${STAGES[active].heading}`}
       </div>
 
-      {/* build rail 01–05 */}
+      {/* sheet rail 01–05 — position, progress, and a jump for each stage */}
       <nav className="apr-rail" aria-label="Approach stages">
-        {STAGES.map((_, i) => (
+        {STAGES.map((s, i) => (
           <button
             key={i}
-            className={"apr-rail-dot" + (i === active ? " on" : "") + (reached > i && stageDone[i] ? " done" : "")}
+            className={"apr-rail-dot" + (i === active ? " on" : "") + (i < active ? " done" : "")}
+            style={{ ["--sc" as string]: `var(--s${i})` } as React.CSSProperties}
             onClick={() => jump(i)}
-            aria-label={`Go to stage ${i + 1}: ${STAGES[i].heading}`}
+            aria-label={`Go to sheet ${i + 1}: ${s.heading}`}
             aria-current={i === active ? "step" : undefined}
           >
             {String(i + 1).padStart(2, "0")}
@@ -221,44 +250,12 @@ export default function ApproachPage() {
 
       <Intro />
 
-      {/* pinned blueprint + scroll spacers */}
-      <div ref={wrapRef} className="apr-stage-wrap" style={{ height: `${N * 125}vh` }}>
+      {/* pinned sheet + scroll spacers */}
+      <div ref={wrapRef} className="apr-stage-wrap" style={{ height: `${N * 120}vh` }}>
         <div className="apr-sticky">
           <div className="apr-stage-grid">
-            <StagePanel
-              active={active}
-              reqs={reqs}
-              setReqs={setReqs}
-              frame={frame}
-              setFrame={setFrame}
-              conns={conns}
-              pending={pending}
-              onNodeKeyPick={onNodeKeyPick}
-              wired={wired}
-              spend={spend}
-              setSpend={setSpend}
-              roas={roas}
-              setRoas={setRoas}
-              validated={validated}
-              setValidated={setValidated}
-              markets={markets}
-              setMarkets={setMarkets}
-            />
-            <Blueprint
-              active={active}
-              reached={reached}
-              reqs={reqs}
-              frame={frame}
-              conns={conns}
-              pending={pending}
-              setPending={setPending}
-              connect={connect}
-              wired={wired}
-              spend={spend}
-              roas={roas}
-              validated={validated}
-              markets={markets}
-            />
+            <StagePanel active={active} />
+            <Blueprint active={active} />
           </div>
         </div>
       </div>
@@ -269,32 +266,12 @@ export default function ApproachPage() {
   );
 }
 
-/* ====================================================== left: copy + controls */
-function StagePanel(props: {
-  active: number;
-  reqs: Set<number>;
-  setReqs: React.Dispatch<React.SetStateAction<Set<number>>>;
-  frame: number;
-  setFrame: (v: number) => void;
-  conns: Set<string>;
-  pending: number | null;
-  onNodeKeyPick: (i: number) => void;
-  wired: boolean;
-  spend: number;
-  setSpend: (v: number) => void;
-  roas: number;
-  setRoas: (v: number) => void;
-  validated: boolean;
-  setValidated: (v: boolean) => void;
-  markets: Set<number>;
-  setMarkets: React.Dispatch<React.SetStateAction<Set<number>>>;
-}) {
-  const { active } = props;
+/* ====================================================== left: the stage copy */
+function StagePanel({ active }: { active: number }) {
   const s = STAGES[active];
-
   return (
     <div>
-      {/* key={active} remounts on each stage, replaying the fade-up animation */}
+      {/* key={active} remounts on each stage, replaying the fade-up */}
       <div className="apr-stage-copy" key={active}>
         <div className="apr-mono" style={{ fontSize: 12.5, textTransform: "uppercase", color: C.accent, marginBottom: 16 }}>
           {s.eyebrow}
@@ -302,7 +279,7 @@ function StagePanel(props: {
         <h2 style={{ fontSize: "clamp(30px,3.6vw,42px)", fontWeight: 700, letterSpacing: "-0.03em", margin: 0, lineHeight: 1.04 }}>{s.heading}</h2>
         <p style={{ color: C.muted, fontSize: 17, lineHeight: 1.6, marginTop: 16, maxWidth: 460 }}>{s.body}</p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "22px 0 26px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: 22 }}>
           {s.outputs.map((o, i) => (
             <div key={o} className="apr-out">
               <span className="apr-mono" style={{ color: C.faint, fontSize: 12.5, marginTop: 1, flex: "none" }}>
@@ -314,391 +291,113 @@ function StagePanel(props: {
           ))}
         </div>
 
-        {/* the interaction for this stage */}
-        {active === 0 && <FoundationControls {...props} />}
-        {active === 1 && <FrameControls {...props} />}
-        {active === 2 && <ConnectControls {...props} />}
-        {active === 3 && <TestControls {...props} />}
-        {active === 4 && <ScaleControls {...props} />}
+        {/* drafting schedule for this sheet — fixed values, nothing to operate */}
+        <div className="apr-spec">
+          {s.spec.map(([k, v]) => (
+            <div key={k}>
+              <div className="apr-mono" style={{ fontSize: 11, textTransform: "uppercase", color: C.faint, marginBottom: 5 }}>
+                {k}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em" }}>{v}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-function CueScroll({ done, label }: { done: boolean; label: string }) {
-  return (
-    <div className="apr-mono" style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 18, fontSize: 12, color: done ? C.accent : C.faint }}>
-      <span style={{ width: 7, height: 7, borderRadius: 9, background: done ? C.accent : "transparent", border: done ? "none" : `1.5px solid ${C.faint}` }} />
-      {done ? "LOCKED · scroll to continue ↓" : label}
-    </div>
-  );
-}
-
-/* --- Stage 1: requirement chips → footings */
-function FoundationControls({ reqs, setReqs }: { reqs: Set<number>; setReqs: React.Dispatch<React.SetStateAction<Set<number>>> }) {
-  const toggle = (i: number) =>
-    setReqs((s) => {
-      const n = new Set(s);
-      if (n.has(i)) n.delete(i);
-      else n.add(i);
-      return n;
-    });
-  const arch = `${reqs.has(5) ? "COMPOSABLE" : "MONOLITH"} / ${reqs.has(0) ? "MULTI-REGION" : "SINGLE-REGION"}`;
-  return (
-    <div>
-      <div className="apr-mono" style={{ fontSize: 12, color: C.faint, marginBottom: 11 }}>MAP THE REQUIREMENTS</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {REQS.map((r, i) => (
-          <button key={r} className={"apr-chip" + (reqs.has(i) ? " on" : "")} onClick={() => toggle(i)} aria-pressed={reqs.has(i)}>
-            <span style={{ width: 8, height: 8, borderRadius: 8, flex: "none", background: reqs.has(i) ? C.accent : "transparent", border: reqs.has(i) ? "none" : `1.5px solid ${C.faint}` }} />
-            {r}
-          </button>
-        ))}
-      </div>
-      <div className="apr-mono" style={{ marginTop: 18, fontSize: 13, color: C.muted }}>
-        ARCH:{" "}
-        <span style={{ color: C.accent, fontWeight: 600 }}>{arch}</span>
-        <span style={{ color: C.faint }}> · {reqs.size} FOOTING{reqs.size === 1 ? "" : "S"}</span>
-      </div>
-      <CueScroll done={reqs.size >= 1} label="select ≥ 1 requirement to lay the foundation" />
-    </div>
-  );
-}
-
-/* --- Stage 2: raise the frame */
-function FrameControls({ frame, setFrame, reqs }: { frame: number; setFrame: (v: number) => void; reqs: Set<number> }) {
-  return (
-    <div>
-      <div className="apr-mono" style={{ fontSize: 12, color: C.faint, marginBottom: 11 }}>RAISE THE FRAME — {reqs.size} BAY{reqs.size === 1 ? "" : "S"}</div>
-      <input
-        className="apr-range"
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        value={frame}
-        aria-label="Raise the structural frame"
-        onChange={(e) => setFrame(parseFloat(e.target.value))}
-        style={{ background: `linear-gradient(90deg, ${C.accent} ${frame * 100}%, rgba(255,255,255,.10) ${frame * 100}%)` }}
-      />
-      <div className="apr-mono" style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 12, color: C.muted }}>
-        <span>schematic</span>
-        <span style={{ color: C.accent, fontWeight: 600 }}>{Math.round(frame * 100)}%</span>
-        <span>structure</span>
-      </div>
-      <CueScroll done={frame >= 0.98} label="drag to raise columns & beams" />
-    </div>
-  );
-}
-
-/* --- Stage 3: wire the stack (keyboard path; drag happens on the blueprint) */
-function ConnectControls({ conns, pending, onNodeKeyPick, wired }: { conns: Set<string>; pending: number | null; onNodeKeyPick: (i: number) => void; wired: boolean }) {
-  return (
-    <div>
-      <div className="apr-mono" style={{ fontSize: 12, color: C.faint, marginBottom: 11 }}>
-        WIRE THE STACK · <span style={{ color: wired ? C.accent : C.muted }}>{conns.size} / {EDGES.length}</span>
-      </div>
-      <p style={{ color: C.faint, fontSize: 13, margin: "0 0 12px", maxWidth: 380 }}>
-        Drag node-to-node on the blueprint — or pick two below to connect them.
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        {NODES.map((n, i) => (
-          <button key={n.name} className={"apr-nodebtn" + (pending === i ? " pending" : "")} onClick={() => onNodeKeyPick(i)} aria-label={`${n.name} — ${n.role}`}>
-            <span style={{ width: 9, height: 9, borderRadius: 9, flex: "none", background: n.color }} />
-            <span style={{ minWidth: 0 }}>
-              <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{n.name}</span>
-              <span style={{ fontSize: 11, color: C.muted }}>{n.role}</span>
-            </span>
-          </button>
-        ))}
-      </div>
-      <CueScroll done={wired} label="connect every node into one system" />
-    </div>
-  );
-}
-
-/* --- Stage 4: apply load (reuses the homepage Growth modeler math) */
-function TestControls(props: { spend: number; setSpend: (v: number) => void; roas: number; setRoas: (v: number) => void; validated: boolean; setValidated: (v: boolean) => void }) {
-  const { spend, setSpend, roas, setRoas, validated, setValidated } = props;
-  const marked = spend * 12 * (roas + LIFT);
-  const shown = useCountTo(marked);
-  const spendPct = ((spend - 5000) / (500000 - 5000)) * 100;
-  const roasPct = ((roas - 1) / (5 - 1)) * 100;
-  const stress = () => {
-    setSpend(500000);
-    setRoas(5);
-    setValidated(true);
-  };
-  return (
-    <div>
-      <LoadSlider label="Monthly ad spend" display={money(spend)} min={5000} max={500000} step={5000} val={spend} pct={spendPct} onChange={setSpend} />
-      <LoadSlider label="Current ROAS" display={roas.toFixed(1) + "×"} min={1} max={5} step={0.1} val={roas} pct={roasPct} onChange={setRoas} />
-      <div style={{ color: C.muted, fontSize: 13, marginTop: 4 }}>Modeled annual revenue · +{LIFT.toFixed(1)}× ROAS</div>
-      <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: C.accent }}>{money(shown)}</div>
-      <button
-        className="apr-chip"
-        onClick={stress}
-        style={{ marginTop: 18, background: validated ? "rgba(31,168,95,.12)" : "transparent", borderColor: validated ? C.accent : undefined, color: validated ? C.text : undefined }}
-      >
-        {validated ? "✓ Validated — structure holds" : "Run stress test →"}
-      </button>
-      <CueScroll done={validated} label="apply load or run the stress test" />
-    </div>
-  );
-}
-function LoadSlider({ label, display, min, max, step, val, pct, onChange }: { label: string; display: string; min: number; max: number; step: number; val: number; pct: number; onChange: (v: number) => void }) {
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-        <span style={{ color: C.muted, fontSize: 14 }}>{label}</span>
-        <span style={{ fontSize: 19, fontWeight: 700, color: C.accent }}>{display}</span>
-      </div>
-      <input className="apr-range" type="range" min={min} max={max} step={step} value={val} aria-label={label} onChange={(e) => onChange(parseFloat(e.target.value))} style={{ background: `linear-gradient(90deg, ${C.accent} ${pct}%, rgba(255,255,255,.10) ${pct}%)` }} />
-    </div>
-  );
-}
-
-/* --- Stage 5: replicate across markets (reuses Expansion planner data) */
-function ScaleControls({ markets, setMarkets }: { markets: Set<number>; setMarkets: React.Dispatch<React.SetStateAction<Set<number>>> }) {
-  const data = MD.marketData;
-  const toggle = (i: number) =>
-    setMarkets((s) => {
-      const n = new Set(s);
-      if (n.has(i)) n.delete(i);
-      else n.add(i);
-      return n;
-    });
-  const chosen = data.filter((_, i) => markets.has(i));
-  const opp = chosen.reduce((a, m) => a + m.opp, 0) * 1e6;
-  const regions = new Set(chosen.map((m) => m.region)).size;
-  const oppShown = useCountTo(opp);
-  return (
-    <div>
-      <div className="apr-mono" style={{ fontSize: 12, color: C.faint, marginBottom: 11 }}>REPLICATE ACROSS MARKETS</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 7, maxWidth: 460 }}>
-        {data.map((m, i) => (
-          <button key={m.country} className={"apr-chip" + (markets.has(i) ? " on" : "")} onClick={() => toggle(i)} aria-pressed={markets.has(i)} style={{ fontSize: 12.5, padding: "7px 12px" }}>
-            {m.city}
-          </button>
-        ))}
-      </div>
-      <div style={{ display: "flex", gap: 26, marginTop: 22 }}>
-        <Stat value={String(markets.size)} label="markets" />
-        <Stat value={money(oppShown)} label="first-year opp." accent />
-        <Stat value={String(regions)} label="regions" />
-      </div>
-      <CueScroll done={markets.size >= 1} label="select markets to replicate the system" />
-    </div>
-  );
-}
-function Stat({ value, label, accent }: { value: string; label: string; accent?: boolean }) {
-  return (
-    <div>
-      <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.02em", color: accent ? C.accent : C.text }}>{value}</div>
-      <div style={{ color: C.muted, fontSize: 12.5, marginTop: 3 }}>{label}</div>
-    </div>
-  );
-}
-
-/* ====================================================== right: the blueprint */
-function Blueprint(props: {
-  active: number;
-  reached: number;
-  reqs: Set<number>;
-  frame: number;
-  conns: Set<string>;
-  pending: number | null;
-  setPending: (v: number | null) => void;
-  connect: (a: number, b: number) => boolean;
-  wired: boolean;
-  spend: number;
-  roas: number;
-  validated: boolean;
-  markets: Set<number>;
-}) {
-  const { active, reached, reqs, frame, conns, pending, setPending, connect, wired, spend, roas, validated, markets } = props;
-  const svgRef = React.useRef<SVGSVGElement | null>(null);
-  const canvasRef = React.useRef<HTMLDivElement | null>(null);
-
-  // drafting cursor HUD
-  const [hud, setHud] = React.useState<{ on: boolean; px: number; py: number; vx: number; vy: number }>({ on: false, px: 0, py: 0, vx: 0, vy: 0 });
-  const coarse = React.useRef(false);
-  React.useEffect(() => {
-    coarse.current = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
-  }, []);
-
-  // client → viewBox coords
-  const toVB = (clientX: number, clientY: number) => {
-    const svg = svgRef.current;
-    if (!svg) return { x: 0, y: 0 };
-    const ctm = svg.getScreenCTM();
-    if (!ctm) return { x: 0, y: 0 };
-    const pt = svg.createSVGPoint();
-    pt.x = clientX;
-    pt.y = clientY;
-    const loc = pt.matrixTransform(ctm.inverse());
-    return { x: loc.x, y: loc.y };
-  };
-
-  // wiring drag
-  const [drag, setDrag] = React.useState<{ from: number; x: number; y: number } | null>(null);
-  const onPointerDownNode = (i: number) => (e: React.PointerEvent) => {
-    if (active !== 2) return;
-    e.preventDefault();
-    const v = toVB(e.clientX, e.clientY);
-    setDrag({ from: i, x: v.x, y: v.y });
-    setPending(i);
-  };
-  const onCanvasMove = (e: React.PointerEvent) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect && !coarse.current) {
-      const px = e.clientX - rect.left;
-      const py = e.clientY - rect.top;
-      const snap = 22;
-      const v = toVB(e.clientX, e.clientY);
-      setHud({ on: true, px: Math.round(px / snap) * snap, py: Math.round(py / snap) * snap, vx: Math.round(v.x / 10) * 10, vy: Math.round(v.y / 10) * 10 });
-    }
-    if (drag) {
-      const v = toVB(e.clientX, e.clientY);
-      setDrag({ ...drag, x: v.x, y: v.y });
-    }
-  };
-  const onCanvasUp = (e: React.PointerEvent) => {
-    if (!drag) return;
-    const v = toVB(e.clientX, e.clientY);
-    let hit = -1;
-    let best = 44 * 44;
-    NODES.forEach((n, i) => {
-      const d = (n.x - v.x) ** 2 + (n.y - v.y) ** 2;
-      if (d < best && i !== drag.from) {
-        best = d;
-        hit = i;
-      }
-    });
-    if (hit >= 0) connect(drag.from, hit);
-    setDrag(null);
-    setPending(null);
-  };
-
-  const show = (k: number) => reached >= k; // cumulative
-  const layerStyle = (k: number): React.CSSProperties => ({
-    opacity: show(k) ? (active === k ? 1 : 0.45) : 0,
+/* ====================================================== right: the sheet */
+function Blueprint({ active }: { active: number }) {
+  // Layers persist once passed and dim behind the live one; scrolling back up
+  // takes them off again, so what you see always matches where you are.
+  const layer = (k: number): React.CSSProperties => ({
+    opacity: active >= k ? (active === k ? 1 : 0.42) : 0,
     transition: "opacity .6s cubic-bezier(.2,.7,.3,1)",
   });
-
-  const presentFX = FX.filter((_, i) => reqs.has(i));
-  const minFX = presentFX.length ? Math.min(...presentFX) : FX[0];
-  const maxFX = presentFX.length ? Math.max(...presentFX) : FX[FX.length - 1];
-
-  // stage-4 derived
-  const load = clamp((spend / 500000) * 0.5 + ((roas - 1) / 4) * 0.5, 0, 1);
-  const flowDur = (2.8 - load * 1.9).toFixed(2) + "s";
+  const live = (k: number) => (active === k ? C.accent : LINE);
 
   return (
     <div className="apr-blueprint">
-      <div
-        ref={canvasRef}
-        className="apr-bp-canvas"
-        onPointerMove={onCanvasMove}
-        onPointerUp={onCanvasUp}
-        onPointerLeave={() => {
-          setHud((h) => ({ ...h, on: false }));
-          if (drag) {
-            setDrag(null);
-            setPending(null);
-          }
-        }}
-      >
-        <svg ref={svgRef} viewBox={`0 0 ${VB.w} ${VB.h}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Cumulative growth-system blueprint">
-          {/* ---- Layer 1 · Foundation: datum line + footings ---- */}
-          <g style={layerStyle(0)}>
-            <DrawLine x1={150} y1={BASE_Y} x2={850} y2={BASE_Y} stroke={active === 0 ? C.accent : LINE} draw={show(0)} />
-            {/* dimension callout */}
-            <g className="apr-mono" fill={C.faint} fontSize={13}>
-              <line x1={minFX} y1={BASE_Y + 26} x2={maxFX} y2={BASE_Y + 26} stroke={LINE_DIM} />
-              <line x1={minFX} y1={BASE_Y + 20} x2={minFX} y2={BASE_Y + 32} stroke={LINE_DIM} />
-              <line x1={maxFX} y1={BASE_Y + 20} x2={maxFX} y2={BASE_Y + 32} stroke={LINE_DIM} />
-              <text x={(minFX + maxFX) / 2} y={BASE_Y + 46} textAnchor="middle">
-                {Math.round((maxFX - minFX) * 1.2 + 600)} SQ·M
-              </text>
-            </g>
-            {/* survey crosses */}
+      <div className="apr-bp-canvas">
+        <svg viewBox={`0 0 ${VB.w} ${VB.h}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Blueprint of the Marked Digital growth system, drawn in five layers: foundation, frame, wiring, load test and replication.">
+          {/* ---- Layer 1 · Foundation: datum, survey marks, footings ---- */}
+          <g style={layer(0)}>
+            <Stroke x1={150} y1={BASE_Y} x2={850} y2={BASE_Y} stroke={live(0)} width={2} draw={[0, 0, 0.45]} />
             {[150, 850].map((x) => (
-              <g key={x} stroke={LINE_DIM}>
+              <g key={x} stroke={LINE_DIM} style={{ opacity: ramp(0, 0.35, 0.5) }}>
                 <line x1={x - 7} y1={BASE_Y} x2={x + 7} y2={BASE_Y} />
                 <line x1={x} y1={BASE_Y - 7} x2={x} y2={BASE_Y + 7} />
               </g>
             ))}
-            {/* footing slots */}
             {FX.map((x, i) => {
-              const on = reqs.has(i);
+              const [a, b] = slice(i, FX.length, 0.42, 0.95, 0.16);
               return (
-                <g key={x} style={{ transition: "opacity .4s", opacity: on ? 1 : 0.25 }}>
-                  <rect x={x - 24} y={BASE_Y - 10} width={48} height={20} rx={3} fill={on ? "rgba(31,168,95,.14)" : "transparent"} stroke={on ? C.accent : LINE_DIM} strokeWidth={1.4} />
-                  {on && <rect x={x - 4} y={BASE_Y - 4} width={8} height={8} fill={C.accent} />}
+                <g key={x} style={{ opacity: ramp(0, a, b) }}>
+                  <rect x={x - 24} y={BASE_Y - 10} width={48} height={20} rx={3} fill="rgba(31,168,95,.14)" stroke={C.accent} strokeWidth={1.4} />
+                  <rect x={x - 4} y={BASE_Y - 4} width={8} height={8} fill={C.accent} />
                 </g>
               );
             })}
-          </g>
-
-          {/* ---- Layer 2 · Frame: columns, beam, roof ---- */}
-          <g style={layerStyle(1)}>
-            {FX.map((x, i) =>
-              reqs.has(i) ? (
-                <g key={x} style={{ transform: `scaleY(${frame})`, transformOrigin: `${x}px ${BASE_Y}px`, transformBox: "fill-box", transition: "transform .8s cubic-bezier(.55,.1,.25,1)" }}>
-                  <line x1={x} y1={TOP_Y} x2={x} y2={BASE_Y} stroke={active === 1 ? C.accent : LINE} strokeWidth={2} />
-                </g>
-              ) : null
-            )}
-            {/* top beam + roof appear once mostly raised */}
-            <g style={{ opacity: frame > 0.6 ? 1 : 0, transition: "opacity .5s" }}>
-              <line x1={minFX} y1={TOP_Y} x2={maxFX} y2={TOP_Y} stroke={active === 1 ? C.accent : LINE} strokeWidth={2} />
-              <line x1={minFX} y1={TOP_Y} x2={APEX.x} y2={APEX.y} stroke={active === 1 ? C.accent : LINE} strokeWidth={2} />
-              <line x1={APEX.x} y1={APEX.y} x2={maxFX} y2={TOP_Y} stroke={active === 1 ? C.accent : LINE} strokeWidth={2} />
-              {/* a diagonal brace in the first bay — load-bearing detail */}
-              {presentFX.length > 1 && <line x1={presentFX[0]} y1={BASE_Y} x2={presentFX[1]} y2={TOP_Y} stroke={LINE_DIM} strokeWidth={1.2} strokeDasharray="5 5" />}
+            {/* span dimension below the datum */}
+            <g className="apr-mono" fill={C.faint} fontSize={13} style={{ opacity: ramp(0, 0.8, 1) }}>
+              <line x1={SPAN_L} y1={BASE_Y + 18} x2={SPAN_R} y2={BASE_Y + 18} stroke={LINE_DIM} />
+              <line x1={SPAN_L} y1={BASE_Y + 12} x2={SPAN_L} y2={BASE_Y + 24} stroke={LINE_DIM} />
+              <line x1={SPAN_R} y1={BASE_Y + 12} x2={SPAN_R} y2={BASE_Y + 24} stroke={LINE_DIM} />
+              <text x={(SPAN_L + SPAN_R) / 2} y={BASE_Y + 38} textAnchor="middle">
+                SPAN {SPAN_R - SPAN_L}
+              </text>
             </g>
           </g>
 
-          {/* ---- Layer 3 · Connect: nodes + wires + core ---- */}
-          <g style={layerStyle(2)}>
-            {/* drawn wires */}
-            {EDGES.map(([a, b]) => {
-              const k = ekey(a, b);
-              if (!conns.has(k)) return null;
-              const A = NODES[a];
-              const B = NODES[b];
+          {/* ---- Layer 2 · Framework: columns rise, then beam and roof ---- */}
+          <g style={layer(1)}>
+            {FX.map((x, i) => {
+              const [a, b] = slice(i, FX.length, 0, 0.6, 0.26);
               return (
-                <g key={k}>
-                  <line x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke={C.accent} strokeWidth={2.2} opacity={0.85} />
-                  <line className="apr-pulse" x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke={C.accentHover} strokeWidth={2.6} strokeLinecap="round" style={{ ["--flow" as string]: wired ? flowDur : "2.4s" }} />
+                <g key={x} style={{ transform: `scaleY(${ramp(1, a, b)})`, transformOrigin: `${x}px ${BASE_Y}px` }}>
+                  <line x1={x} y1={TOP_Y} x2={x} y2={BASE_Y} stroke={live(1)} strokeWidth={2} />
                 </g>
               );
             })}
-            {/* live drag wire */}
-            {drag && <line x1={NODES[drag.from].x} y1={NODES[drag.from].y} x2={drag.x} y2={drag.y} stroke={C.accent} strokeWidth={2} strokeDasharray="6 6" opacity={0.7} />}
+            <Stroke x1={SPAN_L} y1={TOP_Y} x2={SPAN_R} y2={TOP_Y} stroke={live(1)} width={2} draw={[1, 0.52, 0.76]} />
+            <Stroke x1={SPAN_L} y1={TOP_Y} x2={APEX.x} y2={APEX.y} stroke={live(1)} width={2} draw={[1, 0.72, 0.92]} />
+            <Stroke x1={SPAN_R} y1={TOP_Y} x2={APEX.x} y2={APEX.y} stroke={live(1)} width={2} draw={[1, 0.72, 0.92]} />
+            {/* a diagonal brace in the first bay — the load-bearing detail */}
+            <line x1={FX[0]} y1={BASE_Y} x2={FX[1]} y2={TOP_Y} stroke={LINE_DIM} strokeWidth={1.2} strokeDasharray="5 5" style={{ opacity: ramp(1, 0.88, 1) }} />
+          </g>
 
-            {/* core badge once wired */}
-            <g style={{ opacity: wired ? 1 : 0, transition: "opacity .6s" }}>
-              <circle cx={CEN.x} cy={CEN.y} r={34} fill="rgba(31,168,95,.12)" stroke={C.accent} />
-              <text x={CEN.x} y={CEN.y + 4} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={14} fontWeight={700}>
-                1 SYSTEM
+          {/* ---- Layer 3 · Implementation: nodes, then the ring closes ---- */}
+          <g style={layer(2)}>
+            {EDGES.map(([a, b], i) => {
+              const A = NODES[a];
+              const B = NODES[b];
+              const [f, t] = slice(i, EDGES.length, 0.34, 0.88, 0.2);
+              return (
+                <g key={`${a}-${b}`}>
+                  <Stroke x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke={C.accent} width={2.2} opacity={0.85} draw={[2, f, t]} />
+                  <line className="apr-pulse" x1={A.x} y1={A.y} x2={B.x} y2={B.y} stroke={C.accentHover} strokeWidth={2.6} strokeLinecap="round" style={{ opacity: ramp(2, t, 1) }} />
+                </g>
+              );
+            })}
+
+            {/* the whole point of the layer: six tools reading as one system */}
+            <g style={{ opacity: ramp(2, 0.88, 1) }}>
+              <circle cx={CEN.x} cy={CEN.y} r={38} fill="rgba(31,168,95,.12)" stroke={C.accent} />
+              <text x={CEN.x} y={CEN.y - 1} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} fontWeight={700}>
+                1
+              </text>
+              <text x={CEN.x} y={CEN.y + 14} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} fontWeight={700}>
+                SYSTEM
               </text>
             </g>
 
-            {/* nodes */}
             {NODES.map((n, i) => {
               const path = iconPath(n.icon);
-              const lit = pending === i || conns.has(ekey(i, (i + 1) % NODES.length)) || conns.has(ekey(i, (i + 5) % NODES.length));
+              const [a, b] = slice(i, NODES.length, 0, 0.38, 0.16);
               return (
-                <g
-                  key={n.name}
-                  onPointerDown={onPointerDownNode(i)}
-                  style={{ cursor: active === 2 ? "grab" : "default", transition: "transform .2s" }}
-                >
-                  <circle cx={n.x} cy={n.y} r={NR} fill="#141614" stroke={pending === i ? C.accent : lit ? "rgba(31,168,95,.6)" : LINE} strokeWidth={pending === i ? 2.4 : 1.6} />
-                  {/* generous invisible hit target */}
-                  <circle cx={n.x} cy={n.y} r={44} fill="transparent" />
+                <g key={n.name} style={{ opacity: ramp(2, a, b) }}>
+                  <circle cx={n.x} cy={n.y} r={NR} fill="#141614" stroke="rgba(31,168,95,.55)" strokeWidth={1.6} />
                   {path ? (
                     <g transform={`translate(${n.x - 13},${n.y - 13}) scale(1.083)`} fill={n.color}>
                       <path d={path} />
@@ -708,71 +407,67 @@ function Blueprint(props: {
                       {n.mono}
                     </text>
                   )}
+                  {/* Side nodes label outboard of the ring; the ring's own
+                      vertical wires run straight through where a label
+                      underneath them would sit. */}
+                  <text
+                    x={n.x === CEN.x ? n.x : n.x + (n.x > CEN.x ? NR + 11 : -NR - 11)}
+                    y={n.x === CEN.x ? n.y + NR + 17 : n.y + 4}
+                    textAnchor={n.x === CEN.x ? "middle" : n.x > CEN.x ? "start" : "end"}
+                    className="apr-mono"
+                    fill={C.muted}
+                    fontSize={13}
+                  >
+                    {n.name}
+                  </text>
                 </g>
               );
             })}
           </g>
 
-          {/* ---- Layer 4 · Validation: gauges + performance curve ---- */}
-          <g style={layerStyle(3)}>
-            <Gauge cx={320} cy={250} frac={clamp((spend - 5000) / (500000 - 5000), 0, 1)} label="LOAD" />
-            <Gauge cx={680} cy={250} frac={clamp((roas - 1) / 4, 0, 1)} label="ROAS" />
-            {/* compounding performance curve across the interior */}
-            <path
-              d={`M 260 ${520} C 420 ${520 - load * 40}, 560 ${500 - load * 150}, 740 ${480 - load * 230}`}
-              fill="none"
-              stroke={C.accent}
-              strokeWidth={2.4}
-              style={{ transition: "d .5s" }}
-              strokeLinecap="round"
-            />
-            <text x={744} y={480 - load * 230 - 12} className="apr-mono" fill={validated ? C.accent : C.muted} fontSize={13} textAnchor="end">
-              {validated ? "✓ HOLDS UNDER LOAD" : "PERF ↑"}
+          {/* ---- Layer 4 · Validation: load onto the roof, gauges sweep ---- */}
+          <g style={layer(3)}>
+            {LOAD_X.map((x, i) => {
+              const [a, b] = slice(i, LOAD_X.length, 0.12, 0.62, 0.2);
+              const yTo = roofY(x) - 9;
+              return (
+                <g key={x} style={{ opacity: ramp(3, a, b) }}>
+                  <Stroke x1={x} y1={yTo - 54} x2={x} y2={yTo} stroke={C.accent} width={1.8} draw={[3, a, b]} />
+                  <path d={`M ${x - 5} ${yTo - 9} L ${x} ${yTo} L ${x + 5} ${yTo - 9}`} fill="none" stroke={C.accent} strokeWidth={1.8} strokeLinecap="round" />
+                </g>
+              );
+            })}
+            <Gauge cx={104} cy={300} to={1} label="Load" read="100%" from={0.05} until={0.6} />
+            <Gauge cx={896} cy={300} to={0.72} label="ROAS lift" read="+1.8×" from={0.05} until={0.6} />
+            <text x={APEX.x} y={230} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} style={{ opacity: ramp(3, 0.74, 0.94) }}>
+              HOLDS UNDER LOAD
             </text>
           </g>
 
-          {/* ---- Layer 5 · Scale: replicated ghost modules ---- */}
-          <g style={layerStyle(4)}>
-            {Array.from(markets).map((m, idx) => {
-              // tile the finished module outward to the right & down — uncapped
-              const col = idx % 3;
-              const row = Math.floor(idx / 3);
-              const tx = 560 + col * 150 - row * 40;
-              const ty = -40 + row * 120;
-              const op = clamp(0.5 - row * 0.12, 0.16, 0.5);
+          {/* ---- Layer 5 · Scale: the finished module, repeating ---- */}
+          <g style={layer(4)}>
+            {/* A shared datum under the copies, running off to the right: the
+                same structure on the same ground, not three loose objects. */}
+            <line x1={GHOST_X[0] - 10} y1={GHOST_Y} x2={GHOST_X[2] + 90} y2={GHOST_Y} stroke={LINE_DIM} strokeWidth={1.4} strokeDasharray="7 7" style={{ opacity: ramp(4, 0, 0.3) }} />
+            {GHOST_X.map((tx, i) => {
+              const [a, b] = slice(i, GHOST_X.length, 0.05, 0.72, 0.24);
               return (
-                <g key={m} transform={`translate(${tx},${ty}) scale(0.26)`} style={{ opacity: op }}>
-                  <GhostModule />
+                <g key={tx} style={{ opacity: `calc(${ramp(4, a, b)} * ${(0.62 - i * 0.14).toFixed(2)})` }}>
+                  <g transform={`translate(${tx},${GHOST_Y - 64}) scale(0.2)`}>
+                    <GhostModule />
+                  </g>
                 </g>
               );
             })}
-            {markets.size > 0 && (
-              <>
-                <line x1={840} y1={400} x2={930} y2={400} stroke={C.accent} strokeWidth={2} markerEnd="url(#arr)" />
-                <text x={930} y={384} className="apr-mono" fill={C.accent} fontSize={13} textAnchor="end">
-                  +{markets.size} MARKET{markets.size === 1 ? "" : "S"}
-                </text>
-              </>
-            )}
-            <defs>
-              <marker id="arr" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
-                <path d="M0,0 L6,3 L0,6 Z" fill={C.accent} />
-              </marker>
-            </defs>
+            <g style={{ opacity: ramp(4, 0.74, 1) }}>
+              <Stroke x1={GHOST_X[2] + 95} y1={GHOST_Y} x2={838} y2={GHOST_Y} stroke={C.accent} width={2} draw={[4, 0.74, 0.95]} />
+              <path d={`M 832 ${GHOST_Y - 6} L 845 ${GHOST_Y} L 832 ${GHOST_Y + 6}`} fill={C.accent} />
+              <text x={845} y={GHOST_Y - 16} className="apr-mono" fill={C.accent} fontSize={13} textAnchor="end">
+                UNCAPPED
+              </text>
+            </g>
           </g>
         </svg>
-
-        {/* drafting HUD overlay */}
-        {hud.on && active >= 0 && (
-          <>
-            <div className="apr-cross-v" style={{ left: hud.px }} />
-            <div className="apr-cross-h" style={{ top: hud.py }} />
-            <div className="apr-cross-dot" style={{ left: hud.px, top: hud.py }} />
-            <div className="apr-hud-read" style={{ left: 8, top: 8 }}>
-              X:{String(hud.vx).padStart(4, "0")} Y:{String(hud.vy).padStart(4, "0")} · SHEET {String(active + 1).padStart(2, "0")}/0{N}
-            </div>
-          </>
-        )}
 
         {/* title block */}
         <div className="apr-titleblock">
@@ -787,36 +482,58 @@ function Blueprint(props: {
   );
 }
 
-// A stroke that "draws" itself via stroke-dashoffset when `draw` flips true.
-function DrawLine({ x1, y1, x2, y2, stroke, draw }: { x1: number; y1: number; x2: number; y2: number; stroke: string; draw: boolean }) {
-  return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={2} pathLength={1} strokeDasharray={1} strokeDashoffset={draw ? 0 : 1} className="apr-draw" />;
+/* A stroke that draws itself across a slice of a stage's scroll progress.
+   pathLength={1} normalises the dash to the line's own length, so one ramp
+   expression works for every stroke on the sheet regardless of geometry. */
+function Stroke({ x1, y1, x2, y2, stroke, width = 2, opacity, draw }: { x1: number; y1: number; x2: number; y2: number; stroke: string; width?: number; opacity?: number; draw: readonly [number, number, number] }) {
+  const [stage, a, b] = draw;
+  return (
+    <line
+      x1={x1}
+      y1={y1}
+      x2={x2}
+      y2={y2}
+      stroke={stroke}
+      strokeWidth={width}
+      opacity={opacity}
+      pathLength={1}
+      strokeDasharray={1}
+      style={{ strokeDashoffset: undrawn(stage, a, b) }}
+    />
+  );
 }
 
-// A semicircular drafting gauge whose needle + arc track a 0..1 value.
-function Gauge({ cx, cy, frac, label }: { cx: number; cy: number; frac: number; label: string }) {
+/* A semicircular drafting gauge whose arc and needle sweep to a fixed reading
+   as stage 4 draws. `to` is the target fraction, `read` the value it lands on. */
+function Gauge({ cx, cy, to, label, read, from, until }: { cx: number; cy: number; to: number; label: string; read: string; from: number; until: number }) {
   const r = 52;
-  const f = clamp(frac, 0, 1);
-  const theta = Math.PI - f * Math.PI; // 180°(0) → 0°(1)
-  const nx = cx + r * 0.82 * Math.cos(theta);
-  const ny = cy - r * 0.82 * Math.sin(theta);
   const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+  const sweep = `calc(${ramp(3, from, until)} * ${to})`;
   return (
     <g>
       <path d={arc} fill="none" stroke={LINE_DIM} strokeWidth={3} />
-      <path d={arc} fill="none" stroke={C.accent} strokeWidth={3} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - f} style={{ transition: "stroke-dashoffset .4s" }} strokeLinecap="round" />
-      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={C.accentHover} strokeWidth={2.4} strokeLinecap="round" style={{ transition: "all .35s" }} />
+      <path d={arc} fill="none" stroke={C.accent} strokeWidth={3} strokeLinecap="round" pathLength={1} strokeDasharray={1} style={{ strokeDashoffset: `calc((1 - ${sweep}) * 1px)` }} />
+      {/* Needle rests pointing left at 0 and sweeps to the right. Positive
+          rotation is clockwise in SVG's y-down space, which takes a leftward
+          vector up and over — under the arc, not below the gauge. */}
+      <g style={{ transform: `rotate(calc(${sweep} * 180deg))`, transformOrigin: `${cx}px ${cy}px` }}>
+        <line x1={cx} y1={cy} x2={cx - r * 0.82} y2={cy} stroke={C.accentHover} strokeWidth={2.4} strokeLinecap="round" />
+      </g>
       <circle cx={cx} cy={cy} r={4} fill={C.accent} />
-      <text x={cx} y={cy + 22} textAnchor="middle" className="apr-mono" fill={C.muted} fontSize={12}>
+      <text x={cx} y={cy + 22} textAnchor="middle" className="apr-mono" fill={C.muted} fontSize={12} style={{ textTransform: "uppercase" }}>
         {label}
+      </text>
+      <text x={cx} y={cy + 44} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={16} fontWeight={700} style={{ opacity: ramp(3, until, until + 0.15) }}>
+        {read}
       </text>
     </g>
   );
 }
 
-// A tiny silhouette of the finished module, reused for the replicated copies.
+// A silhouette of the finished module, reused for the replicated copies.
 function GhostModule() {
   return (
-    <g stroke={C.accent} strokeWidth={4} fill="none">
+    <g stroke={C.accent} strokeWidth={6} fill="none">
       <line x1={0} y1={320} x2={400} y2={320} />
       {[40, 160, 280, 360].map((x) => (
         <line key={x} x1={x} y1={120} x2={x} y2={320} />
@@ -873,11 +590,11 @@ function Intro() {
         <span style={{ color: C.muted }}>like architecture.</span>
       </h1>
       <p style={{ color: C.muted, fontSize: 19, lineHeight: 1.55, maxWidth: 560, marginTop: 28 }}>
-        Not a campaign that ends — a system that compounds. Scroll to assemble it, layer by layer: foundation, frame, wiring, load test, and a structure that replicates itself across every market you enter.
+        Campaigns stop when the budget stops. A system keeps working. Five sheets, in the order we build them: foundation, frame, wiring, load test, and a structure that goes up again in the next market.
       </p>
       <div className="apr-mono" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 34, color: C.faint, fontSize: 13 }}>
         <span style={{ width: 7, height: 7, borderRadius: 9, background: C.accent }} />
-        Drag · connect · model — the blueprint is yours to draw ↓
+        Scroll to draw the set ↓
       </div>
     </section>
   );
