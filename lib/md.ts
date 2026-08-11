@@ -5,9 +5,6 @@ export const MD = {
   brandFull: "Marked Digital",
   nav: ["Services", "Work", "Approach", "About"],
   cta: "Book a strategy call",
-  // Short label for the nav CTA on phones, where the full wording would crowd
-  // out the logo and the menu button. Swapped by CSS in NavCta (site-nav.tsx).
-  ctaShort: "Book a call",
   // Every "Book a strategy call" button across the site points here — the
   // booking page, which embeds the Google Calendar appointment scheduler.
   ctaHref: "/book",
@@ -25,7 +22,37 @@ export const MD = {
     { value: 13, suffix: "", label: "years in ecommerce industry" },
   ],
 
-  markets: ["Berlin", "Tokyo", "Dubai", "São Paulo", "London", "Singapore", "Seoul", "Sydney", "Mexico City", "Toronto"],
+  // Rotated one at a time by the hero's "Now launching in …" line
+  // (home-signal.tsx), 2.4s each. Countries, not cities — the offer is market
+  // entry, and a city reads like a field office. Two constraints on anything
+  // added here: the name stays short enough that the line doesn't wrap on a
+  // 360px phone (≤14 characters), and it reads correctly straight after
+  // "in" — hence "the UAE" rather than "United Arab Emirates", which is both
+  // too long and ungrammatical there. Ordered to move between regions rather
+  // than run through Europe in a block, so consecutive swaps look deliberate.
+  markets: [
+    "United States",
+    "Germany",
+    "Japan",
+    "United Kingdom",
+    "Brazil",
+    "Australia",
+    "France",
+    "China",
+    "Canada",
+    "Netherlands",
+    "South Korea",
+    "Mexico",
+    "Spain",
+    "Singapore",
+    "Sweden",
+    "India",
+    "Italy",
+    "the UAE",
+    "Poland",
+    "New Zealand",
+    "Saudi Arabia",
+  ],
 
   marketData: [
     { city: "Berlin", country: "Germany", region: "EU", opp: 4.2, weeks: 6 },
@@ -168,10 +195,23 @@ export const WORK: WorkItem[] = [
     title: "ONTARIO EDUCATION ONLINE",
     industry: "Online Educational Services",
     tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
-    // Must match OEO.headlineStat / OEO.results[0] in lib/oeo.ts.
+    // Must match OEO.headlineStat / OEO.results.items[0] in lib/oeo.ts.
     metric: "+548% revenue",
     href: "/work/ontario-education-online",
     bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
+  },
+  {
+    // Real results, led by our own team — badges mirror the case study hero:
+    // the channel span, the marketplace work, and the global replatform from
+    // its SERVICES line.
+    title: "ROADPOST",
+    industry: "Satellite Communications",
+    tags: ["Web + marketplace", "Amazon growth", "Global replatform"],
+    // Must match ROADPOST.headlineStat / ROADPOST.results.items[0] in
+    // lib/roadpost.ts.
+    metric: "$20.9M revenue",
+    href: "/work/roadpost",
+    bg: "radial-gradient(100% 110% at 88% 6%, rgba(31,168,95,0.12), transparent 56%), radial-gradient(90% 80% at 8% 92%, rgba(243,245,242,0.05), transparent 60%), linear-gradient(165deg, #121412 0%, #0A0B0A 74%)",
   },
   {
     title: "LUMEN",
@@ -239,11 +279,13 @@ export const STACK_TOOLS: StackTool[] = [
   { name: "OpenAI", cat: "AI & Automation", mono: "O", color: "#10A37F", role: "LLM models", why: "Embeddings and generation wired into our pipelines.", localLogo: "openai" },
   { name: "Zapier", cat: "AI & Automation", mono: "Z", color: "#FF4F00", role: "Workflow automation", why: "Connects the stack end-to-end without custom code.", icon: "zapier" },
   { name: "Make", cat: "AI & Automation", mono: "Mk", color: "#B16EFF", role: "Visual automation", why: "Complex multi-step workflows, built and shipped visually.", icon: "make" },
+  { name: "n8n", cat: "AI & Automation", mono: "n8", color: "#EA4B71", role: "Self-hosted automation", why: "Custom AI and data workflows we host and version ourselves.", icon: "n8n" },
   { name: "Shopify", cat: "Commerce", mono: "S", color: "#95BF47", role: "DTC commerce", why: "Fast, conversion-built storefronts for growing brands.", icon: "shopify" },
   { name: "BigCommerce", cat: "Commerce", mono: "B", color: "#9BA7B4", role: "Enterprise commerce", why: "Headless, multi-market catalogs built to scale.", icon: "bigcommerce" },
   { name: "WooCommerce", cat: "Commerce", mono: "W", color: "#96588A", role: "WordPress commerce", why: "Flexible storefronts on the open web.", icon: "woocommerce" },
   { name: "Adobe Commerce", cat: "Commerce", mono: "AC", color: "#F26322", role: "B2B & B2C commerce", why: "Complex catalogs and multi-store setups at scale.", localLogo: "adobe-commerce" },
   { name: "Amazon Marketplace", cat: "Commerce", mono: "A", color: "#FF9900", role: "Marketplace", why: "Beachhead launches on the local marketplace in new markets.", localLogo: "amazon" },
+  { name: "Walmart Marketplace", cat: "Commerce", mono: "W", color: "#0071CE", role: "Marketplace", why: "A second US marketplace to test once Amazon is running well.", localLogo: "walmart" },
   { name: "Salesforce Commerce Cloud", cat: "Commerce", mono: "CC", color: "#00A1E0", role: "Enterprise commerce", why: "Unified B2C and B2B commerce at enterprise scale.", localLogo: "salesforce-commerce" },
   { name: "SAP", cat: "ERP & Operations", mono: "SAP", color: "#0FAAFF", role: "Enterprise ERP", why: "Finance, supply chain, and operations on one enterprise backbone.", icon: "sap" },
   { name: "NetSuite", cat: "ERP & Operations", mono: "NS", color: "#1F74B7", role: "Cloud ERP", why: "Unified ERP, inventory, and financials for scaling merchants.", localLogo: "netsuite" },
@@ -293,6 +335,8 @@ export const STACK_TOOLS: StackTool[] = [
   { name: "Amazon Ads", cat: "Advertising", mono: "AMZ", color: "#FF9900", role: "Retail media", why: "Sponsored placements where buyers are already shopping.", localLogo: "amazon-ads" },
   { name: "Microsoft Ads", cat: "Advertising", mono: "MS", color: "#00A4EF", role: "Search ads", why: "Bing intent capture at lower CPCs.", localLogo: "microsoft-ads" },
   { name: "Pinterest Ads", cat: "Advertising", mono: "P", color: "#E60023", role: "Discovery ads", why: "High-intent visual discovery for DTC brands.", icon: "pinterest" },
+  { name: "Reddit Ads", cat: "Advertising", mono: "R", color: "#FF4500", role: "Community ads", why: "Reaches buyers mid-research, in the threads they already trust.", icon: "reddit" },
+  { name: "LinkedIn Ads", cat: "Advertising", mono: "Li", color: "#0A66C2", role: "B2B ads", why: "Role and industry targeting for considered, longer-cycle purchases.", localLogo: "linkedin" },
   { name: "Klaviyo", cat: "Email & CRM", mono: "K", color: "#23856D", role: "Email & SMS", why: "Lifecycle flows that turn buyers into repeat customers.", localLogo: "klaviyo" },
   { name: "HubSpot", cat: "Email & CRM", mono: "H", color: "#FF7A59", role: "CRM & automation", why: "Pipeline, nurture, and attribution in one place.", icon: "hubspot" },
   { name: "Mailchimp", cat: "Email & CRM", mono: "MC", color: "#FFE01B", role: "Email marketing", why: "Fast campaigns and audience management for growing lists.", icon: "mailchimp" },

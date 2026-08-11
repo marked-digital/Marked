@@ -1,11 +1,16 @@
 "use client";
 
-// Ontario Education Online — growth case study (/work/ontario-education-online).
+// The case study template. One <CaseStudy data={…} /> per engagement:
+//
+//   /work/ontario-education-online → lib/oeo.ts
+//   /work/roadpost                 → lib/roadpost.ts
 //
 // Built from the design handoff in `design_handoff_oeo_case_study`. Structure,
-// section order, copy and behaviour follow the reference; none of its styling
-// does — every colour, type step and surface comes from the Signal tokens in
-// lib/md.ts and the `.oeo` block in app/marked.css, which documents the mapping.
+// section order and behaviour follow the reference; none of its styling does —
+// every colour, type step and surface comes from the Signal tokens in lib/md.ts
+// and the `.oeo` block in app/marked.css, which documents the mapping. That
+// block keeps its original prefix now that the template is shared: same
+// classes, every case study.
 //
 // Nav and footer are out of scope: they're the same compact rebuild the other
 // inner pages use (see book-page.tsx / approach-page.tsx), unchanged.
@@ -23,7 +28,7 @@ import Link from "next/link";
 import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { MarkLogo, ToolLogo } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
-import { OEO, type PageBuild } from "@/lib/oeo";
+import type { BarGroup, CaseStudy as CaseStudyData, PageBuild } from "@/lib/case-study";
 
 const EASE = "cubic-bezier(0.2, 0.7, 0.3, 1)"; // the site's easing, used everywhere
 
@@ -239,13 +244,13 @@ function Footer() {
 
 /* ------------------------------------------------------------------ hero */
 
-function Hero() {
-  const h = OEO.headlineStat;
+function Hero({ d }: { d: CaseStudyData }) {
+  const h = d.headlineStat;
   const meta: [string, string][] = [
-    ["CLIENT", OEO.client],
-    ["INDUSTRY", OEO.industry],
-    ["SERVICES", OEO.services],
-    ["TIMELINE", OEO.timeline],
+    ["CLIENT", d.client],
+    ["INDUSTRY", d.industry],
+    ["SERVICES", d.services],
+    ["TIMELINE", d.timeline],
   ];
   return (
     <section className="oeo-hero">
@@ -253,14 +258,14 @@ function Hero() {
         <div data-rev style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ width: 8, height: 8, background: C.accent, display: "inline-block" }} />
           <span className="oeo-mono" style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.2em", color: C.accent }}>
-            {OEO.kicker}
+            {d.kicker}
           </span>
         </div>
 
         <h1 data-rev data-delay={80} className="oeo-h1">
-          {OEO.h1.before}
+          {d.h1.before}
           <span style={{ position: "relative", display: "inline-block" }}>
-            {OEO.h1.underlined}
+            {d.h1.underlined}
             <svg className="oeo-underline" viewBox="0 0 300 26" preserveAspectRatio="none" aria-hidden="true">
               <path
                 data-draw
@@ -270,16 +275,16 @@ function Hero() {
               />
             </svg>
           </span>
-          {OEO.h1.after}
+          {d.h1.after}
         </h1>
 
         <p data-rev data-delay={200} style={{ margin: "28px 0 0", maxWidth: 640, fontSize: 19, lineHeight: 1.6, color: C.muted }}>
-          {OEO.sub}
+          {d.sub}
         </p>
 
         <div data-rev data-delay={300} style={{ marginTop: 60, display: "flex", alignItems: "baseline", gap: 22, flexWrap: "wrap" }}>
           <span className="oeo-hero-stat">
-            <CountStat value={h.value} prefix={h.prefix} suffix={h.suffix} />
+            <CountStat value={h.value} prefix={h.prefix} suffix={h.suffix} decimals={h.decimals} />
           </span>
           <span className="oeo-mono" style={{ fontSize: 12, letterSpacing: "0.18em", lineHeight: 1.7, color: C.muted }}>
             {h.label[0]}
@@ -302,7 +307,7 @@ function Hero() {
             <i />
           </span>
           <span className="oeo-mono" style={{ fontSize: 11, letterSpacing: "0.2em", color: C.faint }}>
-            Scroll — the brief
+            {d.scrollCue}
           </span>
         </div>
       </div>
@@ -312,22 +317,22 @@ function Hero() {
 
 /* ------------------------------------------------------------ 01 the brief */
 
-function Objectives() {
+function Objectives({ d }: { d: CaseStudyData }) {
+  const b = d.brief;
   return (
     <section className="oeo-sec oeo-sec--tint">
       <div className="oeo-wrap">
         <div className="oeo-head">
           <div data-rev>
-            <Kicker>/ 01 — The brief</Kicker>
-            <h2 className="oeo-h2">What OEO needed.</h2>
+            <Kicker>{b.kicker}</Kicker>
+            <h2 className="oeo-h2">{b.heading}</h2>
           </div>
           <p data-rev data-delay={120} className="oeo-lede">
-            A trusted Ontario course provider with no digital marketing to speak of — and a product the whole world
-            could buy. Four objectives set the engagement.
+            {b.lede}
           </p>
         </div>
         <div className="oeo-cards">
-          {OEO.objectives.map((o, i) => (
+          {b.objectives.map((o, i) => (
             <div key={o.n} data-rev data-delay={i * 80} className="oeo-card">
               <div className="oeo-mono" style={{ fontSize: 13, fontWeight: 600, color: C.accent }}>
                 / {o.n}
@@ -344,22 +349,23 @@ function Objectives() {
 
 /* ---------------------------------------------------------- 02 the results */
 
-function Results() {
+function Results({ d }: { d: CaseStudyData }) {
+  const r = d.results;
   return (
     <section className="oeo-sec">
       <div className="oeo-wrap">
-        <Kicker>/ 02 — The results</Kicker>
+        <Kicker>{r.kicker}</Kicker>
         <h2 data-rev data-delay={80} className="oeo-h2">
-          Seven months in.
+          {r.heading}
         </h2>
         <div className="oeo-results">
-          {OEO.results.map((r, i) => (
-            <div key={r.label} data-rev data-delay={i * 60}>
-              <Label style={{ color: C.muted }}>{r.label}</Label>
-              <div className="oeo-stat" style={r.lead ? { color: C.accent } : undefined}>
-                <CountStat value={r.value} prefix={r.prefix} suffix={r.suffix} decimals={r.decimals} />
+          {r.items.map((item, i) => (
+            <div key={item.label} data-rev data-delay={i * 60}>
+              <Label style={{ color: C.muted }}>{item.label}</Label>
+              <div className="oeo-stat" style={item.lead ? { color: C.accent } : undefined}>
+                <CountStat value={item.value} prefix={item.prefix} suffix={item.suffix} decimals={item.decimals} />
               </div>
-              <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.5, color: C.muted }}>{r.sub}</div>
+              <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.5, color: C.muted }}>{item.sub}</div>
             </div>
           ))}
         </div>
@@ -370,16 +376,16 @@ function Results() {
 
 /* ---------------------------------------------------------- 03 the revenue */
 
-// Chart geometry. The series drives the path, so real monthly numbers drop
-// straight into lib/oeo.ts without touching any coordinates here. The vertical
-// scale is pinned to the top gridline, so changing `gridlines` rescales the
-// plot; values above the top gridline use the headroom, as the final month does.
+// Chart geometry. The series drives the path, so real figures drop straight
+// into the data file without touching any coordinates here. The vertical scale
+// is pinned to the top gridline, so changing `gridlines` rescales the plot;
+// values above the top gridline use the headroom, as the final point does.
 const CH = { w: 1000, h: 388, base: 340, top: 66 };
 const yFor = (v: number, max: number) => CH.base - (v * (CH.base - CH.top)) / max;
 const xFor = (i: number, n: number) => (i * CH.w) / (n - 1);
 
-function RevenueChart() {
-  const { series, engagementIndex: ei, gridlines, rangeLabel, title, body, indexBase, growthPct } = OEO.revenue;
+function RevenueChart({ d }: { d: CaseStudyData }) {
+  const { series, engagementIndex: ei, gridlines, rangeLabel, heading, body, kicker, chartHead, ariaLabel, baseLabel, markerLabel, endLabel } = d.revenue;
   const scaleMax = gridlines[gridlines.length - 1];
   const yAt = (v: number) => yFor(v, scaleMax);
   const n = series.length;
@@ -400,8 +406,8 @@ function RevenueChart() {
       <div className="oeo-wrap">
         <div className="oeo-head">
           <div data-rev>
-            <Kicker>/ 03 — Revenue</Kicker>
-            <h2 className="oeo-h2">{title}</h2>
+            <Kicker>{kicker}</Kicker>
+            <h2 className="oeo-h2">{heading}</h2>
           </div>
           <p data-rev data-delay={120} className="oeo-lede">
             {body}
@@ -409,13 +415,13 @@ function RevenueChart() {
         </div>
 
         <div data-rev data-delay={160} className="oeo-chart-card">
-          {/* Indexed, not absolute — the client's monthly revenue figures are
-              not published. The index carries the same curve and growth rate. */}
+          {/* Indexed, not absolute — the client's real monthly figures are not
+              published. The index carries the same curve and growth rate. */}
           <div className="oeo-chart-head oeo-mono">
-            <span>Online revenue — indexed, engagement start = {indexBase}</span>
+            <span>{chartHead}</span>
             <span>{rangeLabel}</span>
           </div>
-          <svg viewBox={`0 0 ${CH.w} ${CH.h}`} role="img" aria-label={`Monthly online revenue indexed to ${indexBase} at the January 2026 engagement start, ${rangeLabel}, rising to +${growthPct}% by ${last.month}.`}>
+          <svg viewBox={`0 0 ${CH.w} ${CH.h}`} role="img" aria-label={ariaLabel}>
             <defs>
               <linearGradient id="oeoRev" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor={C.accent} stopOpacity="0.22" />
@@ -435,30 +441,32 @@ function RevenueChart() {
 
             <line x1={markerX} y1="40" x2={markerX} y2={CH.base} style={{ stroke: C.faint, strokeDasharray: "3 7" }} />
             <text x={markerX + 11} y="66" style={{ ...mono, fontSize: 11.5, letterSpacing: "0.14em", fill: C.accent, fontWeight: 600 }}>
-              ENGAGEMENT BEGINS
+              {markerLabel}
             </text>
 
             <path data-fade data-delay={1000} d={areaD} style={{ fill: "url(#oeoRev)" }} />
             <path data-draw data-delay={200} d={preD} style={{ fill: "none", stroke: C.faint, strokeWidth: 2.5 }} />
             <path data-draw data-delay={600} d={postD} style={{ fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinejoin: "round" }} />
 
-            <text x={markerX + 11} y={yAt(series[ei].value) + 26} style={{ ...mono, fontSize: 12, fill: C.faint }}>
-              INDEX {indexBase}
-            </text>
+            {baseLabel ? (
+              <text x={markerX + 11} y={yAt(series[ei].value) + 26} style={{ ...mono, fontSize: 12, fill: C.faint }}>
+                {baseLabel}
+              </text>
+            ) : null}
             <circle className="oeo-pulse" cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
             <circle cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
             <text x={CH.w - 10} y={yAt(last.value) - 19} textAnchor="end" style={{ ...mono, fontSize: 13, fontWeight: 600, fill: C.text }}>
-              +{growthPct}%
+              {endLabel}
             </text>
 
             <text x="0" y="380" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
-              {series[0].month}
+              {series[0].label}
             </text>
             <text x={markerX} y="380" textAnchor="middle" style={{ ...mono, fontSize: 11.5, fill: C.accent }}>
-              {series[ei].month}
+              {series[ei].label}
             </text>
             <text x={CH.w} y="380" textAnchor="end" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
-              {last.month}
+              {last.label}
             </text>
           </svg>
         </div>
@@ -467,54 +475,77 @@ function RevenueChart() {
   );
 }
 
-/* ---------------------------------------------------------- 04 the traffic */
+/* ------------------------------------------------------- 04 the split bars */
 
-function Traffic() {
-  const t = OEO.traffic;
+// `reveal` puts a reveal on each row, for the right-hand column where the rows
+// arrive one by one. The left column reveals as a block from its container
+// instead, so its rows stay plain — nesting the two would fade a row in against
+// an already-fading parent.
+function Bars({
+  group,
+  accentFirst,
+  reveal,
+  delayStep,
+}: {
+  group: BarGroup;
+  accentFirst?: boolean;
+  reveal?: boolean;
+  delayStep: number;
+}) {
+  return (
+    <>
+      {group.bars.map((b, i) => (
+        <div
+          key={b.label}
+          {...(reveal ? { "data-rev": true, "data-delay": i * delayStep } : {})}
+          style={{ display: "grid", gap: 8 }}
+        >
+          <div className="oeo-mono" style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, fontWeight: 500, letterSpacing: "0.08em" }}>
+            <span>{b.label}</span>
+            <span>
+              {b.pct}%{b.note ? <span style={{ color: C.faint }}> · {b.note}</span> : null}
+            </span>
+          </div>
+          <Bar pct={b.pct} delay={i * delayStep} accent={accentFirst ? i === 0 : undefined} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+function Split({ d }: { d: CaseStudyData }) {
+  const s = d.split;
   return (
     <section className="oeo-sec oeo-sec--tint oeo-sec--joined">
       <div className="oeo-wrap">
         <div className="oeo-traffic">
           <div>
-            <Kicker>/ 04 — Traffic</Kicker>
+            <Kicker>{s.kicker}</Kicker>
             <h2 data-rev data-delay={80} className="oeo-h2">
-              {t.title}
+              {s.heading}
             </h2>
             <p data-rev data-delay={160} style={{ margin: "22px 0 0", maxWidth: 480, fontSize: 16, lineHeight: 1.65, color: C.muted }}>
-              {t.body}
+              {s.body}
             </p>
             <div data-rev data-delay={240} style={{ marginTop: 46, display: "grid", gap: 18 }}>
-              <Label>Sessions by market</Label>
-              {t.markets.map((m, i) => (
-                <div key={m.label} style={{ display: "grid", gap: 8 }}>
-                  <div className="oeo-mono" style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 500, letterSpacing: "0.08em" }}>
-                    <span>{m.label}</span>
-                    <span>{m.pct}%</span>
-                  </div>
-                  <Bar pct={m.pct} delay={i * 120} accent={i === 0} />
-                </div>
-              ))}
-              <Label style={{ letterSpacing: "0.12em" }}>{t.marketsFootnote}</Label>
+              <Label>{s.primary.label}</Label>
+              <Bars group={s.primary} accentFirst delayStep={120} />
+              {s.primary.footnote ? <Label style={{ letterSpacing: "0.12em" }}>{s.primary.footnote}</Label> : null}
             </div>
           </div>
 
           <div>
             <div data-rev style={{ marginBottom: 26 }}>
-              <Label>Sessions by channel — share of total</Label>
+              <Label>{s.secondary.label}</Label>
             </div>
             <div style={{ display: "grid", gap: 22 }}>
-              {t.channels.map((c, i) => (
-                <div key={c.label} data-rev data-delay={i * 80} style={{ display: "grid", gap: 8 }}>
-                  <div className="oeo-mono" style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, fontWeight: 500, letterSpacing: "0.08em" }}>
-                    <span>{c.label}</span>
-                    <span>
-                      {c.pct}% <span style={{ color: C.faint }}>· {c.note}</span>
-                    </span>
-                  </div>
-                  <Bar pct={c.pct} delay={i * 80} />
-                </div>
-              ))}
+              <Bars group={s.secondary} reveal delayStep={80} />
             </div>
+            {s.secondary.footnote ? (
+              <div data-rev style={{ marginTop: 22 }}>
+                <Label style={{ letterSpacing: "0.12em" }}>{s.secondary.footnote}</Label>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -524,15 +555,15 @@ function Traffic() {
 
 /* ------------------------------------------------------------ 05 the stack */
 
-function Stack() {
-  const s = OEO.stack;
+function Stack({ d }: { d: CaseStudyData }) {
+  const s = d.stack;
   return (
     <section className="oeo-sec oeo-sec--tint oeo-sec--joined">
       <div className="oeo-wrap">
         <div className="oeo-head">
           <div data-rev>
-            <Kicker>/ 05 — The stack</Kicker>
-            <h2 className="oeo-h2">{s.title}</h2>
+            <Kicker>{s.kicker}</Kicker>
+            <h2 className="oeo-h2">{s.heading}</h2>
           </div>
           <p data-rev data-delay={120} className="oeo-lede">
             {s.body}
@@ -565,7 +596,7 @@ function Stack() {
 /* ---------------------------------------------------------- 06 the shipped */
 
 // Schematic stand-ins for real page captures. When `image` is set on a build in
-// lib/oeo.ts the screenshot renders instead — no other change needed.
+// the data file the screenshot renders instead — no other change needed.
 function Thumb({ page }: { page: PageBuild }) {
   if (page.image) {
     return (
@@ -660,9 +691,8 @@ function Thumb({ page }: { page: PageBuild }) {
   }
 }
 
-function Compare() {
+function Compare({ c }: { c: NonNullable<CaseStudyData["shipped"]["compare"]> }) {
   const ref = React.useRef<HTMLDivElement | null>(null);
-  const c = OEO.shipped.compare;
   const onSplit = (e: React.FormEvent<HTMLInputElement>) => {
     ref.current?.style.setProperty("--split", `${e.currentTarget.value}%`);
   };
@@ -670,11 +700,11 @@ function Compare() {
     <div data-rev style={{ marginTop: 70 }}>
       <Label>{c.label}</Label>
       <div className="oeo-compare" ref={ref}>
-        {/* BEFORE — the cluttered legacy course page */}
+        {/* BEFORE — the cluttered legacy page */}
         <div className="oeo-compare-layer oeo-compare-before">
           {c.beforeImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.beforeImage} alt="The legacy course page, before the rebuild" />
+            <img src={c.beforeImage} alt={c.beforeAlt} />
           ) : (
             <>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -702,11 +732,11 @@ function Compare() {
           )}
         </div>
 
-        {/* AFTER — the rebuilt enrol-first template, revealed by the divider */}
+        {/* AFTER — the rebuilt template, revealed by the divider */}
         <div className="oeo-compare-layer oeo-compare-after" style={{ gap: 14 }}>
           {c.afterImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={c.afterImage} alt="The rebuilt enrol-first course page" />
+            <img src={c.afterImage} alt={c.afterAlt} />
           ) : (
             <>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -750,19 +780,19 @@ function Compare() {
   );
 }
 
-function Shipped() {
-  const s = OEO.shipped;
+function Shipped({ d }: { d: CaseStudyData }) {
+  const s = d.shipped;
   return (
     <section className="oeo-sec oeo-sec--tint oeo-sec--joined">
       <div className="oeo-wrap">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 32, flexWrap: "wrap" }}>
           <div data-rev>
-            <Kicker>/ 06 — Shipped</Kicker>
-            <h2 className="oeo-h2">{s.title}</h2>
+            <Kicker>{s.kicker}</Kicker>
+            <h2 className="oeo-h2">{s.heading}</h2>
             <p style={{ margin: "22px 0 0", maxWidth: 560, fontSize: 16, lineHeight: 1.65, color: C.muted }}>{s.body}</p>
           </div>
           <div data-rev data-delay={120} style={{ paddingBottom: 6 }}>
-            <Label style={{ letterSpacing: "0.2em" }}>Scroll →</Label>
+            <Label style={{ letterSpacing: "0.2em" }}>{s.scrollHint}</Label>
           </div>
         </div>
 
@@ -776,13 +806,15 @@ function Shipped() {
               </div>
             </div>
           ))}
-          <div data-rev data-delay={s.pages.length * 60} className="oeo-pcard oeo-pcard--more">
-            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.03em" }}>+{s.more}</div>
-            <Label style={{ letterSpacing: "0.2em" }}>More pages</Label>
-          </div>
+          {s.more ? (
+            <div data-rev data-delay={s.pages.length * 60} className="oeo-pcard oeo-pcard--more">
+              <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.03em" }}>+{s.more.count}</div>
+              <Label style={{ letterSpacing: "0.2em" }}>{s.more.label}</Label>
+            </div>
+          ) : null}
         </div>
 
-        <Compare />
+        {s.compare ? <Compare c={s.compare} /> : null}
       </div>
     </section>
   );
@@ -790,16 +822,16 @@ function Shipped() {
 
 /* --------------------------------------------------------- 07 how it ran */
 
-function Approach() {
-  const a = OEO.approach;
+function Approach({ d }: { d: CaseStudyData }) {
+  const a = d.approach;
   return (
     <section className="oeo-sec oeo-sec--tint oeo-sec--joined" style={{ paddingBottom: 130 }}>
       <div className="oeo-wrap">
         <div className="oeo-approach">
           <div className="oeo-sticky">
-            <Kicker>/ 07 — How it ran</Kicker>
+            <Kicker>{a.kicker}</Kicker>
             <h2 data-rev data-delay={80} className="oeo-h2">
-              {a.title}
+              {a.heading}
             </h2>
             <p data-rev data-delay={160} style={{ margin: "22px 0 0", maxWidth: 420, fontSize: 16, lineHeight: 1.65, color: C.muted }}>
               {a.body}
@@ -817,7 +849,9 @@ function Approach() {
                 <div className="oeo-mono" style={{ marginTop: 22, display: "grid", gap: 10, fontSize: 11, letterSpacing: "0.14em", color: C.muted }}>
                   {p.bullets.map((b) => (
                     <div key={b} style={{ display: "flex", gap: 10 }}>
-                      <span style={{ color: C.accent }}>—</span>
+                      {/* "/" rather than a dash — same marker the section
+                          kickers and objective numbers use. */}
+                      <span style={{ color: C.accent }}>/</span>
                       <span>{b}</span>
                     </div>
                   ))}
@@ -833,8 +867,7 @@ function Approach() {
 
 /* ------------------------------------------------------------------ quote */
 
-function Quote() {
-  const q = OEO.quote;
+function Quote({ q }: { q: NonNullable<CaseStudyData["quote"]> }) {
   return (
     <section className="oeo-sec" style={{ paddingBottom: 130 }}>
       <div className="oeo-wrap">
@@ -856,22 +889,22 @@ function Quote() {
 
 /* ------------------------------------------------------------------- page */
 
-export default function OeoCaseStudy() {
+export default function CaseStudy({ data }: { data: CaseStudyData }) {
   const root = React.useRef<HTMLDivElement | null>(null);
   useScrollMotion(root);
   return (
     <div className="oeo" ref={root}>
       <ScrollProgress />
       <Nav />
-      <Hero />
-      <Objectives />
-      <Results />
-      <RevenueChart />
-      <Traffic />
-      <Stack />
-      <Shipped />
-      <Approach />
-      <Quote />
+      <Hero d={data} />
+      <Objectives d={data} />
+      <Results d={data} />
+      <RevenueChart d={data} />
+      <Split d={data} />
+      <Stack d={data} />
+      <Shipped d={data} />
+      <Approach d={data} />
+      {data.quote ? <Quote q={data.quote} /> : null}
       <Footer />
     </div>
   );

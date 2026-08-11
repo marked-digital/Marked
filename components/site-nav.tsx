@@ -8,9 +8,9 @@
 //   MobileMenu the hamburger button plus its drawer, ≤760px only
 //
 // Below 760px the desktop link row (.sg-nav-links / .stk-nav-links) is hidden by
-// marked.css; the drawer is what replaces it. The bar becomes a three-column
-// grid there — burger left, logo centred, CTA right (see the ≤760px block in
-// marked.css).
+// marked.css; the drawer is what replaces it. The bar CTA is hidden there too —
+// the drawer carries it instead — leaving the bar as logo left, burger right
+// (see the ≤760px block in marked.css).
 
 import React from "react";
 import { createPortal } from "react-dom";
@@ -36,7 +36,8 @@ function activeItem(pathname: string | null): string | null {
 
 /** The nav's pill CTA. `className` picks the page's button flavour
  *  (.sg-btn .sg-btn--p everywhere except the stack page's .stk-btn); the compact
- *  nav sizing and the responsive label live in .mk-nav-cta. */
+ *  nav sizing lives in .mk-nav-cta, which also hides it ≤760px — on phones the
+ *  drawer's own CTA takes over. */
 export function NavCta({ className, current }: { className?: string; current?: boolean }) {
   return (
     <Link
@@ -44,10 +45,7 @@ export function NavCta({ className, current }: { className?: string; current?: b
       href={MD.ctaHref}
       {...(current ? { "aria-current": "page" as const } : {})}
     >
-      {/* One of the two is display:none at any width, which also keeps it out of
-          the accessible name. */}
-      <span className="mk-nav-cta-full">{MD.cta}</span>
-      <span className="mk-nav-cta-short">{MD.ctaShort}</span>
+      {MD.cta}
     </Link>
   );
 }

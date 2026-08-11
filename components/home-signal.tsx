@@ -32,8 +32,8 @@ function Nav() {
           Stack
         </Link>
       </nav>
-      {/* ≤760px the link row above is hidden and MobileMenu's hamburger takes
-          over; the logo and CTA stay in the bar. */}
+      {/* ≤760px the link row above and the bar CTA are hidden, and MobileMenu's
+          hamburger takes over at the right end of the bar. */}
       <div className="mk-nav-right">
         <NavCta />
         <MobileMenu />
