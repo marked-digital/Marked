@@ -856,11 +856,14 @@
 }
 
 /* ================================================ approach page (.apr)
-   An interactive cyan—no, *Signal*—blueprint. Same brand palette and type as
-   the rest of the site (deep emerald accent, Plus Jakarta), but the page reads
-   like a drawing set: graph-paper backdrop, drafting HUD, and a structure the
-   visitor assembles layer by layer as they scroll. Accent green = "alive / you
-   can touch this"; everything cool/white = structure. */
+   Same brand palette and type as the rest of the site (deep emerald accent,
+   Plus Jakarta), but the page reads like a drawing set: graph-paper backdrop,
+   title block, and a structure that draws itself layer by layer as the visitor
+   scrolls. Accent green = "the system"; cool/white = the structure it hangs on.
+
+   The drawing's motion is not in here: approach-page.tsx writes one custom
+   property per stage on .apr, and each stroke's draw-in is a calc() off those.
+   Only the chrome below is styled conventionally. */
 .apr {
   background: #0a0b0a;
   color: #f3f5f2;
@@ -921,8 +924,8 @@
   margin: 0 auto;
   padding: 0 56px;
   display: grid;
-  grid-template-columns: 0.9fr 1.3fr;
-  gap: 44px;
+  grid-template-columns: 0.85fr 1.42fr;
+  gap: 40px;
   align-items: center;
 }
 .apr-blueprint {
@@ -935,8 +938,6 @@
   position: relative;
   width: 100%;
   height: 100%;
-  touch-action: pan-y;
-  cursor: none;
 }
 .apr-blueprint svg {
   width: 100%;
@@ -945,50 +946,7 @@
   display: block;
 }
 
-/* drafting cursor HUD — a grid-snapping crosshair that replaces the pointer */
-.apr-cross-v,
-.apr-cross-h {
-  position: absolute;
-  background: rgba(31, 168, 95, 0.42);
-  pointer-events: none;
-  z-index: 5;
-}
-.apr-cross-v {
-  width: 1px;
-  top: 0;
-  bottom: 0;
-}
-.apr-cross-h {
-  height: 1px;
-  left: 0;
-  right: 0;
-}
-.apr-cross-dot {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border: 1px solid #1fa85f;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 6;
-  background: rgba(31, 168, 95, 0.16);
-}
-.apr-hud-read {
-  position: absolute;
-  z-index: 6;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: #8e948c;
-  background: rgba(8, 9, 8, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.085);
-  border-radius: 6px;
-  padding: 4px 9px;
-  pointer-events: none;
-  font-variant-numeric: tabular-nums;
-}
-
-/* build rail 01–05 */
+/* sheet rail 01–05 */
 .apr-rail {
   position: fixed;
   right: 26px;
@@ -1000,6 +958,7 @@
   gap: 13px;
 }
 .apr-rail-dot {
+  position: relative;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -1025,6 +984,18 @@
   border-color: #1fa85f;
   color: #f3f5f2;
   box-shadow: 0 0 0 4px rgba(31, 168, 95, 0.12);
+}
+/* A thin arc around the live dot, tracking how far that sheet has drawn. Each
+   dot inherits its own stage progress as --sc from the page root. */
+.apr-rail-dot.on::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(#1fa85f calc(var(--sc, 0) * 360deg), transparent 0);
+  -webkit-mask: radial-gradient(closest-side, transparent 79%, #000 80%);
+  mask: radial-gradient(closest-side, transparent 79%, #000 80%);
+  pointer-events: none;
 }
 .apr-rail-dot.done {
   background: #1fa85f;
@@ -1065,65 +1036,29 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* requirement / market chips */
-.apr-chip {
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 13.5px;
-  padding: 9px 15px;
-  border-radius: 999px;
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.085);
-  background: transparent;
-  color: #8e948c;
-  transition: all 0.2s;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.apr-chip:hover {
-  color: #f3f5f2;
-  border-color: rgba(255, 255, 255, 0.25);
-}
-.apr-chip.on {
-  background: rgba(31, 168, 95, 0.12);
-  color: #f3f5f2;
-  border-color: #1fa85f;
-}
-.apr-chip:focus-visible,
-.apr-rail-dot:focus-visible,
-.apr-nodebtn:focus-visible {
+.apr-rail-dot:focus-visible {
   outline: 2px solid #1fa85f;
   outline-offset: 2px;
 }
 
-/* node legend buttons (keyboard path for the wiring stage) */
-.apr-nodebtn {
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 11px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.085);
-  background: transparent;
-  color: #8e948c;
-  transition: all 0.2s;
+/* the drafting schedule under each sheet's outputs — three fixed readings,
+   divided like a title-block table rather than boxed as cards */
+.apr-spec {
   display: flex;
-  align-items: center;
-  gap: 11px;
+  margin-top: 26px;
+  padding-top: 16px;
+  max-width: 460px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
 }
-.apr-nodebtn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+.apr-spec > div {
+  flex: 1;
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.085);
 }
-.apr-nodebtn.pending {
-  border-color: #1fa85f;
-  background: rgba(31, 168, 95, 0.12);
-}
-
-/* blueprint stroke draw-in */
-.apr-draw {
-  transition: stroke-dashoffset 1s cubic-bezier(0.55, 0.1, 0.25, 1), opacity 0.6s;
+.apr-spec > div:first-child {
+  padding-left: 0;
+  border-left: none;
 }
 
 /* travelling pulse along a wire */
@@ -1137,43 +1072,6 @@
   animation: apr-flow var(--flow, 2.4s) linear infinite;
 }
 
-/* the .apr range slider — same proportions as the homepage .sg-range */
-.apr-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-  outline: none;
-  border: none;
-}
-.apr-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #1fa85f;
-  cursor: grab;
-  border: 4px solid #0a0b0a;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.085), 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: transform 0.15s;
-}
-.apr-range::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.08);
-}
-.apr-range::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #1fa85f;
-  border: 4px solid #0a0b0a;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.085);
-  cursor: grab;
-}
-
 .apr-out {
   display: flex;
   gap: 10px;
@@ -1183,10 +1081,9 @@
   line-height: 1.45;
 }
 
+/* The sheet itself is drawn by scroll position, so it has nothing to disable
+   here; these two are the only self-running animations on the page. */
 @media (prefers-reduced-motion: reduce) {
-  .apr-draw {
-    transition: none;
-  }
   .apr-pulse,
   .apr-stage-copy {
     animation: none;
@@ -1204,8 +1101,16 @@
     height: 40vh;
     order: -1;
   }
-  .apr-bp-canvas {
-    cursor: default;
+  /* The sheet scales down with its column, which puts every label on it at
+     roughly 6px — noise, not information. Below here the drawing reads as pure
+     line-work and the words live in the copy column, where they're legible:
+     the spec row carries the same readings as real text. */
+  .apr-blueprint svg text {
+    display: none;
+  }
+  .apr-spec {
+    margin-top: 18px;
+    padding-top: 13px;
   }
   .apr-rail {
     flex-direction: row;
@@ -1221,6 +1126,18 @@
     font-size: 11px;
   }
   .apr-titleblock {
+    display: none;
+  }
+}
+
+/* On a short phone the pinned panel has to hold the copy, the outputs and the
+   sheet inside one 100vh box, and .apr-sticky clips what doesn't fit. The
+   outputs list carries the substance, so the schedule is what gives way. */
+@media (max-width: 720px) {
+  .apr-blueprint {
+    height: 34vh;
+  }
+  .apr-spec {
     display: none;
   }
 }
