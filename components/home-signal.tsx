@@ -9,12 +9,13 @@ import Link from "next/link";
 import { MD, C, STACK_TOOLS, STACK_CATS, WORK, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
+import { MobileMenu, NavCta } from "@/components/site-nav";
 
 function Nav() {
   return (
     <header className="mk-topbar">
       <div className="sg-wrap mk-topbar-inner">
-      <div style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>
+      <div className="mk-nav-logo" style={{ display: "flex", alignItems: "center", gap: 9, fontWeight: 700, letterSpacing: "-0.03em" }}>
         <MarkLogo size={22} color={C.text} accent={C.accent} />
         <span>
           {MD.brand}
@@ -31,9 +32,12 @@ function Nav() {
           Stack
         </Link>
       </nav>
-      <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
-        {MD.cta}
-      </Link>
+      {/* ≤760px the link row above is hidden and MobileMenu's hamburger takes
+          over; the logo and CTA stay in the bar. */}
+      <div className="mk-nav-right">
+        <NavCta />
+        <MobileMenu />
+      </div>
       </div>
     </header>
   );
