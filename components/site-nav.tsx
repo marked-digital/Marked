@@ -8,9 +8,12 @@
 //   MobileMenu the hamburger button plus its drawer, ≤760px only
 //
 // Below 760px the desktop link row (.sg-nav-links / .stk-nav-links) is hidden by
-// marked.css; the drawer is what replaces it. Logo and CTA stay in the bar.
+// marked.css; the drawer is what replaces it. The bar becomes a three-column
+// grid there — burger left, logo centred, CTA right (see the ≤760px block in
+// marked.css).
 
 import React from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLenis } from "lenis/react";
@@ -97,6 +100,55 @@ export function MobileMenu() {
     btnRef.current?.focus();
   }
 
+  // The drawer has to leave the bar's subtree entirely. .mk-topbar carries a
+  // backdrop-filter, and a filtered element becomes the containing block for
+  // its position:fixed descendants — so a drawer rendered in place resolved
+  // top:64px/bottom:0 against the 64px bar and collapsed to zero height. It
+  // was opening the whole time; there was nothing to see. Portalling to
+  // <body> puts it back on the viewport.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+
+  const drawer = (
+    /* Sits under the sticky bar (z-index 49 vs 50) so the logo, CTA and the
+       button that closes it stay visible and clickable while it's open.
+       `inert` keeps the closed drawer out of tab order and the a11y tree
+       without display:none, which would kill the transition. */
+    <div
+      id="mk-mobile-nav"
+      className={`mk-drawer${open ? " is-open" : ""}`}
+      data-lenis-prevent
+      inert={!open}
+    >
+      <nav className="mk-drawer-inner" aria-label="Site">
+        {NAV_ITEMS.map((n, i) => (
+          <Link
+            key={n}
+            ref={i === 0 ? firstLinkRef : undefined}
+            className={`mk-drawer-link${n === active ? " is-active" : ""}`}
+            href={navHref(n)}
+            onClick={() => setOpen(false)}
+            // Staggered entrance; collapsed to 0 when closing so the drawer
+            // leaves in one piece.
+            style={{ transitionDelay: open ? `${70 + i * 45}ms` : "0ms" }}
+          >
+            <span className="mk-drawer-i">{String(i + 1).padStart(2, "0")}</span>
+            <span>{n}</span>
+          </Link>
+        ))}
+        <Link
+          className="sg-btn sg-btn--p mk-drawer-cta"
+          href={MD.ctaHref}
+          onClick={() => setOpen(false)}
+          style={{ transitionDelay: open ? `${70 + NAV_ITEMS.length * 45}ms` : "0ms" }}
+        >
+          {MD.cta}
+        </Link>
+        <div className="mk-drawer-foot">{MD.footer.address}</div>
+      </nav>
+    </div>
+  );
+
   return (
     <>
       <button
@@ -114,43 +166,7 @@ export function MobileMenu() {
         </span>
       </button>
 
-      {/* Sits under the sticky bar (z-index 49 vs 50) so the logo, CTA and the
-          button that closes it stay visible and clickable while it's open.
-          `inert` keeps the closed drawer out of tab order and the a11y tree
-          without display:none, which would kill the transition. */}
-      <div
-        id="mk-mobile-nav"
-        className={`mk-drawer${open ? " is-open" : ""}`}
-        data-lenis-prevent
-        inert={!open}
-      >
-        <nav className="mk-drawer-inner" aria-label="Site">
-          {NAV_ITEMS.map((n, i) => (
-            <Link
-              key={n}
-              ref={i === 0 ? firstLinkRef : undefined}
-              className={`mk-drawer-link${n === active ? " is-active" : ""}`}
-              href={navHref(n)}
-              onClick={() => setOpen(false)}
-              // Staggered entrance; collapsed to 0 when closing so the drawer
-              // leaves in one piece.
-              style={{ transitionDelay: open ? `${70 + i * 45}ms` : "0ms" }}
-            >
-              <span className="mk-drawer-i">{String(i + 1).padStart(2, "0")}</span>
-              <span>{n}</span>
-            </Link>
-          ))}
-          <Link
-            className="sg-btn sg-btn--p mk-drawer-cta"
-            href={MD.ctaHref}
-            onClick={() => setOpen(false)}
-            style={{ transitionDelay: open ? `${70 + NAV_ITEMS.length * 45}ms` : "0ms" }}
-          >
-            {MD.cta}
-          </Link>
-          <div className="mk-drawer-foot">{MD.footer.address}</div>
-        </nav>
-      </div>
+      {mounted ? createPortal(drawer, document.body) : null}
     </>
   );
 }
