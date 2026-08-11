@@ -41,8 +41,11 @@
   top: 0;
   z-index: 50;
   background: rgba(8, 9, 8, 0.5);
+  /* Unprefixed only. Lightning CSS (via @tailwindcss/postcss) prefixes to the
+     browserslist targets on its own, and given both spellings by hand it keeps
+     just the -webkit- one — which current Chrome no longer recognises, so the
+     blur silently stopped rendering. Same rule everywhere else in this file. */
   backdrop-filter: blur(26px) saturate(150%);
-  -webkit-backdrop-filter: blur(26px) saturate(150%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 /* Fallback for browsers without backdrop-filter: nothing blurs the content
@@ -187,7 +190,10 @@
 }
 /* ---- mobile drawer ----
    Fills the viewport below the 64px bar and sits one layer under it, so the
-   logo, CTA and the button that closes it stay live while it's open. */
+   logo, CTA and the button that closes it stay live while it's open.
+   Portalled to <body> by MobileMenu — .mk-topbar's backdrop-filter would
+   otherwise be the containing block for this fixed panel and flatten it to
+   zero height. */
 .mk-drawer {
   position: fixed;
   top: 64px;
@@ -196,17 +202,26 @@
   bottom: 0;
   z-index: 49;
   display: none;
-  /* Solid, not glass. The bar can afford to let content read through it; a
-     full-height menu can't — ghosted headlines behind the links read as a
-     defect. Same ground as the page, so the drawer reads as a surface of the
-     site rather than a panel floating over it. */
-  background: #0a0b0a;
+  /* Glass, matched to the bar it drops out of but pushed heavier: a
+     full-height menu carries more text than the bar does, so the blur runs
+     wide and the tint sits high enough that headlines passing underneath
+     read as depth rather than as show-through. */
+  background: rgba(8, 9, 8, 0.76);
+  backdrop-filter: blur(34px) saturate(150%);
   overflow-y: auto;
   overscroll-behavior: contain;
   opacity: 0;
   transform: translateY(-8px);
   pointer-events: none;
   transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+/* Without backdrop-filter there is nothing blurring the page underneath, so
+   transparency alone would leave the links sitting on live content — fall back
+   to a near-opaque ground, same as the bar does. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mk-drawer {
+    background: rgba(10, 11, 10, 0.98);
+  }
 }
 .mk-drawer.is-open {
   opacity: 1;
@@ -229,6 +244,9 @@
   font-weight: 600;
   letter-spacing: -0.03em;
   color: #d6dad4;
+  /* The drawer renders outside .sg / .stk, so the page-level `a` reset in
+     those shells doesn't reach it. */
+  text-decoration: none;
   /* Entrance only — the stagger delay is set per link in site-nav.tsx. */
   opacity: 0;
   transform: translateY(10px);
@@ -258,6 +276,7 @@
 }
 .mk-drawer-cta {
   justify-content: center;
+  text-decoration: none;
   margin-top: 30px;
   padding: 16px 24px;
   font-size: 15px;
@@ -2019,14 +2038,39 @@
   }
 }
 /* Hand the nav over to the hamburger: the desktop link row goes, the button and
-   its drawer come in. The logo and the CTA stay in the bar at every width. */
+   its drawer come in, and the bar re-forms as three columns — burger, logo,
+   CTA. `1fr auto 1fr` is what centres the logo on the *bar* rather than in the
+   leftover space between two unequal ends; .mk-nav-right drops to
+   display:contents so its two children can be placed individually, and `order`
+   lifts the button ahead of the logo without touching the five page navs that
+   render this markup. */
 @media (max-width: 760px) {
   .sg-nav-links,
   .stk-nav-links {
     display: none;
   }
+  .mk-topbar-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .mk-nav-right {
+    display: contents;
+  }
   .mk-burger {
     display: inline-flex;
+    order: -1;
+    justify-self: start;
+  }
+  .mk-nav-logo {
+    order: 0;
+    justify-self: center;
+  }
+  .sg-btn.mk-nav-cta,
+  .stk-btn.mk-nav-cta {
+    order: 1;
+    justify-self: end;
   }
   .mk-drawer {
     display: block;
@@ -2048,7 +2092,7 @@
     padding: 9px 14px;
     font-size: 13px;
   }
-  .mk-nav-right {
+  .mk-topbar-inner {
     gap: 8px;
   }
   .mk-burger {
