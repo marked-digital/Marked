@@ -5,6 +5,9 @@ export const MD = {
   brandFull: "Marked Digital",
   nav: ["Services", "Work", "Approach", "About"],
   cta: "Book a strategy call",
+  // Short label for the nav CTA on phones, where the full wording would crowd
+  // out the logo and the menu button. Swapped by CSS in NavCta (site-nav.tsx).
+  ctaShort: "Book a call",
   // Every "Book a strategy call" button across the site points here — the
   // booking page, which embeds the Google Calendar appointment scheduler.
   ctaHref: "/book",

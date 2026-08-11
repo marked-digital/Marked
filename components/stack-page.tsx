@@ -7,6 +7,7 @@ import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
+import { MobileMenu, NavCta } from "@/components/site-nav";
 
 type Tool = (typeof STACK_TOOLS)[number];
 
@@ -68,7 +69,7 @@ function Nav() {
   return (
     <header className="mk-topbar">
       <div className="stk-wrap mk-topbar-inner">
-      <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700 }}>
+      <Link href="/" className="stk-disp mk-nav-logo" style={{ display: "flex", alignItems: "center", gap: 9, fontWeight: 700 }}>
         <MarkLogo size={22} color={C.text} accent={C.accent} />
         <span>
           {MD.brand}
@@ -85,10 +86,12 @@ function Nav() {
           Stack
         </Link>
       </nav>
-      {/* Compact nav variant of .stk-btn — matches the .sg-btn--p nav sizing. */}
-      <Link className="stk-btn" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
-        {MD.cta}
-      </Link>
+      <div className="mk-nav-right">
+        {/* .stk-btn is this page's button flavour; .mk-nav-cta trims it to the
+            bar's compact sizing. */}
+        <NavCta className="stk-btn" />
+        <MobileMenu />
+      </div>
       </div>
     </header>
   );

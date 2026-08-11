@@ -62,6 +62,18 @@
   justify-content: space-between;
   height: 64px;
 }
+/* Brand lock-up. Sized here rather than inline so it can step down on the
+   narrowest phones, where the row carries the CTA and the menu button too. */
+.mk-nav-logo {
+  font-size: 19px;
+}
+/* CTA + hamburger travel together at the right end of the bar, so the two don't
+   get pushed apart by the row's space-between once the link row is hidden. */
+.mk-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .sg-btn {
   display: inline-flex;
   align-items: center;
@@ -106,6 +118,178 @@
 }
 .sg-btn.sg-btn--g {
   color: #f3f5f2;
+}
+/* ---- nav CTA (NavCta in components/site-nav.tsx) ----
+   Compact sizing for the bar, doubled with the button classes so it out-weighs
+   .sg-btn / .stk-btn regardless of source order. The label swaps to the short
+   wording on phones — one span is always display:none, which keeps it out of the
+   accessible name too. */
+.sg-btn.mk-nav-cta,
+.stk-btn.mk-nav-cta {
+  padding: 9px 17px;
+  font-size: 14px;
+}
+.mk-nav-cta-short {
+  display: none;
+}
+/* ---- hamburger (≤760px, where the desktop link row is hidden) ---- */
+.mk-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.02);
+  color: #f3f5f2;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.mk-burger:hover,
+.mk-burger[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.05);
+}
+/* Two bars, not three — they meet in the middle and cross to form the close
+   mark, so the button reads as one state changing rather than two icons. */
+.mk-burger-bars {
+  position: relative;
+  display: block;
+  width: 17px;
+  height: 11px;
+}
+.mk-burger-bars > span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1), top 0.24s ease;
+}
+.mk-burger-bars > span:first-child {
+  top: 0;
+}
+.mk-burger-bars > span:last-child {
+  top: 9.5px;
+}
+.mk-burger-bars.is-open > span {
+  top: 4.75px;
+}
+.mk-burger-bars.is-open > span:first-child {
+  transform: rotate(45deg);
+}
+.mk-burger-bars.is-open > span:last-child {
+  transform: rotate(-45deg);
+}
+/* ---- mobile drawer ----
+   Fills the viewport below the 64px bar and sits one layer under it, so the
+   logo, CTA and the button that closes it stay live while it's open. */
+.mk-drawer {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 49;
+  display: none;
+  /* Solid, not glass. The bar can afford to let content read through it; a
+     full-height menu can't — ghosted headlines behind the links read as a
+     defect. Same ground as the page, so the drawer reads as a surface of the
+     site rather than a panel floating over it. */
+  background: #0a0b0a;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.mk-drawer.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.mk-drawer-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 14px 24px 34px;
+}
+.mk-drawer-link {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 19px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: clamp(26px, 7.6vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #d6dad4;
+  /* Entrance only — the stagger delay is set per link in site-nav.tsx. */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1), color 0.2s;
+}
+.mk-drawer.is-open .mk-drawer-link {
+  opacity: 1;
+  transform: none;
+}
+.mk-drawer-link:active {
+  color: #f3f5f2;
+}
+.mk-drawer-link.is-active {
+  color: #f3f5f2;
+}
+.mk-drawer-i {
+  flex: none;
+  width: 22px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: #5c625b;
+}
+.mk-drawer-link.is-active .mk-drawer-i {
+  color: #1fa85f;
+}
+.mk-drawer-cta {
+  justify-content: center;
+  margin-top: 30px;
+  padding: 16px 24px;
+  font-size: 15px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.mk-drawer.is-open .mk-drawer-cta {
+  opacity: 1;
+  transform: none;
+}
+.mk-drawer-foot {
+  margin-top: auto;
+  padding-top: 30px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5c625b;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-drawer,
+  .mk-drawer-link,
+  .mk-drawer-cta,
+  .mk-burger-bars > span {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms !important;
+  }
+  .mk-drawer-link,
+  .mk-drawer-cta {
+    transform: none;
+  }
 }
 .sg-hero {
   position: relative;
@@ -1834,10 +2018,42 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+/* Hand the nav over to the hamburger: the desktop link row goes, the button and
+   its drawer come in. The logo and the CTA stay in the bar at every width. */
 @media (max-width: 760px) {
   .sg-nav-links,
   .stk-nav-links {
     display: none;
+  }
+  .mk-burger {
+    display: inline-flex;
+  }
+  .mk-drawer {
+    display: block;
+  }
+  .mk-nav-cta-full {
+    display: none;
+  }
+  .mk-nav-cta-short {
+    display: inline;
+  }
+}
+/* Narrowest phones — the bar is logo + CTA + button, so trim all three. */
+@media (max-width: 390px) {
+  .mk-nav-logo {
+    font-size: 17px;
+  }
+  .sg-btn.mk-nav-cta,
+  .stk-btn.mk-nav-cta {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+  .mk-nav-right {
+    gap: 8px;
+  }
+  .mk-burger {
+    width: 38px;
+    height: 38px;
   }
 }
 @media (max-width: 720px) {

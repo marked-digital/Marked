@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { MD, C, navHref } from "@/lib/md";
 import { MarkLogo } from "@/components/shared";
+import { MobileMenu, NavCta } from "@/components/site-nav";
 
 // Google Calendar appointment schedule. To repoint the booking flow, swap this
 // one URL — take it from the scheduler's "Embed" snippet and keep ?gv=true,
@@ -19,7 +20,7 @@ function Nav() {
   return (
     <header className="mk-topbar">
       <div className="sg-wrap mk-topbar-inner">
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>
+        <Link href="/" className="mk-nav-logo" style={{ display: "flex", alignItems: "center", gap: 9, fontWeight: 700, letterSpacing: "-0.03em" }}>
           <MarkLogo size={22} color={C.text} accent={C.accent} />
           <span>
             {MD.brand}
@@ -36,11 +37,12 @@ function Nav() {
             Stack
           </Link>
         </nav>
-        {/* Self-link — the bar has to look identical to every other page, so
-            the CTA keeps its button treatment here too. */}
-        <Link className="sg-btn sg-btn--p" href={MD.ctaHref} aria-current="page" style={{ padding: "9px 17px", fontSize: 14 }}>
-          {MD.cta}
-        </Link>
+        <div className="mk-nav-right">
+          {/* Self-link — the bar has to look identical to every other page, so
+              the CTA keeps its button treatment here too. */}
+          <NavCta current />
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );

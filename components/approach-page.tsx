@@ -25,6 +25,7 @@ import { useLenis } from "lenis/react";
 import { MD, C, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, MarkLogo } from "@/components/shared";
+import { MobileMenu, NavCta } from "@/components/site-nav";
 
 /* ------------------------------------------------------------------ copy
    Single source of truth for the five sheets. `spec` is the small drafting
@@ -553,7 +554,7 @@ function Nav() {
   return (
     <header className="mk-topbar">
       <div className="sg-wrap mk-topbar-inner">
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 19, fontWeight: 700, letterSpacing: "-0.03em" }}>
+        <Link href="/" className="mk-nav-logo" style={{ display: "flex", alignItems: "center", gap: 9, fontWeight: 700, letterSpacing: "-0.03em" }}>
           <MarkLogo size={22} color={C.text} accent={C.accent} />
           <span>
             {MD.brand}
@@ -570,9 +571,10 @@ function Nav() {
             Stack
           </Link>
         </nav>
-        <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ padding: "9px 17px", fontSize: 14 }}>
-          {MD.cta}
-        </Link>
+        <div className="mk-nav-right">
+          <NavCta />
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );
