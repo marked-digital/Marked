@@ -124,16 +124,12 @@
 }
 /* ---- nav CTA (NavCta in components/site-nav.tsx) ----
    Compact sizing for the bar, doubled with the button classes so it out-weighs
-   .sg-btn / .stk-btn regardless of source order. The label swaps to the short
-   wording on phones — one span is always display:none, which keeps it out of the
-   accessible name too. */
+   .sg-btn / .stk-btn regardless of source order. Desktop only — ≤760px the bar
+   CTA is hidden and the drawer carries it. */
 .sg-btn.mk-nav-cta,
 .stk-btn.mk-nav-cta {
   padding: 9px 17px;
   font-size: 14px;
-}
-.mk-nav-cta-short {
-  display: none;
 }
 /* ---- hamburger (≤760px, where the desktop link row is hidden) ---- */
 .mk-burger {
@@ -240,7 +236,7 @@
   gap: 14px;
   padding: 19px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  font-size: clamp(26px, 7.6vw, 34px);
+  font-size: clamp(23px, 6.7vw, 30px);
   font-weight: 600;
   letter-spacing: -0.03em;
   color: #d6dad4;
@@ -2038,62 +2034,31 @@
   }
 }
 /* Hand the nav over to the hamburger: the desktop link row goes, the button and
-   its drawer come in, and the bar re-forms as three columns — burger, logo,
-   CTA. `1fr auto 1fr` is what centres the logo on the *bar* rather than in the
-   leftover space between two unequal ends; .mk-nav-right drops to
-   display:contents so its two children can be placed individually, and `order`
-   lifts the button ahead of the logo without touching the five page navs that
-   render this markup. */
+   its drawer come in, and the bar re-forms as two ends — logo left, button
+   right, which the row's own space-between already gives us. The bar CTA is
+   hidden here rather than dropped from the markup, so the five page navs that
+   render NavCta stay untouched; it lives on in the drawer (.mk-drawer-cta),
+   which is where the CTA belongs once the menu is a menu. */
 @media (max-width: 760px) {
   .sg-nav-links,
   .stk-nav-links {
     display: none;
   }
-  .mk-topbar-inner {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 12px;
-  }
-  .mk-nav-right {
-    display: contents;
-  }
   .mk-burger {
     display: inline-flex;
-    order: -1;
-    justify-self: start;
-  }
-  .mk-nav-logo {
-    order: 0;
-    justify-self: center;
   }
   .sg-btn.mk-nav-cta,
   .stk-btn.mk-nav-cta {
-    order: 1;
-    justify-self: end;
+    display: none;
   }
   .mk-drawer {
     display: block;
   }
-  .mk-nav-cta-full {
-    display: none;
-  }
-  .mk-nav-cta-short {
-    display: inline;
-  }
 }
-/* Narrowest phones — the bar is logo + CTA + button, so trim all three. */
+/* Narrowest phones — the bar is logo + button, so trim both. */
 @media (max-width: 390px) {
   .mk-nav-logo {
     font-size: 17px;
-  }
-  .sg-btn.mk-nav-cta,
-  .stk-btn.mk-nav-cta {
-    padding: 9px 14px;
-    font-size: 13px;
-  }
-  .mk-topbar-inner {
-    gap: 8px;
   }
   .mk-burger {
     width: 38px;

@@ -3,13 +3,15 @@
 // the tools in our stack). Each icon is a single 24×24 SVG path.
 //
 // Note: several major vendors (AWS, Azure, OpenAI, Salesforce, Adobe, Amazon,
-// Microsoft, Klaviyo, Ahrefs) have been removed from Simple Icons at the
-// trademark owners' request, so those tools fall back to their monogram chip.
+// Microsoft, Klaviyo, Ahrefs, LinkedIn, Walmart, VS Code) have been removed from
+// Simple Icons at the trademark owners' request, so those tools fall back to
+// their monogram chip.
 import {
   siClaude,
   siAda,
   siZapier,
   siMake,
+  siN8n,
   siShopify,
   siBigcommerce,
   siWoocommerce,
@@ -23,6 +25,7 @@ import {
   siMeta,
   siTiktok,
   siPinterest,
+  siReddit,
   siHubspot,
   siMailchimp,
   siSemrush,
@@ -56,6 +59,7 @@ export const ICON_PATHS: Record<string, string> = {
   ada: siAda.path,
   zapier: siZapier.path,
   make: siMake.path,
+  n8n: siN8n.path,
   shopify: siShopify.path,
   bigcommerce: siBigcommerce.path,
   woocommerce: siWoocommerce.path,
@@ -69,6 +73,7 @@ export const ICON_PATHS: Record<string, string> = {
   meta: siMeta.path,
   tiktok: siTiktok.path,
   pinterest: siPinterest.path,
+  reddit: siReddit.path,
   hubspot: siHubspot.path,
   mailchimp: siMailchimp.path,
   semrush: siSemrush.path,
