@@ -26,7 +26,7 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
-import { MarkLogo, ToolLogo } from "@/components/shared";
+import { MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import type { BarGroup, CaseStudy as CaseStudyData, PageBuild } from "@/lib/case-study";
 
@@ -93,15 +93,18 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
 
 function ScrollProgress() {
   const ref = React.useRef<HTMLElement | null>(null);
+  const syncRef = useScrollSync();
   React.useEffect(() => {
-    const onScroll = () => {
+    const update = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       if (ref.current) ref.current.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    update();
+    syncRef.current = update;
+    return () => {
+      syncRef.current = null;
+    };
+  }, [syncRef]);
   return (
     <div className="oeo-progress" aria-hidden="true">
       <i ref={ref} />

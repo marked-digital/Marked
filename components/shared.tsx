@@ -5,6 +5,7 @@
 // design-tool preview/env workarounds.
 
 import React from "react";
+import { useLenis } from "lenis/react";
 import { iconPath } from "@/lib/icons";
 import { geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
@@ -37,6 +38,35 @@ export function useInView<T extends HTMLElement = HTMLSpanElement>(opts?: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return [ref, seen] as const;
+}
+
+// Drives a per-frame scroll effect from Lenis's rAF instead of the native
+// `scroll` event.
+//
+// Lenis owns the document scroll position and writes it inside its own loop.
+// A native `scroll` listener that defers its work with requestAnimationFrame
+// therefore lands that work on the frame *after* the one Lenis just painted,
+// so pinned and stacked elements trail the page by ~16ms — which reads as the
+// scroll not being smooth, however well it is eased. Lenis calls subscribers
+// synchronously before paint, so the effect and the position commit together.
+//
+// Assign the callback to `.current`. Nothing is called on mount or on resize:
+// those aren't scrolls, so run the effect directly for them.
+export function useScrollSync() {
+  const ref = React.useRef<(() => void) | null>(null);
+  const lenis = useLenis(() => ref.current?.());
+
+  // No provider mounted (the hook is used outside the root layout): fall back
+  // to the native event. Modern browsers already fire it at most once per
+  // frame before paint, so it needs no rAF of its own.
+  React.useEffect(() => {
+    if (lenis) return;
+    const onScroll = () => ref.current?.();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [lenis]);
+
+  return ref;
 }
 
 // Reveal-on-mount: flips data-animate on after mount so the CSS
@@ -221,6 +251,7 @@ const GLOBE_GREEN = "31, 168, 95"; // brand accent #1FA85F as rgb triple
 export function ScrollGlobe() {
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const syncRef = useScrollSync();
   React.useEffect(() => {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
@@ -284,24 +315,17 @@ export function ScrollGlobe() {
     };
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
-    const onScroll = () => {
-      if (!raf)
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          draw();
-        });
-    };
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(wrap);
-    if (!reduce) window.addEventListener("scroll", onScroll, { passive: true });
+    // Already inside Lenis's frame — draw straight through rather than
+    // deferring to a rAF of our own.
+    if (!reduce) syncRef.current = draw;
     return () => {
       ro.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
+      syncRef.current = null;
     };
-  }, []);
+  }, [syncRef]);
 
   return (
     <div className="mk-globe" aria-hidden="true" ref={wrapRef}>

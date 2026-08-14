@@ -24,7 +24,7 @@ import Link from "next/link";
 import { useLenis } from "lenis/react";
 import { MD, C, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
-import { ArrowIcon, MarkLogo } from "@/components/shared";
+import { ArrowIcon, MarkLogo, useScrollSync } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 
 /* ------------------------------------------------------------------ copy
@@ -167,6 +167,7 @@ export default function ApproachPage() {
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
   const [active, setActive] = React.useState(0);
+  const syncRef = useScrollSync();
 
   /* --------------------------------------------------- scroll controller
      Writes --s0…--s4 on the root every animation frame the page moves, and
@@ -178,10 +179,8 @@ export default function ApproachPage() {
     const wrap = wrapRef.current;
     if (!root || !wrap) return;
     const still = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
     let lastIdx = -1;
     const apply = () => {
-      raf = 0;
       const rect = wrap.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const p = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
@@ -196,18 +195,14 @@ export default function ApproachPage() {
         setActive(idx);
       }
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(apply);
-    };
     apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    syncRef.current = apply;
+    window.addEventListener("resize", apply);
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(raf);
+      syncRef.current = null;
+      window.removeEventListener("resize", apply);
     };
-  }, []);
+  }, [syncRef]);
 
   // Land mid-stage so the layer is drawn and holding, not caught mid-stroke.
   // The jump has to go through Lenis: it owns the document scroll position and

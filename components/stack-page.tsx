@@ -6,7 +6,7 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 
 type Tool = (typeof STACK_TOOLS)[number];
@@ -105,6 +105,7 @@ function FilterBar({ filter, setFilter }: { filter: string; setFilter: (c: strin
   const [open, setOpen] = React.useState(false); // manual override while stuck
   const barRef = React.useRef<HTMLDivElement | null>(null);
   const railRef = React.useRef<HTMLDivElement | null>(null);
+  const syncRef = useScrollSync();
 
   // The bar is pinned exactly when its own top has reached the sticky offset,
   // so measure that directly. An IntersectionObserver on a marker above the bar
@@ -113,25 +114,19 @@ function FilterBar({ filter, setFilter }: { filter: string; setFilter: (c: strin
   React.useEffect(() => {
     const el = barRef.current;
     if (!el) return;
-    let raf = 0;
     const update = () => {
-      raf = 0;
       const pinned = el.getBoundingClientRect().top <= TOPBAR_H + 0.5;
       setStuck(pinned);
       if (!pinned) setOpen(false); // back at the top: forget the override
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    syncRef.current = update;
+    window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(raf);
+      syncRef.current = null;
+      window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [syncRef]);
 
   const collapsed = stuck && !open;
 

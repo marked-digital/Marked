@@ -1347,8 +1347,16 @@
    lets it sit as a deliberate inset rather than pretending to be ours. */
 .bk-frame {
   margin-top: 44px;
-  max-width: 940px;
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  /* Wider than the copy above it, and centred in the wrap rather than left in
+     it: .sg-wrap runs to clamp(1080px, 90vw, 1680px), so a fixed 940px block
+     with no inline margin sat flush left and left ~600px of dead space on a
+     1920 monitor. The scheduler puts its date grid and time column side by
+     side, so horizontal room is what makes it readable — the cap only stops it
+     touching the wrap's own padding on the widest screens. */
+  max-width: 1400px;
+  margin-inline: auto;
+  /* Site accent — #1FA85F, the C.accent token in lib/md.ts. */
+  border: 1px solid #1fa85f;
   border-radius: 25px;
   overflow: hidden;
   /* Matches the embed's own ground, so no dark flash before it paints. */
@@ -1357,7 +1365,14 @@
 .bk-frame iframe {
   display: block;
   width: 100%;
-  height: 760px;
+  /* Tracks the viewport instead of the old fixed 760px, so the booking UI is
+     fully reachable on a laptop and doesn't leave dead panel on a tall
+     monitor. The floor is what the scheduler needs before it starts scrolling
+     inside itself. dvh rather than vh so mobile browser chrome can't cut it
+     short. No vh fallback line: Lightning CSS (via @tailwindcss/postcss) keeps
+     only the last of two identical properties, so the duplicate is dropped at
+     build time rather than shipping — same as the prefix note on .mk-topbar. */
+  height: clamp(640px, 78dvh, 920px);
   border: 0;
   /* Left alone, the scheduler follows the visitor's OS preference and renders
      its dark theme — which is unreadable sitting in our dark panel. An explicit
@@ -1372,9 +1387,9 @@
     margin-top: 32px;
     border-radius: 16px;
   }
-  .bk-frame iframe {
-    height: 640px;
-  }
+  /* The iframe height is no longer overridden here: 78dvh of a phone viewport
+     lands under the clamp floor, so it already resolves to the same 640px this
+     used to set by hand. */
 }
 
 /* ============================================ case study (.oeo)

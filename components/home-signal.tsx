@@ -7,7 +7,7 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, STACK_CATS, WORK, navHref } from "@/lib/md";
-import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate } from "@/components/shared";
+import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate, useScrollSync } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 
@@ -118,6 +118,7 @@ const WORK_BLUR_MIN_W = 768; // px
 function SelectedWork() {
   const cardsRef = React.useRef<(HTMLAnchorElement | null)[]>([]);
   const [headRef, headSeen] = useInView<HTMLDivElement>({ threshold: 0.25 });
+  const syncRef = useScrollSync();
 
   React.useEffect(() => {
     // Reduced motion: the cards still stack via sticky, they just don't
@@ -135,9 +136,7 @@ function SelectedWork() {
       maxBlur = window.innerWidth > WORK_BLUR_MIN_W ? WORK_MAX_BLUR : 0;
     };
 
-    let raf = 0;
     const update = () => {
-      raf = 0;
       const cards = cardsRef.current;
       for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
@@ -157,24 +156,20 @@ function SelectedWork() {
         card.style.filter = maxBlur ? `blur(${(p * maxBlur).toFixed(2)}px)` : "";
       }
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
     const onResize = () => {
       measure();
-      onScroll();
+      update();
     };
 
     measure();
     update();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    syncRef.current = update;
     window.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      syncRef.current = null;
       window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [syncRef]);
 
   // Cursor-following "View" pill. Mouse only — the pill is hidden on touch by
   // the (hover: hover) media query, so there's nothing to move there.
