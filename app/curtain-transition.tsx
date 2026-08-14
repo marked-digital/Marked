@@ -1,24 +1,29 @@
 "use client";
 
-// Branded interstitial for the booking CTA. Every "Book a strategy call"
-// button on the site is a plain <Link href="/book">; this component, mounted
-// once in the root layout, intercepts those clicks at the document level,
-// sweeps a near-black curtain up over the page while the mark draws itself
-// and the tagline fades in, navigates underneath the cover, then lifts the
-// curtain off the booking page.
+// Branded curtain interstitial for the site's destination pages (see
+// CURTAIN_ROUTES): the booking page and the About page. Their links across
+// the site are plain <Link>s; this component, mounted once in the root
+// layout, intercepts those clicks at the document level, sweeps a near-black
+// curtain up over the page while the mark draws itself and the tagline fades
+// in, navigates underneath the cover, then lifts the curtain off the new
+// page.
 //
 // Ordinary navigation is untouched: modified clicks (new tab), middle
-// clicks, reduced-motion users, and clicks while already on /book all fall
-// through to the default <Link> behaviour. Styles live in the
-// "booking transition" section of marked.css (.bkt-).
+// clicks, reduced-motion users, and clicks on a link to the page you're
+// already on all fall through to the default <Link> behaviour. Styles live
+// in the "booking transition" section of marked.css (.bkt-).
 
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { C, MD } from "@/lib/md";
 
+// Destinations that get the curtain. Adding a route here is the whole job —
+// every <Link> to it anywhere on the site picks the transition up.
+const CURTAIN_ROUTES = new Set<string>([MD.ctaHref, "/about"]);
+
 // cover: curtain sweeps up — the page is fully hidden when it ends
-// (hold):  logo + tagline sit on black while /book commits underneath
-// reveal: curtain lifts away, exposing the booking page
+// (hold):  logo + tagline sit on black while the route commits underneath
+// reveal: curtain lifts away, exposing the destination page
 const COVER_MS = 480;
 const HOLD_MS = 900;
 const REVEAL_MS = 560;
@@ -28,20 +33,19 @@ const FAILSAFE_MS = 4000;
 
 type Phase = "idle" | "cover" | "reveal";
 
-export default function BookTransition() {
+export default function CurtainTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const [phase, setPhase] = React.useState<Phase>("idle");
 
   // Mirrors for the click handler, which is bound once.
   const phaseRef = React.useRef(phase);
+  phaseRef.current = phase;
   const pathnameRef = React.useRef(pathname);
-  React.useEffect(() => {
-    phaseRef.current = phase;
-    pathnameRef.current = pathname;
-  }, [phase, pathname]);
-  // Set once the covered navigation lands on /book, so the arrival effect
-  // and the failsafe can't both schedule the reveal.
+  pathnameRef.current = pathname;
+  // Where the in-flight navigation is headed, and whether it has landed —
+  // so the arrival effect and the failsafe can't both schedule the reveal.
+  const targetRef = React.useRef<string | null>(null);
   const arrivedRef = React.useRef(false);
 
   const timers = React.useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -55,9 +59,10 @@ export default function BookTransition() {
     []
   );
 
-  // Intercept /book clicks. Capture phase on the document so this runs ahead
-  // of Next's own Link handler (attached at the React root); stopPropagation
-  // keeps that handler from also starting the navigation.
+  // Intercept clicks headed to a curtain route. Capture phase on the
+  // document so this runs ahead of Next's own Link handler (attached at the
+  // React root); stopPropagation keeps that handler from also starting the
+  // navigation.
   React.useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -69,22 +74,24 @@ export default function BookTransition() {
       } catch {
         return;
       }
-      if (url.origin !== location.origin || url.pathname !== MD.ctaHref) return;
+      if (url.origin !== location.origin || !CURTAIN_ROUTES.has(url.pathname)) return;
       // Reduced motion: skip the interstitial entirely — plain navigation.
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      // Already on /book (the nav's self-link): nothing to transition to.
-      if (pathnameRef.current === MD.ctaHref) return;
+      // Already on the destination (a nav self-link): nothing to transition to.
+      if (pathnameRef.current === url.pathname) return;
 
       e.preventDefault();
       e.stopPropagation();
       if (phaseRef.current !== "idle") return; // a run is already in flight
 
+      const target = url.pathname;
+      targetRef.current = target;
       arrivedRef.current = false;
       setPhase("cover");
       // Push once the curtain has the page hidden; the route change (and its
-      // scroll-to-top) happens out of sight. The CTA <Link>s have already
-      // prefetched /book, so the commit is effectively instant.
-      later(() => router.push(MD.ctaHref), COVER_MS);
+      // scroll-to-top) happens out of sight. The <Link>s have already
+      // prefetched the destination, so the commit is effectively instant.
+      later(() => router.push(target), COVER_MS);
       later(() => {
         if (phaseRef.current === "cover" && !arrivedRef.current) {
           arrivedRef.current = true;
@@ -99,7 +106,7 @@ export default function BookTransition() {
 
   // The covered navigation has landed: hold the lockup a beat, then lift.
   React.useEffect(() => {
-    if (phase !== "cover" || pathname !== MD.ctaHref || arrivedRef.current) return;
+    if (phase !== "cover" || pathname !== targetRef.current || arrivedRef.current) return;
     arrivedRef.current = true;
     later(() => setPhase("reveal"), HOLD_MS);
     later(() => setPhase("idle"), HOLD_MS + REVEAL_MS);
