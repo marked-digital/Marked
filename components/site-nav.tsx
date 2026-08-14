@@ -30,6 +30,7 @@ function activeItem(pathname: string | null): string | null {
   if (!pathname) return null;
   if (pathname === "/approach") return "Approach";
   if (pathname === "/stack") return "Stack";
+  if (pathname === "/about") return "About";
   if (pathname.startsWith("/work")) return "Work";
   return null;
 }

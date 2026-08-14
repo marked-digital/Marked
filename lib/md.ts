@@ -129,7 +129,16 @@ export const MD = {
   footer: {
     cols: [
       { h: "Services", items: ["International expansion", "Paid media", "AI systems", "Web development", "SEO & content"] },
-      { h: "Company", items: ["Work", "Approach", "About", "Careers", "Contact"] },
+      {
+        h: "Company",
+        items: [
+          { label: "Work", href: "/#work" },
+          { label: "Approach", href: "/approach" },
+          { label: "About", href: "/about" },
+          "Careers",
+          "Contact",
+        ],
+      },
       // Footer items are plain labels until they have somewhere real to go —
       // give one an href and it renders as a live link (external ones open in
       // a new tab). See the Footer in home-signal.tsx.
@@ -147,12 +156,13 @@ export const MD = {
   },
 };
 
-// Nav destinations. "Approach" and "Stack" are real routes; the remaining
-// nav items (Services, Work, About) are sections of the homepage, reached via
-// hash anchors that match the section ids set in home-signal.tsx.
+// Nav destinations. "Approach", "Stack" and "About" are real routes; the
+// remaining nav items (Services, Work) are sections of the homepage, reached
+// via hash anchors that match the section ids set in home-signal.tsx.
 export function navHref(n: string): string {
   if (n === "Approach") return "/approach";
   if (n === "Stack") return "/stack";
+  if (n === "About") return "/about";
   return "/#" + n.toLowerCase();
 }
 

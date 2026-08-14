@@ -5,7 +5,7 @@ import "./globals.css";
 import "./marked.css";
 import "lenis/dist/lenis.css";
 import SmoothScroll from "./smooth-scroll";
-import BookTransition from "./book-transition";
+import CurtainTransition from "./curtain-transition";
 
 // GA4 measurement ID. Lives here so the tag covers every route in the app.
 const GA_ID = "G-EPKJQ7RZ90";
@@ -34,10 +34,11 @@ export default function RootLayout({
     <html lang="en" className={`${jakarta.variable} antialiased`}>
       <body>
         <SmoothScroll>{children}</SmoothScroll>
-        {/* Curtain interstitial for "Book a strategy call" clicks — lives at
-            the root so it can intercept the CTA on every page and persist
-            across the route change it covers. */}
-        <BookTransition />
+        {/* Curtain interstitial for clicks to the destination pages (/book,
+            /about — see CURTAIN_ROUTES) — lives at the root so it can
+            intercept their links on every page and persist across the route
+            change it covers. */}
+        <CurtainTransition />
         {/* Google tag (gtag.js). next/script's default "afterInteractive"
             strategy loads these once the page is interactive — it handles the
             async loading the raw snippet does by hand. The inline half needs an

@@ -392,6 +392,11 @@
 .sg-navlink:hover {
   color: #f3f5f2;
 }
+/* Current-page highlight — a page marks its own link with aria-current="page"
+   (see the About nav), so the semantic state drives the visual one. */
+.sg-navlink[aria-current="page"] {
+  color: #f3f5f2;
+}
 .sg-metrics {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2262,5 +2267,456 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------ about page (.abt) */
+/* Split view (components/about-page.tsx): the shell is exactly one viewport
+   tall, so the document never scrolls on desktop — each pane is its own
+   overflow container (the shell's data-lenis-prevent keeps Lenis off the
+   page's wheel events) and scrolls independently. The narrative <main> comes
+   first in the DOM for reading/tab order; explicit grid placement below puts
+   it visually right. ≤900px the split collapses into a normal single-scroll
+   page in plain DOM order: narrative, mosaic, footer. */
+.abt-shell {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.abt-cols {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.abt-col {
+  min-height: 0;
+  overflow-y: auto;
+  /* Reaching the end of one pane must not fling the other / the document. */
+  overscroll-behavior: contain;
+  /* The panes read as one composition — hide their scrollbars. */
+  scrollbar-width: none;
+}
+.abt-col::-webkit-scrollbar {
+  display: none;
+}
+/* The panes are the page's only scrollers and are focusable (tabIndex in the
+   component) so keyboard users can scroll them; the ring shows which pane
+   keyboard input will move. */
+.abt-col:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: -2px;
+}
+.abt-left {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: 1px solid rgba(255, 255, 255, 0.085);
+}
+.abt-right {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* --------------- left pane: mosaic feed */
+.abt-mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 18px;
+}
+.abt-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 200px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0f110f;
+}
+.abt-tile--wide {
+  grid-column: span 2;
+}
+a.abt-tile {
+  transition: border-color 200ms ease, transform 250ms ease;
+}
+a.abt-tile:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+/* Same focus ring as .sg-work-card — the site's card-link convention. */
+a.abt-tile:focus-visible,
+.abt-proof-case:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 4px;
+}
+/* Instagram tiles (lib/instagram.ts → IgTile): the media fills the tile,
+   a small badge names the format. Square singles, 2:1 wides — object-fit
+   keeps any IG aspect (1:1, 4:5, 9:16 reel covers) cropped cleanly. */
+.abt-tile--ig {
+  padding: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+}
+.abt-tile--ig.abt-tile--wide {
+  aspect-ratio: 2 / 1;
+}
+.abt-tile--ig img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 350ms ease;
+}
+a.abt-tile--ig:hover img {
+  transform: scale(1.03);
+}
+/* Founder photo tile — full-bleed portrait with a scrimmed caption. The
+   object-position keeps the face in frame when the wide crop bites into the
+   portrait source. */
+.abt-tile--founder {
+  padding: 0;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+}
+.abt-tile--founder img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+}
+.abt-founder-cap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 60px 22px 18px;
+  background: linear-gradient(180deg, transparent, rgba(10, 11, 10, 0.85));
+}
+.abt-founder-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.abt-ig-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(10, 11, 10, 0.6);
+  backdrop-filter: blur(6px);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f3f5f2;
+}
+.abt-tile--brand {
+  min-height: 320px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  background: radial-gradient(110% 90% at 50% 0%, rgba(31, 168, 95, 0.12), transparent 60%), linear-gradient(165deg, #121412 0%, #0a0b0a 75%);
+}
+.abt-brand-word {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.abt-brand-tag {
+  font-size: 15px;
+  font-weight: 600;
+  color: #8e948c;
+}
+.abt-tile--metric {
+  justify-content: center;
+  gap: 8px;
+  min-height: 160px;
+}
+.abt-metric-n {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #1fa85f;
+}
+.abt-metric-l {
+  font-size: 13px;
+  color: #8e948c;
+}
+.abt-tile--case {
+  min-height: 280px;
+}
+.abt-case-industry {
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #1fa85f;
+}
+.abt-case-title {
+  font-size: clamp(20px, 2.1vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+.abt-case-metric {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: rgba(10, 11, 10, 0.55);
+}
+.abt-tile--list {
+  justify-content: center;
+  gap: 14px;
+  min-height: 160px;
+}
+.abt-list-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.abt-list-n {
+  font-size: 11.5px;
+  color: #1fa85f;
+  font-weight: 700;
+  flex: none;
+}
+.abt-tile--stack {
+  min-height: 0;
+  gap: 14px;
+}
+.abt-tile-cap {
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #8e948c;
+}
+.abt-stack-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.abt-tile--cta {
+  min-height: 240px;
+  gap: 12px;
+  background: radial-gradient(120% 100% at 80% 100%, rgba(31, 168, 95, 0.16), transparent 62%), linear-gradient(180deg, #0f110f 0%, #0a0b0a 100%);
+}
+.abt-cta-line {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  max-width: 360px;
+}
+
+/* --------------- right pane: narrative */
+.abt-sec {
+  padding: clamp(56px, 9vh, 96px) clamp(28px, 4.5vw, 72px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.085);
+}
+.abt-kicker {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #1fa85f;
+}
+.abt-h {
+  margin: 16px 0 0;
+  font-size: clamp(28px, 2.6vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  max-width: 560px;
+}
+.abt-body {
+  margin: 18px 0 0;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: #8e948c;
+  max-width: 560px;
+}
+.abt-beliefs {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.abt-belief {
+  display: flex;
+  gap: 14px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+}
+.abt-belief .abt-list-n {
+  padding-top: 3px;
+}
+.abt-belief-t {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.abt-mission {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f3f5f2;
+}
+.abt-proof-grid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.abt-proof-cell {
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 16px;
+  background: #0f110f;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.abt-proof-case {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+.abt-proof-case:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: #0f110f;
+}
+.abt-proof-name {
+  flex: 1;
+  min-width: 0;
+}
+.abt-proof-metric {
+  color: #1fa85f;
+  font-size: 14px;
+  flex: none;
+}
+.abt-next {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+/* Social row under the section-05 CTAs — the softer next step. */
+.abt-social {
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 14px;
+}
+.abt-social-lead {
+  color: #5c625b;
+}
+.abt-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #8e948c;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.abt-social-link:hover {
+  color: #f3f5f2;
+}
+.abt-social-link:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 4px;
+}
+.abt-sec--last {
+  border-bottom: 0;
+}
+.abt-foot {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 26px clamp(28px, 4.5vw, 72px) 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+  color: #5c625b;
+  font-size: 13px;
+}
+/* The footer renders twice (see Foot in about-page.tsx): the split copy ends
+   the right pane on desktop; the stack copy ends the collapsed page ≤900px.
+   display toggles keep exactly one visible / in the a11y tree. */
+.abt-foot--stack {
+  display: none;
+}
+
+/* --------------- ≤900px: collapse to one normal-scrolling column */
+@media (max-width: 900px) {
+  .abt-shell {
+    height: auto;
+  }
+  .abt-cols {
+    display: flex;
+    flex-direction: column;
+  }
+  .abt-col {
+    overflow: visible;
+    min-height: 0;
+  }
+  /* DOM order already leads with the narrative; the mosaic just swaps its
+     split-view border for a stacked one. */
+  .abt-left {
+    border-right: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.085);
+  }
+  /* Swap footers: the split copy would land mid-page (it lives inside the
+     narrative pane); the stack copy sits after the mosaic, ending the page. */
+  .abt-foot--split {
+    display: none;
+  }
+  .abt-foot--stack {
+    display: flex;
+  }
+}
+@media (max-width: 560px) {
+  .abt-mosaic {
+    gap: 10px;
+    padding: 12px;
+  }
+  .abt-tile {
+    padding: 16px;
+    min-height: 150px;
+  }
+  .abt-tile--case {
+    min-height: 210px;
+  }
+  .abt-brand-word {
+    font-size: 34px;
+  }
+  .abt-proof-grid {
+    grid-template-columns: 1fr;
   }
 }
