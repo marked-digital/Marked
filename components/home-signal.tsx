@@ -261,8 +261,15 @@ function Services() {
       show();
       return;
     }
+    // Snap to the hidden state with the transition off, and commit it with a
+    // forced reflow before re-enabling. With the 0.45s transition live, these
+    // writes animated the panel downward first (a visible jump on mobile
+    // frame rates) before the fade-in yanked it back.
+    el.style.transition = "none";
     el.style.opacity = "0";
     el.style.transform = "translateY(10px)";
+    void el.offsetHeight;
+    el.style.transition = "";
     const id = requestAnimationFrame(() => requestAnimationFrame(show));
     const t = setTimeout(show, 240);
     return () => {
@@ -272,9 +279,9 @@ function Services() {
   }, [active]);
   return (
     <section id="services" className="sg-wrap" style={{ paddingTop: 108, paddingBottom: 108, scrollMarginTop: 96 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 46 }}>
+      <div className="sg-sec-head">
         <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>WHAT WE DO</h2>
-        <p style={{ color: C.faint, fontSize: 14 }}>Five capabilities. One growth system.</p>
+        <p style={{ color: C.faint, fontSize: 14, margin: 0 }}>Five capabilities. One growth system.</p>
       </div>
       <div className="sg-svc-grid">
         <div ref={listRef} className={"sg-svc-list" + (listSeen ? " is-in" : "")}>

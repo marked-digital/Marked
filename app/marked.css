@@ -402,6 +402,23 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
 }
+/* Section header row (heading left, tagline right). On phones the two lines
+   stack instead of squeezing side by side. */
+.sg-sec-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 46px;
+}
+@media (max-width: 640px) {
+  .sg-sec-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 32px;
+  }
+}
 .sg-svc-grid {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;

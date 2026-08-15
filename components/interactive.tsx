@@ -65,9 +65,12 @@ function Slider({
 export function GrowthCalc() {
   const [spend, setSpend] = React.useState(50000);
   const [roas, setRoas] = React.useState(2.0);
-  const LIFT = 1.8; // modeled additional ROAS points with Marked
+  // Single-sourced from the hero's headline stat (+412% avg. ROAS lift,
+  // MD.metrics[0]) so the modeler and the claim can never disagree. The lift
+  // is a percentage increase on the current ROAS, not additive points.
+  const LIFT_PCT = MD.metrics[0].value;
   const today = spend * 12 * roas;
-  const marked = spend * 12 * (roas + LIFT);
+  const marked = today * (1 + LIFT_PCT / 100);
   const added = marked - today;
   const shown = useCountTo(marked);
   const addedShown = useCountTo(added);
@@ -97,7 +100,7 @@ export function GrowthCalc() {
           <Slider label="Current ROAS" val={roas} display={roas.toFixed(1) + "×"} min={1} max={5} step={0.1} pct={roasPct} onChange={setRoas} />
           <div style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "9px 15px", borderRadius: 999, background: "rgba(255,255,255,.05)", border: `1px solid ${C.line}`, marginTop: 6 }}>
             <span style={{ width: 8, height: 8, borderRadius: 8, background: C.accent }}></span>
-            <span style={{ color: C.muted, fontSize: 13 }}>Modeled +{LIFT.toFixed(1)}× ROAS · client avg.</span>
+            <span style={{ color: C.muted, fontSize: 13 }}>Modeled +{LIFT_PCT}% ROAS lift · client avg.</span>
           </div>
         </div>
         <div>
