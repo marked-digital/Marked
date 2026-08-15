@@ -526,7 +526,26 @@
 }
 .sg-detail {
   opacity: 1;
+  /* Grid tracks refuse to shrink below an item's min-content width, so
+     without this the card sizes to its widest panel (tab 03 exceeded a
+     375px viewport) instead of the column. */
+  min-width: 0;
   transition: opacity 0.45s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.sg-detail-bullets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+  margin-top: 30px;
+}
+@media (max-width: 720px) {
+  /* One column on phones — two squeezed columns forced long checkmarks
+     ("Visibility in ChatGPT, Perplexity & AI Overviews") into 4-line towers
+     and set the card's min-content width. */
+  .sg-detail-bullets {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 }
 .sg-bullet {
   display: flex;

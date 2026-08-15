@@ -188,7 +188,7 @@ function SelectedWork() {
         style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 32, flexWrap: "wrap", marginBottom: 46 }}
       >
         <div className="mk-reveal-l">
-          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>SELECTED WORK · 47 MARKETS</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.accent, letterSpacing: "0.04em", margin: 0 }}>SELECTED WORK · 47 MARKETS</h2>
           <h3 className="sg-h2" style={{ fontWeight: 700, letterSpacing: "-0.03em", margin: "22px 0 0", lineHeight: 1.06 }}>
             Proof, in any market.
           </h3>
@@ -280,7 +280,7 @@ function Services() {
   return (
     <section id="services" className="sg-wrap" style={{ paddingTop: 108, paddingBottom: 108, scrollMarginTop: 96 }}>
       <div className="sg-sec-head">
-        <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>WHAT WE DO</h2>
+        <h2 style={{ fontSize: 15, fontWeight: 500, color: C.accent, letterSpacing: "0.04em", margin: 0 }}>WHAT WE DO</h2>
         <p style={{ color: C.faint, fontSize: 14, margin: 0 }}>Five capabilities. One growth system.</p>
       </div>
       <div className="sg-svc-grid">
@@ -310,7 +310,7 @@ function Services() {
             <div key={sv.key} style={{ display: i === active ? "block" : "none" }}>
               <h3 style={{ color: C.accent, fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15, margin: 0 }}>{sv.tag}</h3>
               <p style={{ color: C.muted, fontSize: 16.5, lineHeight: 1.6, marginTop: 18 }}>{sv.desc}</p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px", marginTop: 30 }}>
+              <div className="sg-detail-bullets">
                 {sv.bullets.map((b) => (
                   <div key={b} className="sg-bullet">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2.4" style={{ marginTop: 3, flex: "none" }}>
@@ -355,7 +355,7 @@ function Architecture() {
     <section id="about" className="sg-wrap sg-arch" style={{ paddingTop: 40, paddingBottom: 110, scrollMarginTop: 96 }}>
       <div className="sg-arch-grid">
         <div>
-          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.muted, letterSpacing: "0.04em", margin: 0 }}>ARCHITECTURE</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 500, color: C.accent, letterSpacing: "0.04em", margin: 0 }}>ARCHITECTURE</h2>
           <h3 className="sg-h2" style={{ fontWeight: 700, letterSpacing: "-0.03em", margin: "22px 0 0", lineHeight: 1.06 }}>
             The right stack,
             <br />
