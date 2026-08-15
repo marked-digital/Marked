@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "Marked. | %s",
   },
   description:
-    "Marked Digital is the growth partner for e-commerce brands going global — international expansion, AI-run advertising, and conversion-built sites, operated as one compounding system.",
+    "Marked Digital: the growth partner for ecommerce brands going global. Expansion, paid media, tech stacks, web builds and SEO/AEO as one compounding system.",
 };
 
 export default function RootLayout({
