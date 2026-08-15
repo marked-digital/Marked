@@ -3,7 +3,8 @@
 export const MD = {
   brand: "Marked",
   brandFull: "Marked Digital",
-  nav: ["Services", "Work", "Approach", "About"],
+  // Rendered in this order by every desktop nav and the mobile drawer.
+  nav: ["Services", "Work", "Approach", "Stack", "About"],
   cta: "Book a strategy call",
   // Every "Book a strategy call" button across the site points here — the
   // booking page, which embeds the Google Calendar appointment scheduler.
@@ -19,7 +20,7 @@ export const MD = {
     { prefix: "+", value: 412, suffix: "%", label: "avg. ROAS lift" },
     { value: 47, suffix: "", label: "markets launched" },
     { prefix: "$", value: 1.4, suffix: "B", decimals: 1, label: "revenue generated" },
-    { value: 13, suffix: "", label: "years in ecommerce industry" },
+    { value: 13, suffix: "", label: "years in ecommerce" },
   ],
 
   // Rotated one at a time by the hero's "Now launching in …" line
@@ -66,12 +67,15 @@ export const MD = {
     { city: "Mexico City", country: "Mexico", region: "LATAM", opp: 2.7, weeks: 7 },
   ],
 
+  // Synced word for word with the finalized Instagram "What we do" carousel —
+  // someone arriving from the carousel should hear the same voice here. Keys
+  // are React-internal only (verified: no DOM ids or anchors ride on them).
   services: [
     {
       key: "intl",
       n: "01",
       title: "International Ecommerce Expansion",
-      tag: "Sell everywhere your customers already are.",
+      tag: "Your customers stopped caring about borders. Your checkout should too.",
       desc: "We take proven brands into new markets, handling the strategy, storefronts, payments and logistics, so launching in Berlin or Bogotá feels as native as your home market.",
       bullets: ["Market prioritization & sizing", "Localized storefronts & checkout", "Cross-border logistics & tax", "Local paid + organic launch"],
       stat: ["47", "markets launched"],
@@ -80,37 +84,37 @@ export const MD = {
       key: "ads",
       n: "02",
       title: "Digital Advertising & Paid Media",
-      tag: "Performance media that compounds.",
+      tag: "Ad budgets that behave like investments, not donations to Google.",
       desc: "Full-funnel paid across Meta, Google, TikTok, Amazon and retail media, engineered around incrementality, not vanity metrics, with creative tested at scale.",
       bullets: ["Full-funnel paid strategy", "Creative testing at scale", "Bidding & budget automation", "Incrementality measurement"],
       stat: ["+412%", "avg. ROAS lift"],
     },
     {
-      key: "ai",
+      key: "stack",
       n: "03",
-      title: "AI Marketing Systems",
-      tag: "Put AI to work across the funnel.",
-      desc: "We build the AI layer for your marketing org: creative pipelines, predictive audiences, and agents that run the busywork so your team compounds output, not headcount.",
-      bullets: ["AI creative pipelines", "Predictive audience models", "Workflow & agent automation", "LLM-powered personalization"],
-      stat: ["9×", "creative throughput"],
+      title: "Tech Stack Implementation",
+      tag: "14 tools that don't talk to each other isn't a stack. It's a pile.",
+      desc: "We audit what you're running, select the platforms that actually fit your catalog, margins and markets, then implement and integrate them end to end. One connected stack, sized for where you're going.",
+      bullets: ["Stack audits & tool consolidation", "Platform & vendor selection", "Integration & data architecture", "AI pipeline development", "Implementation & migration"],
+      stat: ["−38%", "avg. tool spend"],
     },
     {
       key: "web",
       n: "04",
       title: "Website Development",
-      tag: "Sites built to convert and scale.",
+      tag: "Your site loads before their doubt does.",
       desc: "Headless, composable commerce builds that load instantly and convert, engineered with CRO baked in from the first wireframe to the last A/B test.",
-      bullets: ["Headless / composable builds", "Core Web Vitals & speed", "Conversion-rate optimization", "Design systems & CMS"],
-      stat: ["0.9s", "median load time"],
+      bullets: ["Headless / composable builds", "Core Web Vitals & speed", "Conversion-rate optimization", "Multi-regional + localization", "Design systems & CMS"],
+      stat: ["+34%", "avg. conversion lift"],
     },
     {
       key: "seo",
       n: "05",
-      title: "SEO & Content",
-      tag: "Own the demand before it searches.",
-      desc: "Technical, international and programmatic SEO paired with a content engine that earns authority, so you capture intent in every language you sell in.",
-      bullets: ["Technical & international SEO", "Programmatic content engines", "Editorial & thought leadership", "Digital PR & link building"],
-      stat: ["6.4×", "organic traffic"],
+      title: "SEO, AEO & Content",
+      tag: "AI answers don't have a page 2. You're the answer or you're invisible.",
+      desc: "We engineer visibility for both eras of search: rankings where people still Google, and presence inside ChatGPT, Perplexity and AI Overviews where they increasingly don't. Content, schema and authority built so answer engines know exactly who you are.",
+      bullets: ["Technical & international SEO", "Visibility in ChatGPT, Perplexity & AI Overviews", "Entity & schema optimization", "Programmatic content engines", "Digital PR, links & AI citations"],
+      stat: ["6.4×", "organic sessions"],
     },
   ],
 
@@ -127,32 +131,42 @@ export const MD = {
   },
 
   footer: {
+    // Items are plain labels until they have somewhere real to go — give one
+    // an href and it renders as a live link (external ones open in a new
+    // tab). See the Footer in home-signal.tsx.
     cols: [
-      { h: "Services", items: ["International expansion", "Paid media", "AI systems", "Web development", "SEO & content"] },
+      // Every service jumps to the "What we do" section on the homepage
+      // (id="services" in home-signal.tsx).
+      {
+        h: "Services",
+        items: [
+          { label: "International expansion", href: "/#services" },
+          { label: "Paid media", href: "/#services" },
+          { label: "Tech stack", href: "/#services" },
+          { label: "Web development", href: "/#services" },
+          { label: "SEO, AEO & content", href: "/#services" },
+        ],
+      },
       {
         h: "Company",
         items: [
           { label: "Work", href: "/#work" },
           { label: "Approach", href: "/approach" },
           { label: "About", href: "/about" },
-          "Careers",
-          "Contact",
+          // Contact goes straight to the booking page — the calendar is the
+          // contact channel.
+          { label: "Contact", href: "/book" },
         ],
       },
-      // Footer items are plain labels until they have somewhere real to go —
-      // give one an href and it renders as a live link (external ones open in
-      // a new tab). See the Footer in home-signal.tsx.
       {
         h: "Connect",
         items: [
           { label: "LinkedIn", href: "https://www.linkedin.com/company/markeddigital/" },
           { label: "Instagram", href: "https://www.instagram.com/marked__digital/" },
-          "X / Twitter",
-          "Newsletter",
         ],
       },
     ],
-    address: "Toronto · London · Singapore",
+    address: "Toronto",
   },
 };
 

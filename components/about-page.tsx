@@ -12,23 +12,29 @@
 //               01 their problem → 02 why I started → 03 what we stand for
 //               → 04 proof → 05 next step. Copy is a working draft — edit
 //               the JSX in place, the structure doesn't care.
-//   mosaic    — a visual feed: brand lockup, case art, metrics, approach,
-//               stack, and — when BEHOLD_FEED_URL is set (see
-//               lib/instagram.ts) — the latest Instagram reels and posts
-//               from @marked__digital, interleaved between the brand tiles.
-//               Everything else reuses existing content from lib/md.ts, so
-//               copy/art changes land here automatically.
+//   mosaic    — a visual feed: brand lockup, founder photo, case art,
+//               metrics, approach, stack, and — when BEHOLD_FEED_URL is set
+//               (see lib/instagram.ts) — the latest Instagram reels and
+//               posts from @marked__digital, interleaved between the brand
+//               tiles. Everything else reuses existing content from
+//               lib/md.ts, so copy/art changes land here automatically.
+//
+// ≤900px there is no room for the split, so the mosaic pane hides and its
+// tiles come back as themed, horizontally snap-scrolling RAILS woven between
+// the narrative sections (founder+numbers after 01, case art after 02,
+// Instagram after 03, stack after 04 — see the <Rail>s in Narrative). Each
+// tile is defined once as a component and rendered in both homes; CSS
+// display rules guarantee only one home is visible (and in the a11y tree)
+// at a time. The footer renders twice for the same reason (see Foot).
 //
 // The narrative <main> comes first in the DOM so reading/tab order follows
 // content priority; the desktop visual split (mosaic left, narrative right)
-// is restored by explicit grid placement in marked.css. ≤900px the split
-// collapses to a normal single-scroll page — narrative, then mosaic, then
-// footer (the footer renders twice with display toggles; see Foot). No hooks
-// here, so like book-page.tsx this stays a server component; CountUp/ToolLogo
-// are client children.
+// is restored by explicit grid placement in marked.css. No hooks here, so
+// like book-page.tsx this stays a server component; CountUp/ToolLogo are
+// client children.
 
 import Link from "next/link";
-import { MD, C, navHref, WORK, STACK_TOOLS } from "@/lib/md";
+import { MD, C, navHref, WORK, STACK_TOOLS, STACK_CATS } from "@/lib/md";
 import { getInstagramPosts, type IgPost } from "@/lib/instagram";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
@@ -62,9 +68,6 @@ function Nav() {
               {n}
             </Link>
           ))}
-          <Link className="sg-navlink" href="/stack">
-            Stack
-          </Link>
         </nav>
         <div className="mk-nav-right">
           <NavCta />
@@ -77,9 +80,9 @@ function Nav() {
 
 // Rendered twice: once at the end of the narrative pane (desktop — scrolls
 // out at the bottom of the right column) and once as the shell's last child
-// (≤900px — after the mosaic, so the collapsed page still ends on the
-// footer). The marked.css display toggles keep exactly one visible — and in
-// the accessibility tree — at a time.
+// (≤900px — so the collapsed page still ends on the footer). The marked.css
+// display toggles keep exactly one visible — and in the accessibility
+// tree — at a time.
 function Foot({ variant }: { variant: "split" | "stack" }) {
   return (
     <footer className={`abt-foot abt-foot--${variant}`}>
@@ -92,7 +95,8 @@ function Foot({ variant }: { variant: "split" | "stack" }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Mosaic pane                                                         */
+/* Tiles — each defined once, rendered in the desktop mosaic and the   */
+/* mobile rails                                                        */
 /* ------------------------------------------------------------------ */
 
 // Case-study art tile. Only the first two WORK entries have real routes, so
@@ -146,12 +150,92 @@ function IgTile({ post, wide }: { post: IgPost; wide?: boolean }) {
   );
 }
 
+// The founder — the face behind Section 2's story. Photo lives at
+// public/about/founder.jpg; swap the file to update it.
+function FounderTile() {
+  return (
+    <div className="abt-tile abt-tile--wide abt-tile--founder">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/about/founder.jpg" alt="Mark Youash, Managing Director of Marked Digital, at his desk" loading="lazy" />
+      <div className="abt-founder-cap">
+        <span className="abt-founder-role">Managing Director</span>
+        <div className="abt-founder-name">Mark Youash</div>
+      </div>
+    </div>
+  );
+}
+
+// How we work, in three beats
+function ApproachTile() {
+  return (
+    <div className="abt-tile abt-tile--list">
+      {MD.approach.map((a) => (
+        <div key={a.n} className="abt-list-row">
+          <span className="abt-list-n">{a.n}</span>
+          <span>{a.title}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // A recognizable cross-section of the stack for the logo tile — full roster
 // lives on /stack.
 const MOSAIC_TOOL_NAMES = new Set(["Shopify", "Amazon Marketplace", "Google Ads", "Meta Ads", "Klaviyo", "OpenAI", "Stripe", "AWS"]);
 
-function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
+// The stack, expressed as breadth rather than a roster: the real totals from
+// lib/md.ts, a sampler of household names, and a handoff to /stack. The whole
+// tile links there. ToolLogo has no accessible name of its own (its img
+// branch is alt="" and its SVG branch aria-hidden), so each chip gets a named
+// img role — the monogram fallback then stays quiet too.
+function StackTile() {
   const tools = STACK_TOOLS.filter((t) => MOSAIC_TOOL_NAMES.has(t.name));
+  return (
+    <Link href="/stack" className="abt-tile abt-tile--wide abt-tile--stack">
+      <div className="abt-tile-cap">The toolbox</div>
+      <div className="abt-stack-count">
+        <span style={{ color: C.accent }}>
+          <CountUp value={STACK_TOOLS.length} />
+        </span>{" "}
+        tools · {STACK_CATS.length} categories
+      </div>
+      <p className="abt-stack-line">These are just the household names. We pick the right tools per engagement and wire them into one system.</p>
+      <div className="abt-stack-row">
+        {tools.map((t) => (
+          <span key={t.name} role="img" aria-label={t.name}>
+            <ToolLogo tool={t} size={40} />
+          </span>
+        ))}
+        <span className="abt-stack-more">+{STACK_TOOLS.length - tools.length}</span>
+      </div>
+      <span className="abt-stack-cta">
+        Explore the full stack <ArrowIcon />
+      </span>
+    </Link>
+  );
+}
+
+function CtaTile() {
+  return (
+    <div className="abt-tile abt-tile--wide abt-tile--cta">
+      <div className="abt-tile-cap" style={{ color: C.accent }}>
+        {MD.ctaBand.kicker}
+      </div>
+      <div className="abt-cta-line">
+        {MD.ctaBand.title[0]} {MD.ctaBand.title[1]}
+      </div>
+      <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ alignSelf: "flex-start" }}>
+        {MD.cta}
+      </Link>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Mosaic pane (desktop)                                               */
+/* ------------------------------------------------------------------ */
+
+function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
   // Instagram tiles slot between the brand tiles at fixed positions; a short
   // (or empty) feed just leaves those slots out. Singles are placed in pairs
   // so the 2-column grid stays even.
@@ -170,18 +254,7 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
         </div>
       </div>
 
-      {/* The founder — the face behind Section 2's story. Photo lives at
-          public/about/founder.jpg; swap the file to update it. */}
-      <div className="abt-tile abt-tile--wide abt-tile--founder">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/about/founder.jpg" alt="Mark Youash, founder of Marked Digital, at his desk" />
-        <div className="abt-founder-cap">
-          <div className="abt-tile-cap" style={{ color: C.accent }}>
-            The founder
-          </div>
-          <div className="abt-founder-name">Mark Youash</div>
-        </div>
-      </div>
+      <FounderTile />
 
       <MetricTile m={MD.metrics[0]} />
       <MetricTile m={MD.metrics[1]} />
@@ -191,34 +264,14 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
 
       <CaseTile item={WORK[0]} wide link />
 
-      {/* How we work, in three beats */}
-      <div className="abt-tile abt-tile--list">
-        {MD.approach.map((a) => (
-          <div key={a.n} className="abt-list-row">
-            <span className="abt-list-n">{a.n}</span>
-            <span>{a.title}</span>
-          </div>
-        ))}
-      </div>
+      <ApproachTile />
       <MetricTile m={MD.metrics[3]} />
 
       {ig(2, true)}
 
       <CaseTile item={WORK[1]} wide link />
 
-      {/* Stack sampler. ToolLogo has no accessible name of its own (its img
-          branch is alt="" and its SVG branch aria-hidden), so each chip gets
-          a named img role here — the monogram fallback then stays quiet too. */}
-      <div className="abt-tile abt-tile--wide abt-tile--stack">
-        <div className="abt-tile-cap">The stack we run</div>
-        <div className="abt-stack-row">
-          {tools.map((t) => (
-            <span key={t.name} role="img" aria-label={t.name}>
-              <ToolLogo tool={t} size={40} />
-            </span>
-          ))}
-        </div>
-      </div>
+      <StackTile />
 
       {ig(3)}
       {ig(4)}
@@ -231,17 +284,22 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
       {ig(5, true)}
 
       {/* Feed close — hand the scroller to the CTA */}
-      <div className="abt-tile abt-tile--wide abt-tile--cta">
-        <div className="abt-tile-cap" style={{ color: C.accent }}>
-          {MD.ctaBand.kicker}
-        </div>
-        <div className="abt-cta-line">
-          {MD.ctaBand.title[0]} {MD.ctaBand.title[1]}
-        </div>
-        <Link className="sg-btn sg-btn--p" href={MD.ctaHref} style={{ alignSelf: "flex-start" }}>
-          {MD.cta}
-        </Link>
-      </div>
+      <CtaTile />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile rails                                                        */
+/* ------------------------------------------------------------------ */
+
+// A themed, horizontally snap-scrolling strip of tiles, shown only ≤900px
+// (see .abt-rail in marked.css). Desktop delivers the same tiles via the
+// mosaic pane instead.
+function Rail({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="abt-rail" aria-label={label}>
+      {children}
     </div>
   );
 }
@@ -253,43 +311,55 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
 // Section 3's belief list. Edit freely — rows render in order.
 const BELIEFS = [
   ["One system, not five vendors", "Media, site, AI and content are engineered together, because together is the only way they compound."],
-  ["Revenue is the only vanity-proof metric", "If a number can't be traced to money in your account, we don't optimize for it — and we won't report on it."],
+  ["Revenue is the only vanity-proof metric", "If a number can't be traced to money in your account, we don't optimize for it, and we won't waste your time reporting on it."],
   ["Every market is winnable", "With the right sequence of entry, localization and proof, borders are logistics, not limits."],
   ["No decks, no fluff", "Straight answers, visible work, and reporting you can read in one screen."],
 ];
 
-function Narrative() {
+function Narrative({ igPosts }: { igPosts: IgPost[] }) {
   return (
     <>
       {/* --- Section 1: Their problem — meet them where they are ---------- */}
       <section className="abt-sec">
         <div className="abt-kicker">01 · Sound familiar?</div>
-        <h1 className="abt-h">You didn&apos;t plateau. Your setup did.</h1>
+        <h1 className="abt-h">Going global isn&apos;t the risk. Going it alone is.</h1>
         <p className="abt-body">
-          You built a brand that works. The product converts, customers come back, and your home market knows your name. But growth has flattened, and every
-          quarter squeezes a little harder — ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo; has quietly stopped
-          meaning &ldquo;more revenue.&rdquo;
+          If you&apos;re here, you probably already sense it: your brand&apos;s next chapter is international. Selling in Berlin, Dubai and Tokyo the way you
+          sell at home. It&apos;s the single biggest growth lever in e-commerce, and the one most brands are left to figure out with a consultant deck and a
+          prayer. Which market first? Who owns tax, logistics, localization, local media? Real questions, and nobody accountable for the answers end to end.
         </p>
         <p className="abt-body">
-          You&apos;ve probably tried the usual route: an agency for ads, a freelancer for the site, a consultant deck for &ldquo;international.&rdquo; Five
-          vendors, five dashboards, nobody accountable for the number that matters. Expanding abroad looks like the obvious next move — and also the riskiest
-          one to get wrong alone.
+          Or maybe the pull is closer to home: growth has flattened, ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo;
+          has quietly stopped meaning &ldquo;more revenue.&rdquo; Different symptoms, same diagnosis. You&apos;ve outgrown your setup, not your ceiling. New
+          markets create the room to grow, and one connected system is what makes them pay. You deserve a partner who treats both like their own money on the
+          line.
         </p>
+        <Rail label="The founder and the numbers">
+          <FounderTile />
+          <MetricTile m={MD.metrics[0]} />
+          <MetricTile m={MD.metrics[1]} />
+          <ApproachTile />
+        </Rail>
       </section>
 
       {/* --- Section 2: Why I started — the reason behind the business ---- */}
       <section className="abt-sec">
         <div className="abt-kicker">02 · Why I started Marked</div>
-        <h2 className="abt-h">Growth kept getting sold in pieces. I started Marked to sell it whole.</h2>
+        <h2 className="abt-h">Other agencies didn&apos;t care the way I did. So I built one that does.</h2>
         <p className="abt-body">
-          I&apos;ve spent {MD.metrics[3].value} years inside e-commerce — launching brands into new markets and running the media, storefronts and systems
-          behind them. The pattern never changed: strategy lived in one shop, ads in another, the site in a third. Every hand-off leaked money, and every
-          vendor optimized their slice instead of the whole.
+          I&apos;ve spent {MD.metrics[3].value} years inside e-commerce, launching brands into new markets and running the media, storefronts and systems
+          behind them. And one thing kept eating at me: nobody cared about the business, or the numbers, the way I did. Strategy lived in one shop, ads in
+          another, the site in a third. Every hand-off leaked money, and nobody lost sleep over it. I did.
         </p>
         <p className="abt-body">
-          Marked exists to end the hand-offs. One team that runs expansion, advertising, AI and the storefront as a single compounding system — accountable to
-          revenue, not to a channel report.
+          Marked is the agency I went looking for and couldn&apos;t find. One team that runs expansion, advertising, AI and the storefront as a single
+          compounding system, obsesses over your numbers like they&apos;re our own, and answers for revenue. Not impressions. Not a channel report. Revenue.
         </p>
+        <Rail label="Selected work">
+          {WORK.map((w, i) => (
+            <CaseTile key={w.href} item={w} link={i < 2} />
+          ))}
+        </Rail>
       </section>
 
       {/* --- Section 3: What we stand for — something to root for --------- */}
@@ -310,8 +380,15 @@ function Narrative() {
           ))}
         </div>
         <p className="abt-body abt-mission">
-          The mission: make growth in any market feel as native as your home market.
+          The mission is simple: make growth in any market feel as native as your home market. Every market. Yours included.
         </p>
+        {igPosts.length > 0 && (
+          <Rail label="Latest from Instagram">
+            {igPosts.map((p) => (
+              <IgTile key={p.id} post={p} />
+            ))}
+          </Rail>
+        )}
       </section>
 
       {/* --- Section 4: Proof — back the story up ------------------------- */}
@@ -337,8 +414,13 @@ function Narrative() {
           </Link>
         ))}
         <p className="abt-body" style={{ marginTop: 18, fontSize: 14.5 }}>
-          Full breakdowns — strategy, build, numbers — live in the case studies.
+          Full breakdowns live in the case studies: the strategy, the build, and the numbers behind every claim.
         </p>
+        <Rail label="The stack we run">
+          <StackTile />
+          <MetricTile m={MD.metrics[2]} />
+          <MetricTile m={MD.metrics[3]} />
+        </Rail>
       </section>
 
       {/* --- Section 5: Next step — don't leave them hanging --------------- */}
@@ -356,7 +438,7 @@ function Narrative() {
         </div>
         {/* Softer next step for the not-ready-yet: follow the work in public. */}
         <div className="abt-social">
-          <span className="abt-social-lead">Not ready to talk? Follow the work in public —</span>
+          <span className="abt-social-lead">Not ready to talk? Follow the work in public.</span>
           {SOCIALS.map((s) => (
             <a key={s.label} className="abt-social-link" href={s.href} target="_blank" rel="noopener noreferrer">
               {s.path && (
@@ -382,7 +464,7 @@ export default async function AboutPage() {
       <Nav />
       <div className="abt-cols">
         <main className="abt-col abt-right" tabIndex={0} aria-label="About Marked">
-          <Narrative />
+          <Narrative igPosts={igPosts} />
         </main>
         <aside className="abt-col abt-left" tabIndex={0} aria-label="Marked in pictures and numbers">
           <Mosaic igPosts={igPosts} />

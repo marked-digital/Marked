@@ -28,9 +28,6 @@ function Nav() {
             {n}
           </Link>
         ))}
-        <Link className="sg-navlink" href="/stack">
-          Stack
-        </Link>
       </nav>
       {/* ≤760px the link row above and the bar CTA are hidden, and MobileMenu's
           hamburger takes over at the right end of the bar. */}
@@ -246,7 +243,6 @@ function SelectedWork() {
 
 function Services() {
   const [active, setActive] = React.useState(0);
-  const s = MD.services[active];
   const detRef = React.useRef<HTMLDivElement | null>(null);
   const firstRef = React.useRef(true);
   // Slide the category list in from the left when the section scrolls into view.
@@ -298,22 +294,39 @@ function Services() {
           ))}
         </div>
         <div ref={detRef} className="sg-detail" style={{ position: "sticky", top: 40, background: C.panel, border: `1px solid ${C.line}`, borderRadius: 18, padding: 40 }}>
-          <div style={{ color: C.accent, fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15 }}>{s.tag}</div>
-          <p style={{ color: C.muted, fontSize: 16.5, lineHeight: 1.6, marginTop: 18 }}>{s.desc}</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px", marginTop: 30 }}>
-            {s.bullets.map((b) => (
-              <div key={b} className="sg-bullet">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2.4" style={{ marginTop: 3, flex: "none" }}>
-                  <path d="M5 12l5 5L20 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {b}
+          {/* Every panel renders into the server HTML (inactive ones are
+              display:none) so crawlers and answer engines can quote all five
+              subheads and descriptions, not just the tab that happens to be
+              open. The tab-change animation lives on the container above and
+              is unaffected. */}
+          {MD.services.map((sv, i) => (
+            <div key={sv.key} style={{ display: i === active ? "block" : "none" }}>
+              <h3 style={{ color: C.accent, fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.15, margin: 0 }}>{sv.tag}</h3>
+              <p style={{ color: C.muted, fontSize: 16.5, lineHeight: 1.6, marginTop: 18 }}>{sv.desc}</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px 24px", marginTop: 30 }}>
+                {sv.bullets.map((b) => (
+                  <div key={b} className="sg-bullet">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2.4" style={{ marginTop: 3, flex: "none" }}>
+                      <path d="M5 12l5 5L20 6" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {b}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 34, paddingTop: 26, borderTop: `1px solid ${C.line}` }}>
-            <span style={{ fontSize: 40, color: C.text, fontWeight: 700, letterSpacing: "-0.03em" }}>{s.stat[0]}</span>
-            <span style={{ color: C.muted, fontSize: 15 }}>{s.stat[1]}</span>
-          </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 34, paddingTop: 26, borderTop: `1px solid ${C.line}` }}>
+                <span style={{ fontSize: 40, color: C.text, fontWeight: 700, letterSpacing: "-0.03em" }}>{sv.stat[0]}</span>
+                <span style={{ color: C.muted, fontSize: 15 }}>{sv.stat[1]}</span>
+              </div>
+              {/* The Architecture section deep-dives the stack; this panel
+                  stays service-level and links down. */}
+              {sv.key === "stack" && (
+                <Link className="sg-navlink" href="/stack" style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 22, color: C.text, fontSize: 14, fontWeight: 600 }}>
+                  Explore the full stack
+                  <ArrowIcon />
+                </Link>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </section>
