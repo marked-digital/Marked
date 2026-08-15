@@ -27,6 +27,7 @@ import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
+import SiteFooter from "@/components/site-footer";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import type { BarGroup, CaseStudy as CaseStudyData, PageBuild } from "@/lib/case-study";
 
@@ -229,17 +230,9 @@ function Nav() {
   );
 }
 
+// The shared footer (components/site-footer.tsx) — same on every page.
 function Footer() {
-  return (
-    <footer style={{ borderTop: `1px solid ${C.line}` }}>
-      <div className="oeo-wrap" style={{ paddingTop: 30, paddingBottom: 30, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, color: C.faint, fontSize: 13.5 }}>
-        <span>
-          © 2026 {MD.brandFull}. {MD.footer.address}.
-        </span>
-        <span>Privacy · Terms</span>
-      </div>
-    </footer>
-  );
+  return <SiteFooter />;
 }
 
 /* ------------------------------------------------------------------ hero */

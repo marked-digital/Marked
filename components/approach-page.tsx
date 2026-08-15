@@ -26,6 +26,7 @@ import { MD, C, navHref } from "@/lib/md";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, MarkLogo, useScrollSync } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
+import SiteFooter from "@/components/site-footer";
 
 /* ------------------------------------------------------------------ copy
    Single source of truth for the five sheets. `spec` is the small drafting
@@ -382,9 +383,10 @@ function Blueprint({ active }: { active: number }) {
             {/* the whole point of the layer: six tools reading as one system */}
             <g style={{ opacity: ramp(2, 0.88, 1) }}>
               <circle cx={CEN.x} cy={CEN.y} r={38} fill="rgba(31,168,95,.12)" stroke={C.accent} />
-              {/* apr-core-num survives the mobile hide-all-labels rule (and
-                  upsizes there) — the "1" is the layer's payoff, not noise. */}
-              <text x={CEN.x} y={CEN.y - 1} textAnchor="middle" className="apr-mono apr-core-num" fill={C.accent} fontSize={13} fontWeight={700}>
+              {/* apr-keep survives the mobile hide-all-labels rule; the size
+                  and centering fixups live on apr-core-num — the "1" is the
+                  layer's payoff, not noise. */}
+              <text x={CEN.x} y={CEN.y - 1} textAnchor="middle" className="apr-mono apr-keep apr-core-num" fill={C.accent} fontSize={13} fontWeight={700}>
                 1
               </text>
               <text x={CEN.x} y={CEN.y + 14} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} fontWeight={700}>
@@ -403,10 +405,10 @@ function Blueprint({ active }: { active: number }) {
                       <path d={path} />
                     </g>
                   ) : (
-                    /* apr-node-mono keeps the monogram on mobile — it IS the
+                    /* apr-keep holds the monogram on mobile — it IS the
                        node's emblem (Klaviyo has no vector logo), unlike the
                        name labels the mobile rule strips. */
-                    <text x={n.x} y={n.y + 1} textAnchor="middle" dominantBaseline="middle" className="apr-node-mono" fill={n.color} fontWeight={800} fontSize={n.mono.length >= 2 ? 16 : 22}>
+                    <text x={n.x} y={n.y + 1} textAnchor="middle" dominantBaseline="middle" className="apr-keep apr-node-mono" fill={n.color} fontWeight={800} fontSize={n.mono.length >= 2 ? 16 : 22}>
                       {n.mono}
                     </text>
                   )}
@@ -523,10 +525,12 @@ function Gauge({ cx, cy, to, label, read, from, until }: { cx: number; cy: numbe
         <line x1={cx} y1={cy} x2={cx - r * 0.82} y2={cy} stroke={C.accentHover} strokeWidth={2.4} strokeLinecap="round" />
       </g>
       <circle cx={cx} cy={cy} r={4} fill={C.accent} />
-      <text x={cx} y={cy + 22} textAnchor="middle" className="apr-mono" fill={C.muted} fontSize={12} style={{ textTransform: "uppercase" }}>
+      {/* apr-keep: the gauges are readings, not labels — they stay (and
+          upsize) on the phone-scale sheet where decorative text is hidden. */}
+      <text x={cx} y={cy + 22} textAnchor="middle" className="apr-mono apr-keep apr-gauge-l" fill={C.muted} fontSize={12} style={{ textTransform: "uppercase" }}>
         {label}
       </text>
-      <text x={cx} y={cy + 44} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={16} fontWeight={700} style={{ opacity: ramp(3, until, until + 0.15) }}>
+      <text x={cx} y={cy + 44} textAnchor="middle" className="apr-mono apr-keep apr-gauge-r" fill={C.accent} fontSize={16} fontWeight={700} style={{ opacity: ramp(3, until, until + 0.15) }}>
         {read}
       </text>
     </g>
@@ -622,14 +626,12 @@ function CTA() {
   );
 }
 
+// The shared footer (components/site-footer.tsx) — same on every page. The
+// wrapper keeps it above the page's fixed blueprint grid backdrop.
 function Footer() {
-  const f = MD.footer;
   return (
-    <footer style={{ borderTop: `1px solid ${C.line}`, position: "relative", zIndex: 2 }}>
-      <div className="apr-wrap" style={{ paddingTop: 30, paddingBottom: 30, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, color: C.faint, fontSize: 13.5 }}>
-        <span>© 2026 {MD.brandFull}. {f.address}.</span>
-        <span>Privacy · Terms</span>
-      </div>
-    </footer>
+    <div style={{ position: "relative", zIndex: 2 }}>
+      <SiteFooter />
+    </div>
   );
 }

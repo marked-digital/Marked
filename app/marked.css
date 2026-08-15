@@ -1348,20 +1348,31 @@
   /* The sheet scales down with its column, which puts every label on it at
      roughly 6px — noise, not information. Below here the drawing reads as pure
      line-work and the words live in the copy column, where they're legible:
-     the spec row carries the same readings as real text. Two glyphs are the
-     information rather than labels, so they stay: the ring's "1" payoff and
-     the Klaviyo monogram (the one node with no vector logo — its neighbours
-     all render as icon paths, which this rule never touched). */
-  .apr-blueprint svg text:not(.apr-core-num):not(.apr-node-mono) {
+     the spec row carries the same readings as real text. Anything that IS the
+     information rather than a label carries .apr-keep and stays: the ring's
+     "1" payoff, the Klaviyo monogram (the one node with no vector logo), and
+     the two gauges' readings. */
+  .apr-blueprint svg text:not(.apr-keep) {
     display: none;
   }
-  /* Upsized in sheet units to land ~10px rendered at phone scale, matching
-     the icon nodes' visual weight. Desktop keeps the attribute sizes. */
+  /* Upsized in sheet units to land ~8-10px rendered at phone scale, matching
+     the icon nodes' visual weight. Desktop keeps the attribute sizes. The
+     "1" stands alone here (SYSTEM stays hidden), so it centres on the
+     circle's midline instead of the two-line baseline it uses on desktop. */
   .apr-blueprint svg .apr-core-num {
     font-size: 30px;
+    dominant-baseline: central;
   }
   .apr-blueprint svg .apr-node-mono {
     font-size: 26px;
+  }
+  .apr-blueprint svg .apr-gauge-l {
+    font-size: 22px;
+  }
+  .apr-blueprint svg .apr-gauge-r {
+    font-size: 26px;
+    /* The bigger reading needs a touch more air under its label. */
+    transform: translateY(6px);
   }
   .apr-spec {
     margin-top: 18px;
@@ -2796,19 +2807,10 @@ a.abt-tile--ig:hover img {
 .abt-sec--last {
   border-bottom: 0;
 }
-.abt-foot {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 26px clamp(28px, 4.5vw, 72px) 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.085);
-  color: #5c625b;
-  font-size: 13px;
-}
-/* The footer renders twice (see Foot in about-page.tsx): the split copy ends
-   the right pane on desktop; the stack copy ends the collapsed page ≤900px.
-   display toggles keep exactly one visible / in the a11y tree. */
+/* The shared SiteFooter renders twice (see Foot in about-page.tsx): the
+   split copy ends the right pane on desktop; the stack copy ends the
+   collapsed page ≤900px. Display toggles keep exactly one visible / in the
+   a11y tree. */
 .abt-foot--stack {
   display: none;
 }
@@ -2877,7 +2879,7 @@ a.abt-tile--ig:hover img {
     display: none;
   }
   .abt-foot--stack {
-    display: flex;
+    display: block;
   }
 }
 @media (max-width: 560px) {
@@ -2897,5 +2899,129 @@ a.abt-tile--ig:hover img {
   }
   .abt-proof-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------ site footer (.ftr) */
+/* One footer for every page (components/site-footer.tsx). It queries its own
+   width — container units, not viewport units — so it lays out correctly
+   full-bleed on normal pages AND inside the About page's half-width pane. */
+.ftr {
+  container-type: inline-size;
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+  background: #0a0b0a;
+  overflow: hidden;
+}
+.ftr-inner {
+  max-width: 1680px;
+  margin: 0 auto;
+}
+.ftr-top {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) auto;
+  gap: 48px;
+  padding: clamp(40px, 6cqw, 68px) clamp(24px, 4.5cqw, 56px) 0;
+}
+.ftr-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.ftr-line {
+  margin: 16px 0 0;
+  max-width: 250px;
+  color: #8e948c;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.ftr-social {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.ftr-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #8e948c;
+  transition: color 0.2s, border-color 0.2s, transform 0.25s;
+}
+.ftr-social-btn:hover {
+  color: #f3f5f2;
+  border-color: rgba(31, 168, 95, 0.65);
+  transform: translateY(-2px);
+}
+.ftr-cols {
+  display: grid;
+  grid-auto-flow: column;
+  gap: clamp(30px, 5cqw, 80px);
+}
+.ftr-h {
+  margin-bottom: 15px;
+  color: #5c625b;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ftr-link {
+  display: block;
+  margin-bottom: 11px;
+  color: #8e948c;
+  font-size: 14.5px;
+  transition: color 0.2s;
+}
+.ftr-link:hover {
+  color: #f3f5f2;
+}
+/* The watermark: outlined, dimmed, fading down into the legal bar. The green
+   period is the one place the accent shows. Sized in container units so it
+   spans any footer width at the same visual weight. */
+.ftr-mark {
+  margin-top: clamp(26px, 5cqw, 54px);
+  text-align: center;
+  font-size: 23cqw;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.74;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+  user-select: none;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent 88%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent 88%);
+}
+.ftr-mark span {
+  -webkit-text-stroke-color: rgba(31, 168, 95, 0.35);
+}
+.ftr-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px clamp(24px, 4.5cqw, 56px) 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+  color: #5c625b;
+  font-size: 13px;
+}
+/* Narrow footer (phones, or the About pane): brand stacks above the link
+   columns, which drop to a two-up grid. */
+@container (max-width: 720px) {
+  .ftr-top {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+  .ftr-cols {
+    grid-auto-flow: row;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
   }
 }

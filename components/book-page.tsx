@@ -9,6 +9,7 @@ import Link from "next/link";
 import { MD, C, navHref } from "@/lib/md";
 import { MarkLogo } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
+import SiteFooter from "@/components/site-footer";
 
 // Google Calendar appointment schedule. To repoint the booking flow, swap this
 // one URL — take it from the scheduler's "Embed" snippet and keep ?gv=true,
@@ -45,18 +46,9 @@ function Nav() {
   );
 }
 
+// The shared footer (components/site-footer.tsx) — same on every page.
 function Footer() {
-  const f = MD.footer;
-  return (
-    <footer style={{ borderTop: `1px solid ${C.line}` }}>
-      <div className="sg-wrap" style={{ paddingTop: 30, paddingBottom: 30, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, color: C.faint, fontSize: 13.5 }}>
-        <span>
-          © 2026 {MD.brandFull}. {f.address}.
-        </span>
-        <span>Privacy · Terms</span>
-      </div>
-    </footer>
-  );
+  return <SiteFooter />;
 }
 
 export default function BookPage() {

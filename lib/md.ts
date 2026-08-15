@@ -163,6 +163,8 @@ export const MD = {
         items: [
           { label: "LinkedIn", href: "https://www.linkedin.com/company/markeddigital/" },
           { label: "Instagram", href: "https://www.instagram.com/marked__digital/" },
+          // The org page — public repos, pinned work, the site's own source.
+          { label: "GitHub", href: "https://github.com/marked-digital" },
         ],
       },
     ],

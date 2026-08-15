@@ -7,6 +7,7 @@ import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_CATS, STACK_TOOLS, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
+import SiteFooter from "@/components/site-footer";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 
 type Tool = (typeof STACK_TOOLS)[number];
@@ -270,21 +271,8 @@ export default function StackPage() {
           </Link>
         </div>
       </section>
-      {/* footer */}
-      <footer style={{ borderTop: `1px solid ${C.line}` }}>
-        <div className="stk-wrap" style={{ paddingTop: 26, paddingBottom: 26, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, color: C.faint, fontSize: 13.5 }}>
-          <Link href="/" className="stk-disp" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 18, fontWeight: 700, color: C.text }}>
-            <MarkLogo size={20} color={C.text} accent={C.accent} />
-            <span>
-              {MD.brand}
-              <span style={{ color: C.accent }}>.</span>
-            </span>
-          </Link>
-          <span>
-            © 2026 {MD.brandFull}. {MD.footer.address}
-          </span>
-        </div>
-      </footer>
+      {/* The shared footer (components/site-footer.tsx) — same on every page. */}
+      <SiteFooter />
     </div>
   );
 }

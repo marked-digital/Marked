@@ -36,17 +36,9 @@
 import Link from "next/link";
 import { MD, C, navHref, WORK, STACK_TOOLS, STACK_CATS } from "@/lib/md";
 import { getInstagramPosts, type IgPost } from "@/lib/instagram";
-import { iconPath } from "@/lib/icons";
 import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
 import { MobileMenu, NavCta } from "@/components/site-nav";
-
-// Our social profiles, single-sourced from the footer's Connect column so a
-// URL change there lands here too. Icon slugs resolve via lib/icons.ts.
-const SOCIALS = (["LinkedIn", "Instagram"] as const).flatMap((label) => {
-  const items = MD.footer.cols.find((c) => c.h === "Connect")?.items ?? [];
-  const item = items.find((i): i is { label: string; href: string } => typeof i !== "string" && i.label === label);
-  return item ? [{ label, href: item.href, path: iconPath(label.toLowerCase()) }] : [];
-});
+import SiteFooter, { SOCIALS } from "@/components/site-footer";
 
 // Same compact chrome as book-page.tsx / approach-page.tsx. The current-page
 // highlight rides on aria-current (see .sg-navlink[aria-current] in
@@ -78,19 +70,17 @@ function Nav() {
   );
 }
 
-// Rendered twice: once at the end of the narrative pane (desktop — scrolls
-// out at the bottom of the right column) and once as the shell's last child
-// (≤900px — so the collapsed page still ends on the footer). The marked.css
-// display toggles keep exactly one visible — and in the accessibility
-// tree — at a time.
+// The shared site footer, rendered twice: once at the end of the narrative
+// pane (desktop — scrolls out at the bottom of the right column) and once as
+// the shell's last child (≤900px — so the collapsed page still ends on the
+// footer). The marked.css display toggles keep exactly one visible — and in
+// the accessibility tree — at a time. SiteFooter sizes against its container,
+// so the half-width pane gets the stacked layout automatically.
 function Foot({ variant }: { variant: "split" | "stack" }) {
   return (
-    <footer className={`abt-foot abt-foot--${variant}`}>
-      <span>
-        © 2026 {MD.brandFull}. {MD.footer.address}.
-      </span>
-      <span>Privacy · Terms</span>
-    </footer>
+    <div className={`abt-foot--${variant}`}>
+      <SiteFooter />
+    </div>
   );
 }
 
