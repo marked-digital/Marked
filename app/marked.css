@@ -2529,8 +2529,16 @@ a.abt-tile--ig:hover img {
 
 /* --------------- right pane: narrative */
 .abt-sec {
-  padding: clamp(56px, 9vh, 96px) clamp(28px, 4.5vw, 72px);
+  /* Shared with the mobile rails, which bleed to the right edge by undoing
+     this padding (see .abt-rail in the ≤900px block). */
+  --abt-pad: clamp(28px, 4.5vw, 72px);
+  padding: clamp(56px, 9vh, 96px) var(--abt-pad);
   border-bottom: 1px solid rgba(255, 255, 255, 0.085);
+}
+/* Mobile-only tile rails (Rail in about-page.tsx) — hidden on desktop, where
+   the mosaic pane carries the same tiles. */
+.abt-rail {
+  display: none;
 }
 .abt-kicker {
   font-size: 12px;
@@ -2686,11 +2694,50 @@ a.abt-tile--ig:hover img {
     overflow: visible;
     min-height: 0;
   }
-  /* DOM order already leads with the narrative; the mosaic just swaps its
-     split-view border for a stacked one. */
+  /* The mosaic pane hides — its tiles come back as the themed rails woven
+     between the narrative sections instead. */
   .abt-left {
-    border-right: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.085);
+    display: none;
+  }
+  /* Horizontal snap-scroll strips. Negative margins undo the section's side
+     padding so the rail bleeds to the viewport edge; scroll-padding keeps
+     snapped tiles aligned with the text column, and the partial next tile
+     peeking in from the right is the "swipe me" affordance. */
+  .abt-rail {
+    display: flex;
+    gap: 10px;
+    margin: 34px calc(-1 * var(--abt-pad)) 0;
+    padding: 4px var(--abt-pad);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: var(--abt-pad);
+    scrollbar-width: none;
+  }
+  .abt-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .abt-rail > * {
+    flex: 0 0 74%;
+    max-width: 320px;
+    scroll-snap-align: start;
+    min-height: 0;
+  }
+  /* Rail-specific shapes: the founder reads as a portrait, cases and metrics
+     get consistent heights, and the stack tile earns extra width for its
+     logo row. */
+  .abt-rail .abt-tile--founder {
+    aspect-ratio: 4 / 5;
+  }
+  .abt-rail .abt-tile--case {
+    min-height: 240px;
+  }
+  .abt-rail .abt-tile--metric,
+  .abt-rail .abt-tile--list {
+    min-height: 190px;
+  }
+  .abt-rail .abt-tile--stack {
+    flex-basis: 86%;
   }
   /* Swap footers: the split copy would land mid-page (it lives inside the
      narrative pane); the stack copy sits after the mosaic, ending the page. */
