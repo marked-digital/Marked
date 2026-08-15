@@ -7,10 +7,10 @@
 // viewport, so the same component works full-bleed on normal pages and inside
 // the About page's half-width narrative pane without a special variant.
 //
-// Anatomy: brand + one-liner + socials on the left, the MD.footer link
-// columns on the right, a giant outlined wordmark as a watermark, and the
-// legal bar. All content is data-driven from lib/md.ts — edit there, not
-// here.
+// Anatomy: one evenly-distributed grid — brand + one-liner + socials in the
+// first (wider) column, the MD.footer link columns filling the rest (same
+// 1.4fr/1fr rhythm the old home footer used) — then the legal bar. All
+// content is data-driven from lib/md.ts — edit there, not here.
 
 import Link from "next/link";
 import { MD, C } from "@/lib/md";
@@ -53,6 +53,8 @@ export default function SiteFooter() {
               ))}
             </div>
           </div>
+          {/* display: contents — the nav stays a landmark while its three
+              columns sit directly in the .ftr-top grid next to the brand. */}
           <nav className="ftr-cols" aria-label="Footer">
             {MD.footer.cols.map((col) => (
               <div key={col.h}>
@@ -71,12 +73,6 @@ export default function SiteFooter() {
             ))}
           </nav>
         </div>
-      </div>
-      {/* The signature: an oversized outlined wordmark fading toward the
-          legal bar. Pure decoration — hidden from the a11y tree. */}
-      <div className="ftr-mark" aria-hidden="true">
-        {MD.brand}
-        <span>.</span>
       </div>
       <div className="ftr-bar">
         <span>
