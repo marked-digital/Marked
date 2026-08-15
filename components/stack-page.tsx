@@ -78,13 +78,10 @@ function Nav() {
       </Link>
       <nav className="stk-nav-links">
         {MD.nav.map((n) => (
-          <Link key={n} className="stk-navlink" href={navHref(n)}>
+          <Link key={n} className="stk-navlink" href={navHref(n)} style={n === "Stack" ? { color: C.text } : undefined}>
             {n}
           </Link>
         ))}
-        <Link className="stk-navlink" style={{ color: C.text }} href="/stack">
-          Stack
-        </Link>
       </nav>
       <div className="mk-nav-right">
         {/* .stk-btn is this page's button flavour; .mk-nav-cta trims it to the

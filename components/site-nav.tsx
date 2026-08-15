@@ -19,9 +19,9 @@ import { usePathname } from "next/navigation";
 import { useLenis } from "lenis/react";
 import { MD, navHref } from "@/lib/md";
 
-// Drawer destinations, in the same order the desktop navs render them: the four
-// MD.nav items, then /stack, which every page appends by hand.
-const NAV_ITEMS = [...MD.nav, "Stack"];
+// Drawer destinations — MD.nav, in the same order the desktop navs render it
+// (Stack and About included; nothing is appended by hand anymore).
+const NAV_ITEMS = MD.nav;
 
 // Which nav item the current route belongs to, so the drawer can mark it.
 // "/work/…" case studies belong to Work; the homepage's hash sections have no

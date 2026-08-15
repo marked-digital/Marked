@@ -68,9 +68,6 @@ function Nav() {
               {n}
             </Link>
           ))}
-          <Link className="sg-navlink" href="/stack">
-            Stack
-          </Link>
         </nav>
         <div className="mk-nav-right">
           <NavCta />
@@ -325,16 +322,17 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
       {/* --- Section 1: Their problem — meet them where they are ---------- */}
       <section className="abt-sec">
         <div className="abt-kicker">01 · Sound familiar?</div>
-        <h1 className="abt-h">You didn&apos;t plateau. Your setup did.</h1>
+        <h1 className="abt-h">Going global isn&apos;t the risk. Going it alone is.</h1>
         <p className="abt-body">
-          You built a brand that works. The product converts, customers come back, and your home market knows your name. But growth has flattened, and every
-          quarter squeezes a little harder. Ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo; has quietly stopped
-          meaning &ldquo;more revenue.&rdquo;
+          If you&apos;re here, you probably already sense it: your brand&apos;s next chapter is international. Selling in Berlin, Dubai and Tokyo the way you
+          sell at home. It&apos;s the single biggest growth lever in e-commerce, and the one most brands are left to figure out with a consultant deck and a
+          prayer. Which market first? Who owns tax, logistics, localization, local media? Real questions, and nobody accountable for the answers end to end.
         </p>
         <p className="abt-body">
-          You&apos;ve probably tried the usual route: an agency for ads, a freelancer for the site, a consultant deck for &ldquo;international.&rdquo; Five
-          vendors, five dashboards, and nobody accountable for the number that actually matters. Expanding abroad looks like the obvious next move, and also
-          the riskiest one to get wrong alone. You deserve a partner who treats it like their own money on the line.
+          Or maybe the pull is closer to home: growth has flattened, ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo;
+          has quietly stopped meaning &ldquo;more revenue.&rdquo; Different symptoms, same diagnosis. You&apos;ve outgrown your setup, not your ceiling. New
+          markets create the room to grow, and one connected system is what makes them pay. You deserve a partner who treats both like their own money on the
+          line.
         </p>
         <Rail label="The founder and the numbers">
           <FounderTile />

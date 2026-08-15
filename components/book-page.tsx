@@ -33,9 +33,6 @@ function Nav() {
               {n}
             </Link>
           ))}
-          <Link className="sg-navlink" href="/stack">
-            Stack
-          </Link>
         </nav>
         <div className="mk-nav-right">
           {/* Self-link — the bar has to look identical to every other page, so

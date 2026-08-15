@@ -3,7 +3,8 @@
 export const MD = {
   brand: "Marked",
   brandFull: "Marked Digital",
-  nav: ["Services", "Work", "Approach", "About"],
+  // Rendered in this order by every desktop nav and the mobile drawer.
+  nav: ["Services", "Work", "Approach", "Stack", "About"],
   cta: "Book a strategy call",
   // Every "Book a strategy call" button across the site points here — the
   // booking page, which embeds the Google Calendar appointment scheduler.
@@ -127,32 +128,42 @@ export const MD = {
   },
 
   footer: {
+    // Items are plain labels until they have somewhere real to go — give one
+    // an href and it renders as a live link (external ones open in a new
+    // tab). See the Footer in home-signal.tsx.
     cols: [
-      { h: "Services", items: ["International expansion", "Paid media", "AI systems", "Web development", "SEO & content"] },
+      // Every service jumps to the "What we do" section on the homepage
+      // (id="services" in home-signal.tsx).
+      {
+        h: "Services",
+        items: [
+          { label: "International expansion", href: "/#services" },
+          { label: "Paid media", href: "/#services" },
+          { label: "AI systems", href: "/#services" },
+          { label: "Web development", href: "/#services" },
+          { label: "SEO & content", href: "/#services" },
+        ],
+      },
       {
         h: "Company",
         items: [
           { label: "Work", href: "/#work" },
           { label: "Approach", href: "/approach" },
           { label: "About", href: "/about" },
-          "Careers",
-          "Contact",
+          // Contact goes straight to the booking page — the calendar is the
+          // contact channel.
+          { label: "Contact", href: "/book" },
         ],
       },
-      // Footer items are plain labels until they have somewhere real to go —
-      // give one an href and it renders as a live link (external ones open in
-      // a new tab). See the Footer in home-signal.tsx.
       {
         h: "Connect",
         items: [
           { label: "LinkedIn", href: "https://www.linkedin.com/company/markeddigital/" },
           { label: "Instagram", href: "https://www.instagram.com/marked__digital/" },
-          "X / Twitter",
-          "Newsletter",
         ],
       },
     ],
-    address: "Toronto · London · Singapore",
+    address: "Toronto",
   },
 };
 

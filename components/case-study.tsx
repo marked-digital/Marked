@@ -219,9 +219,6 @@ function Nav() {
               {n}
             </Link>
           ))}
-          <Link className="sg-navlink" href="/stack">
-            Stack
-          </Link>
         </nav>
         <div className="mk-nav-right">
           <NavCta />

@@ -28,9 +28,6 @@ function Nav() {
             {n}
           </Link>
         ))}
-        <Link className="sg-navlink" href="/stack">
-          Stack
-        </Link>
       </nav>
       {/* ≤760px the link row above and the bar CTA are hidden, and MobileMenu's
           hamburger takes over at the right end of the bar. */}
