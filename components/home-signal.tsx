@@ -10,6 +10,7 @@ import { MD, C, STACK_TOOLS, STACK_CATS, WORK, navHref } from "@/lib/md";
 import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic, useReveal, useRotate, useScrollSync } from "@/components/shared";
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 import { MobileMenu, NavCta } from "@/components/site-nav";
+import SiteFooter from "@/components/site-footer";
 
 function Nav() {
   return (
@@ -474,49 +475,9 @@ function CTA() {
   );
 }
 
+// The shared footer (components/site-footer.tsx) — same on every page.
 function Footer() {
-  const f = MD.footer;
-  return (
-    <footer style={{ borderTop: `1px solid ${C.line}` }}>
-      <div className="sg-wrap sg-foot-grid" style={{ paddingTop: 60, paddingBottom: 44 }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 11, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em" }}>
-            <MarkLogo size={24} color={C.text} accent={C.accent} />
-            <span>
-              {MD.brand}
-              <span style={{ color: C.accent }}>.</span>
-            </span>
-          </div>
-          <p style={{ color: C.faint, fontSize: 14.5, marginTop: 16, maxWidth: 230, lineHeight: 1.55 }}>{f.address}</p>
-        </div>
-        {f.cols.map((col) => (
-          <div key={col.h}>
-            <div style={{ fontSize: 13, color: C.faint, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 16 }}>{col.h}</div>
-            {col.items.map((it) => {
-              const label = typeof it === "string" ? it : it.label;
-              const href = typeof it === "string" ? "#" : it.href;
-              const external = href.startsWith("http");
-              return (
-                <a
-                  key={label}
-                  className="sg-navlink"
-                  href={href}
-                  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  style={{ display: "block", marginBottom: 11 }}
-                >
-                  {label}
-                </a>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-      <div className="sg-wrap" style={{ borderTop: `1px solid ${C.line}`, paddingTop: 22, paddingBottom: 22, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, color: C.faint, fontSize: 13.5 }}>
-        <span>© 2026 {MD.brandFull}. All rights reserved.</span>
-        <span>Privacy · Terms</span>
-      </div>
-    </footer>
-  );
+  return <SiteFooter />;
 }
 
 export default function HomeSignal() {
