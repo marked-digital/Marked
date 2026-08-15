@@ -17,12 +17,28 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  // Resolves relative metadata (og:image, canonical) to absolute URLs —
+  // scrapers like Facebook's reject relative image paths.
+  metadataBase: new URL("https://marked-digital.com"),
   title: {
     default: "Marked. | Make your mark in any market",
     template: "Marked. | %s",
   },
   description:
     "Marked Digital: the growth partner for ecommerce brands going global. Expansion, paid media, tech stacks, web builds and SEO/AEO as one compounding system.",
+  // Home's canonical. Every other page sets its own in its metadata block —
+  // this inherited value only reaches routes that don't override it.
+  alternates: { canonical: "/" },
+  // The link-preview card itself comes from app/opengraph-image.tsx /
+  // twitter-image.tsx (file conventions); these set the surrounding fields.
+  openGraph: {
+    siteName: "Marked Digital",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
