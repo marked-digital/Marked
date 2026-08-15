@@ -17,7 +17,7 @@ export const MD = {
   },
 
   metrics: [
-    { prefix: "+", value: 412, suffix: "%", label: "avg. ROAS lift" },
+    { prefix: "+", value: 312, suffix: "%", label: "avg. ROAS lift" },
     { value: 47, suffix: "", label: "markets launched" },
     { prefix: "$", value: 1.4, suffix: "B", decimals: 1, label: "revenue generated" },
     { value: 13, suffix: "", label: "years in ecommerce" },
@@ -87,7 +87,7 @@ export const MD = {
       tag: "Ad budgets that behave like investments, not donations to Google.",
       desc: "Full-funnel paid across Meta, Google, TikTok, Amazon and retail media, engineered around incrementality, not vanity metrics, with creative tested at scale.",
       bullets: ["Full-funnel paid strategy", "Creative testing at scale", "Bidding & budget automation", "Incrementality measurement"],
-      stat: ["+412%", "avg. ROAS lift"],
+      stat: ["+312%", "avg. ROAS lift"],
     },
     {
       key: "stack",

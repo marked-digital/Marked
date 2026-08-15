@@ -2112,8 +2112,14 @@
   .sg-plan-grid {
     padding: 28px !important;
   }
+  /* Fluid size so the longest titles ("Digital Advertising & Paid Media",
+     "International Ecommerce Expansion") hold one line on phones instead of
+     wrapping; wrap stays allowed as the fallback for extreme cases. */
   .sg-svc-t {
-    font-size: 21px;
+    font-size: clamp(14px, 4.6vw, 21px);
+  }
+  .sg-svc-n {
+    width: 24px;
   }
   .sg-work-stack {
     gap: 20px;
