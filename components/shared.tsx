@@ -216,11 +216,28 @@ export function CountUp({
     if (!seen) return;
     let raf: number;
     let start: number | undefined;
+    let last = -Infinity;
+    let shown = fmt(0, decimals);
     const step = (t: number) => {
-      if (!start) start = t;
+      if (start === undefined) start = t;
       const p = Math.min((t - start) / duration, 1);
+      // ~30fps is indistinguishable for a counting number, and several of
+      // these run at once while the page is scrolling — skipping alternate
+      // frames halves the main-thread work that was stuttering mobile scroll.
+      if (p < 1 && t - last < 33) {
+        raf = requestAnimationFrame(step);
+        return;
+      }
+      last = t;
       const eased = 1 - Math.pow(1 - p, 3);
-      setN(value * eased);
+      const next = value * eased;
+      // Only commit renders that change the visible string — near the end of
+      // the ease, many frames round to the same number.
+      const s = fmt(next, decimals);
+      if (s !== shown) {
+        shown = s;
+        setN(next);
+      }
       if (p < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
@@ -229,9 +246,11 @@ export function CountUp({
       cancelAnimationFrame(raf);
       clearTimeout(fb);
     };
-  }, [seen, value, duration]);
+  }, [seen, value, duration, decimals]);
   return (
-    <span ref={ref}>
+    // Tabular figures keep every digit the same width, so the layout doesn't
+    // reflow (and the number doesn't wobble) on each tick.
+    <span ref={ref} style={{ fontVariantNumeric: "tabular-nums" }}>
       {prefix}
       {fmt(n, decimals)}
       {suffix}

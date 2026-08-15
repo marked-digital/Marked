@@ -65,7 +65,7 @@ function Slider({
 export function GrowthCalc() {
   const [spend, setSpend] = React.useState(50000);
   const [roas, setRoas] = React.useState(2.0);
-  // Single-sourced from the hero's headline stat (+412% avg. ROAS lift,
+  // Single-sourced from the hero's headline stat (avg. ROAS lift,
   // MD.metrics[0]) so the modeler and the claim can never disagree. The lift
   // is a percentage increase on the current ROAS, not additive points.
   const LIFT_PCT = MD.metrics[0].value;
