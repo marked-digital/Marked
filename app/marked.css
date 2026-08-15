@@ -2326,6 +2326,28 @@
   display: flex;
   flex-direction: column;
 }
+/* In the desktop split the document never scrolls, so the sticky topbar sits
+   in its own flex row with nothing ever passing behind it — its glass blur
+   had nothing to sample and read as solid black. Overlaying the bar on the
+   panes puts their content underneath the glass, same look as every other
+   page. The panes' top padding clears the 64px bar (+1px border) and lives
+   inside the scroll area, so content still travels under the bar on scroll.
+   ≤900px keeps plain sticky — the document scrolls there and the blur
+   already works. */
+@media (min-width: 901px) {
+  .abt-shell {
+    position: relative;
+  }
+  .abt-shell .mk-topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  .abt-col {
+    padding-top: 65px;
+  }
+}
 .abt-cols {
   flex: 1;
   min-height: 0;
