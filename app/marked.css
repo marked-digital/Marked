@@ -1334,7 +1334,11 @@
   .apr-stage-grid {
     grid-template-columns: 1fr;
     gap: 16px;
-    padding: 76px 24px 0;
+    /* Bottom padding reserves the stage rail's zone (bottom 16px + 30px
+       dots), so the outputs list can't run underneath it on short phones;
+       with align-content: center that also nudges the whole panel up into
+       the slack above the sheet. Top stays clear of the 64px glass bar. */
+    padding: 64px 24px 64px;
     align-content: center;
   }
   .apr-blueprint {
@@ -1344,9 +1348,20 @@
   /* The sheet scales down with its column, which puts every label on it at
      roughly 6px — noise, not information. Below here the drawing reads as pure
      line-work and the words live in the copy column, where they're legible:
-     the spec row carries the same readings as real text. */
-  .apr-blueprint svg text {
+     the spec row carries the same readings as real text. Two glyphs are the
+     information rather than labels, so they stay: the ring's "1" payoff and
+     the Klaviyo monogram (the one node with no vector logo — its neighbours
+     all render as icon paths, which this rule never touched). */
+  .apr-blueprint svg text:not(.apr-core-num):not(.apr-node-mono) {
     display: none;
+  }
+  /* Upsized in sheet units to land ~10px rendered at phone scale, matching
+     the icon nodes' visual weight. Desktop keeps the attribute sizes. */
+  .apr-blueprint svg .apr-core-num {
+    font-size: 30px;
+  }
+  .apr-blueprint svg .apr-node-mono {
+    font-size: 26px;
   }
   .apr-spec {
     margin-top: 18px;

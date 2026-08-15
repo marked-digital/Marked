@@ -72,7 +72,9 @@ const STAGES = [
     outputs: ["Instrumented end to end", "Tuned under real spend", "Results that hold over time"],
     spec: [
       ["Load applied", "100%"],
-      ["ROAS lift", "+1.8×"],
+      // Same reading as the homepage's headline stat (MD.metrics[0]) — the
+      // gauge on the sheet quotes it too, so all three can't drift apart.
+      ["ROAS lift", `+${MD.metrics[0].value}%`],
       ["Structure", "Holds"],
     ],
   },
@@ -380,7 +382,9 @@ function Blueprint({ active }: { active: number }) {
             {/* the whole point of the layer: six tools reading as one system */}
             <g style={{ opacity: ramp(2, 0.88, 1) }}>
               <circle cx={CEN.x} cy={CEN.y} r={38} fill="rgba(31,168,95,.12)" stroke={C.accent} />
-              <text x={CEN.x} y={CEN.y - 1} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} fontWeight={700}>
+              {/* apr-core-num survives the mobile hide-all-labels rule (and
+                  upsizes there) — the "1" is the layer's payoff, not noise. */}
+              <text x={CEN.x} y={CEN.y - 1} textAnchor="middle" className="apr-mono apr-core-num" fill={C.accent} fontSize={13} fontWeight={700}>
                 1
               </text>
               <text x={CEN.x} y={CEN.y + 14} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} fontWeight={700}>
@@ -399,7 +403,10 @@ function Blueprint({ active }: { active: number }) {
                       <path d={path} />
                     </g>
                   ) : (
-                    <text x={n.x} y={n.y + 1} textAnchor="middle" dominantBaseline="middle" fill={n.color} fontWeight={800} fontSize={n.mono.length >= 2 ? 16 : 22}>
+                    /* apr-node-mono keeps the monogram on mobile — it IS the
+                       node's emblem (Klaviyo has no vector logo), unlike the
+                       name labels the mobile rule strips. */
+                    <text x={n.x} y={n.y + 1} textAnchor="middle" dominantBaseline="middle" className="apr-node-mono" fill={n.color} fontWeight={800} fontSize={n.mono.length >= 2 ? 16 : 22}>
                       {n.mono}
                     </text>
                   )}
@@ -434,7 +441,7 @@ function Blueprint({ active }: { active: number }) {
               );
             })}
             <Gauge cx={104} cy={300} to={1} label="Load" read="100%" from={0.05} until={0.6} />
-            <Gauge cx={896} cy={300} to={0.72} label="ROAS lift" read="+1.8×" from={0.05} until={0.6} />
+            <Gauge cx={896} cy={300} to={0.72} label="ROAS lift" read={`+${MD.metrics[0].value}%`} from={0.05} until={0.6} />
             <text x={APEX.x} y={230} textAnchor="middle" className="apr-mono" fill={C.accent} fontSize={13} style={{ opacity: ramp(3, 0.74, 0.94) }}>
               HOLDS UNDER LOAD
             </text>
