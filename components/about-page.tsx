@@ -34,7 +34,7 @@
 // client children.
 
 import Link from "next/link";
-import { MD, C, navHref, WORK, STACK_TOOLS } from "@/lib/md";
+import { MD, C, navHref, WORK, STACK_TOOLS, STACK_CATS } from "@/lib/md";
 import { getInstagramPosts, type IgPost } from "@/lib/instagram";
 import { iconPath } from "@/lib/icons";
 import { ArrowIcon, CountUp, MarkLogo, ToolLogo } from "@/components/shared";
@@ -159,11 +159,9 @@ function FounderTile() {
   return (
     <div className="abt-tile abt-tile--wide abt-tile--founder">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/about/founder.jpg" alt="Mark Youash, founder of Marked Digital, at his desk" loading="lazy" />
+      <img src="/about/founder.jpg" alt="Mark Youash, Managing Director of Marked Digital, at his desk" loading="lazy" />
       <div className="abt-founder-cap">
-        <div className="abt-tile-cap" style={{ color: C.accent }}>
-          The founder
-        </div>
+        <span className="abt-founder-role">Managing Director</span>
         <div className="abt-founder-name">Mark Youash</div>
       </div>
     </div>
@@ -188,22 +186,35 @@ function ApproachTile() {
 // lives on /stack.
 const MOSAIC_TOOL_NAMES = new Set(["Shopify", "Amazon Marketplace", "Google Ads", "Meta Ads", "Klaviyo", "OpenAI", "Stripe", "AWS"]);
 
-// Stack sampler. ToolLogo has no accessible name of its own (its img branch
-// is alt="" and its SVG branch aria-hidden), so each chip gets a named img
-// role here — the monogram fallback then stays quiet too.
+// The stack, expressed as breadth rather than a roster: the real totals from
+// lib/md.ts, a sampler of household names, and a handoff to /stack. The whole
+// tile links there. ToolLogo has no accessible name of its own (its img
+// branch is alt="" and its SVG branch aria-hidden), so each chip gets a named
+// img role — the monogram fallback then stays quiet too.
 function StackTile() {
   const tools = STACK_TOOLS.filter((t) => MOSAIC_TOOL_NAMES.has(t.name));
   return (
-    <div className="abt-tile abt-tile--wide abt-tile--stack">
-      <div className="abt-tile-cap">The stack we run</div>
+    <Link href="/stack" className="abt-tile abt-tile--wide abt-tile--stack">
+      <div className="abt-tile-cap">The toolbox</div>
+      <div className="abt-stack-count">
+        <span style={{ color: C.accent }}>
+          <CountUp value={STACK_TOOLS.length} />
+        </span>{" "}
+        tools · {STACK_CATS.length} categories
+      </div>
+      <p className="abt-stack-line">These are just the household names. We pick the right tools per engagement and wire them into one system.</p>
       <div className="abt-stack-row">
         {tools.map((t) => (
           <span key={t.name} role="img" aria-label={t.name}>
             <ToolLogo tool={t} size={40} />
           </span>
         ))}
+        <span className="abt-stack-more">+{STACK_TOOLS.length - tools.length}</span>
       </div>
-    </div>
+      <span className="abt-stack-cta">
+        Explore the full stack <ArrowIcon />
+      </span>
+    </Link>
   );
 }
 
@@ -303,7 +314,7 @@ function Rail({ label, children }: { label: string; children: React.ReactNode })
 // Section 3's belief list. Edit freely — rows render in order.
 const BELIEFS = [
   ["One system, not five vendors", "Media, site, AI and content are engineered together, because together is the only way they compound."],
-  ["Revenue is the only vanity-proof metric", "If a number can't be traced to money in your account, we don't optimize for it — and we won't report on it."],
+  ["Revenue is the only vanity-proof metric", "If a number can't be traced to money in your account, we don't optimize for it, and we won't waste your time reporting on it."],
   ["Every market is winnable", "With the right sequence of entry, localization and proof, borders are logistics, not limits."],
   ["No decks, no fluff", "Straight answers, visible work, and reporting you can read in one screen."],
 ];
@@ -317,13 +328,13 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
         <h1 className="abt-h">You didn&apos;t plateau. Your setup did.</h1>
         <p className="abt-body">
           You built a brand that works. The product converts, customers come back, and your home market knows your name. But growth has flattened, and every
-          quarter squeezes a little harder — ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo; has quietly stopped
+          quarter squeezes a little harder. Ad costs creep up, the same audiences get more expensive, and &ldquo;more budget&rdquo; has quietly stopped
           meaning &ldquo;more revenue.&rdquo;
         </p>
         <p className="abt-body">
           You&apos;ve probably tried the usual route: an agency for ads, a freelancer for the site, a consultant deck for &ldquo;international.&rdquo; Five
-          vendors, five dashboards, nobody accountable for the number that matters. Expanding abroad looks like the obvious next move — and also the riskiest
-          one to get wrong alone.
+          vendors, five dashboards, and nobody accountable for the number that actually matters. Expanding abroad looks like the obvious next move, and also
+          the riskiest one to get wrong alone. You deserve a partner who treats it like their own money on the line.
         </p>
         <Rail label="The founder and the numbers">
           <FounderTile />
@@ -336,15 +347,15 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
       {/* --- Section 2: Why I started — the reason behind the business ---- */}
       <section className="abt-sec">
         <div className="abt-kicker">02 · Why I started Marked</div>
-        <h2 className="abt-h">Growth kept getting sold in pieces. I started Marked to sell it whole.</h2>
+        <h2 className="abt-h">Other agencies didn&apos;t care the way I did. So I built one that does.</h2>
         <p className="abt-body">
-          I&apos;ve spent {MD.metrics[3].value} years inside e-commerce — launching brands into new markets and running the media, storefronts and systems
-          behind them. The pattern never changed: strategy lived in one shop, ads in another, the site in a third. Every hand-off leaked money, and every
-          vendor optimized their slice instead of the whole.
+          I&apos;ve spent {MD.metrics[3].value} years inside e-commerce, launching brands into new markets and running the media, storefronts and systems
+          behind them. And one thing kept eating at me: nobody cared about the business, or the numbers, the way I did. Strategy lived in one shop, ads in
+          another, the site in a third. Every hand-off leaked money, and nobody lost sleep over it. I did.
         </p>
         <p className="abt-body">
-          Marked exists to end the hand-offs. One team that runs expansion, advertising, AI and the storefront as a single compounding system — accountable to
-          revenue, not to a channel report.
+          Marked is the agency I went looking for and couldn&apos;t find. One team that runs expansion, advertising, AI and the storefront as a single
+          compounding system, obsesses over your numbers like they&apos;re our own, and answers for revenue. Not impressions. Not a channel report. Revenue.
         </p>
         <Rail label="Selected work">
           {WORK.map((w, i) => (
@@ -371,7 +382,7 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
           ))}
         </div>
         <p className="abt-body abt-mission">
-          The mission: make growth in any market feel as native as your home market.
+          The mission is simple: make growth in any market feel as native as your home market. Every market. Yours included.
         </p>
         {igPosts.length > 0 && (
           <Rail label="Latest from Instagram">
@@ -405,7 +416,7 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
           </Link>
         ))}
         <p className="abt-body" style={{ marginTop: 18, fontSize: 14.5 }}>
-          Full breakdowns — strategy, build, numbers — live in the case studies.
+          Full breakdowns live in the case studies: the strategy, the build, and the numbers behind every claim.
         </p>
         <Rail label="The stack we run">
           <StackTile />
@@ -429,7 +440,7 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
         </div>
         {/* Softer next step for the not-ready-yet: follow the work in public. */}
         <div className="abt-social">
-          <span className="abt-social-lead">Not ready to talk? Follow the work in public —</span>
+          <span className="abt-social-lead">Not ready to talk? Follow the work in public.</span>
           {SOCIALS.map((s) => (
             <a key={s.label} className="abt-social-link" href={s.href} target="_blank" rel="noopener noreferrer">
               {s.path && (

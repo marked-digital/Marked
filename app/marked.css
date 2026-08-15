@@ -2377,12 +2377,12 @@ a.abt-tile--ig:hover img {
   transform: scale(1.03);
 }
 /* Founder photo tile — full-bleed portrait with a scrimmed caption. The
-   object-position keeps the face in frame when the wide crop bites into the
-   portrait source. */
+   object-position keeps the head fully in frame when the wide crop bites
+   into the portrait source. */
 .abt-tile--founder {
   padding: 0;
   min-height: 0;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
 }
 .abt-tile--founder img {
   position: absolute;
@@ -2390,21 +2390,37 @@ a.abt-tile--ig:hover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 22%;
+  object-position: 50% 10%;
 }
 .abt-founder-cap {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 60px 22px 18px;
-  background: linear-gradient(180deg, transparent, rgba(10, 11, 10, 0.85));
+  align-items: flex-start;
+  gap: 8px;
+  padding: 56px 20px 16px;
+  background: linear-gradient(180deg, transparent, rgba(10, 11, 10, 0.9));
+}
+/* Same chip treatment as the Instagram badge, so the role stays legible on
+   any photo. */
+.abt-founder-role {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(10, 11, 10, 0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(31, 168, 95, 0.35);
+  color: #27be6e;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .abt-founder-name {
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  text-shadow: 0 1px 12px rgba(10, 11, 10, 0.8);
 }
 .abt-ig-badge {
   position: absolute;
@@ -2501,7 +2517,44 @@ a.abt-tile--ig:hover img {
 }
 .abt-tile--stack {
   min-height: 0;
-  gap: 14px;
+  gap: 12px;
+}
+.abt-stack-count {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.abt-stack-line {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #8e948c;
+  max-width: 420px;
+}
+/* The "+N" chip rides the logo row — same anatomy as a ToolLogo chip. */
+.abt-stack-more {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8e948c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.abt-stack-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #27be6e;
 }
 .abt-tile-cap {
   font-size: 11px;
