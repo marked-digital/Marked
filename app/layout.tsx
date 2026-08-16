@@ -6,9 +6,54 @@ import "./marked.css";
 import "lenis/dist/lenis.css";
 import SmoothScroll from "./smooth-scroll";
 import CurtainTransition from "./curtain-transition";
+import { MD } from "@/lib/md";
 
 // GA4 measurement ID. Lives here so the tag covers every route in the app.
 const GA_ID = "G-EPKJQ7RZ90";
+
+// Structured data (schema.org JSON-LD) — how search engines and answer
+// engines learn what Marked Digital *is*: an organization, its founder, its
+// services, its profiles. Site-wide facts only; everything derives from
+// lib/md.ts so the schema can't drift from the site copy. Rendered as a
+// script tag in <body> per the Next JSON-LD guide, with `<` escaped against
+// XSS injection through stringified content.
+const SITE = "https://marked-digital.com";
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE}/#org`,
+      name: MD.brandFull,
+      url: SITE,
+      logo: `${SITE}/icon.png`,
+      slogan: `${MD.hero.h1[0]} ${MD.hero.h1[1]}`,
+      description:
+        "Marked Digital: the growth partner for ecommerce brands going global. Expansion, paid media, tech stacks, web builds and SEO/AEO as one compounding system.",
+      founder: { "@type": "Person", name: "Mark Youash", jobTitle: "Managing Director" },
+      address: { "@type": "PostalAddress", addressLocality: "Toronto", addressCountry: "CA" },
+      // Social profiles, straight from the footer's Connect column.
+      sameAs: (MD.footer.cols.find((c) => c.h === "Connect")?.items ?? [])
+        .map((i) => (typeof i === "string" ? null : i.href))
+        .filter(Boolean),
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Services",
+        itemListElement: MD.services.map((s) => ({
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: s.title, description: s.desc },
+        })),
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE}/#website`,
+      url: SITE,
+      name: MD.brandFull,
+      publisher: { "@id": `${SITE}/#org` },
+    },
+  ],
+};
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -49,6 +94,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jakarta.variable} antialiased`}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c") }} />
         <SmoothScroll>{children}</SmoothScroll>
         {/* Curtain interstitial for clicks to the destination pages (/book,
             /about — see CURTAIN_ROUTES) — lives at the root so it can
