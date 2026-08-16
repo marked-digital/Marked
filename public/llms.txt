@@ -1,0 +1,33 @@
+# Marked Digital
+
+> The growth partner for e-commerce brands going global. International expansion, paid media, tech stacks, web builds and SEO/AEO, run as one compounding system accountable to revenue.
+
+Marked Digital is a Toronto-based growth agency for e-commerce brands. Founded and led by Mark Youash (Managing Director, 13 years in e-commerce), it exists because growth kept getting sold in pieces: strategy in one shop, ads in another, the site in a third. Marked runs all of it as a single system.
+
+## What we do
+
+- International Ecommerce Expansion: market prioritization, localized storefronts and checkout, cross-border logistics and tax, local paid + organic launch. 47 markets launched.
+- Digital Advertising & Paid Media: full-funnel paid across Meta, Google, TikTok, Amazon and retail media, engineered around incrementality. +312% average ROAS lift.
+- Tech Stack Implementation: stack audits, platform selection, integration and data architecture, AI pipeline development, implementation and migration.
+- Website Development: headless/composable commerce builds, Core Web Vitals, CRO, multi-regional + localization. +34% average conversion lift.
+- SEO, AEO & Content: rankings where people still Google, presence inside ChatGPT, Perplexity and AI Overviews where they increasingly don't. Entity and schema optimization, programmatic content, digital PR. 6.4x organic sessions.
+
+## Proof
+
+- Ontario Education Online: provincial course provider to international brand in seven months. +548% revenue year over year. https://marked-digital.com/work/ontario-education-online
+- Roadpost: record $20.9M FY24 e-commerce revenue, up 118% year over year, $8M on Amazon USA. https://marked-digital.com/work/roadpost
+
+## Pages
+
+- [Home](https://marked-digital.com/): services, growth modeler, selected work
+- [About](https://marked-digital.com/about): why the company exists, beliefs, proof
+- [Approach](https://marked-digital.com/approach): the five-stage system, drawn as a blueprint
+- [Stack](https://marked-digital.com/stack): 87 tools across 17 categories we have hands-on experience with
+- [Book a call](https://marked-digital.com/book): 30-minute strategy call, no decks, no fluff
+
+## Contact
+
+- Book: https://marked-digital.com/book
+- LinkedIn: https://www.linkedin.com/company/markeddigital/
+- Instagram: https://www.instagram.com/marked__digital/
+- GitHub: https://github.com/marked-digital
