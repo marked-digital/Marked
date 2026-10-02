@@ -1480,7 +1480,7 @@
    are divided by a hairline rather than a colour change.
 
    Motion here is progressive enhancement: the markup carries final values and
-   the JS in oeo-case-study.tsx sets the initial states on mount, so with JS
+   the JS in case-study.tsx sets the initial states on mount, so with JS
    off (or reduced motion on) the page renders complete. Nothing below hides
    content. */
 .oeo {
@@ -1515,6 +1515,20 @@
 .oeo-disp {
   letter-spacing: -0.03em;
   font-weight: 700;
+}
+/* Visually hidden, still read: the full sentence behind a figure that is
+   drawn for sighted readers (scorecard gauges, the live-site link's "opens in
+   a new tab"). */
+.oeo-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .oeo-h1 {
   font-size: clamp(46px, 6.2vw, 92px);
@@ -1601,6 +1615,21 @@
   padding-top: 20px;
   margin-top: 64px;
 }
+/* The live-site meta cell. `.oeo a` strips decoration, so the underline is set
+   back here to read as a link; the focus ring is the card-link convention
+   (.sg-work-card). */
+.oeo a.oeo-site-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.oeo a.oeo-site-link:hover {
+  color: #1fa85f;
+}
+.oeo a.oeo-site-link:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 4px;
+}
 .oeo-cue {
   width: 1px;
   height: 44px;
@@ -1686,6 +1715,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Five results: the lead figure takes the whole first row and the other four
+   sit under it (four across, then two, then one), so no row ends on an empty
+   cell. Four-figure grids keep the auto-fit layout above. */
+.oeo-results--wide-lead {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.oeo-results--wide-lead > div:first-child {
+  grid-column: 1 / -1;
+}
+
 /* revenue chart card */
 .oeo-chart-card {
   margin-top: 56px;
@@ -1702,7 +1741,9 @@
   letter-spacing: 0.16em;
   color: #5c625b;
 }
-.oeo-chart-card svg {
+/* Direct child only: the scorecard reuses this card and draws its gauges in
+   SVGs of their own. */
+.oeo-chart-card > svg {
   display: block;
   width: 100%;
   height: auto;
@@ -1727,6 +1768,105 @@
   }
 }
 
+/* results scorecard: a tool's own report, rebuilt in the Signal palette. Sits
+   on the chart-card surface between the results heading and the grid, which
+   then closes up to 18px. One gauge per score, five across, then the ratio
+   tile; the ring scales down with its column at in-between widths. */
+.oeo-score + .oeo-results {
+  margin-top: 18px;
+}
+/* When the two head lines don't fit side by side, the date drops under the
+   left line instead of either one breaking mid-phrase. (Scorecard and finding
+   cards only, so the revenue chart is unchanged.) */
+.oeo-score > .oeo-chart-head,
+.oeo-checks-card > .oeo-chart-head {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.oeo-score > .oeo-chart-head > :last-child,
+.oeo-checks-card > .oeo-chart-head > :last-child {
+  white-space: nowrap;
+}
+.oeo-gauges {
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.oeo-gauge {
+  min-width: 0;
+  text-align: center;
+}
+.oeo-gauge-vis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.oeo-gauge-dial {
+  position: relative;
+  width: min(112px, 100%);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.oeo-gauge-dial svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.oeo-gauge-n {
+  position: relative;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #f3f5f2;
+  font-variant-numeric: tabular-nums;
+}
+/* checks passed rather than a score: a pill on the line of the ring centres */
+.oeo-ratio {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 999px;
+  background: rgba(31, 168, 95, 0.08);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  color: #f3f5f2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.oeo-ratio > i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1fa85f;
+}
+.oeo-score-foot {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+}
+.oeo-score-note {
+  margin: 0;
+  max-width: 640px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #8e948c;
+}
+
 /* traffic — two columns of bars */
 .oeo-traffic {
   display: grid;
@@ -1749,6 +1889,75 @@
   background: #1fa85f;
 }
 
+/* the finding: options checked against one constraint, as a ruled list on the
+   chart-card surface, then the documented routes as objective-style cards.
+   Ruled-out rows sit in muted grey; the selected row is the section's only
+   accent. Its pill ships green, and the motion JS sets it neutral on mount and
+   flips it back on intersect, through the transition below. */
+.oeo-checks {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+}
+.oeo-check {
+  display: grid;
+  grid-template-columns: minmax(110px, 200px) minmax(0, 1fr) auto;
+  grid-template-areas: "name note verdict";
+  align-items: baseline;
+  gap: 8px 32px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+}
+.oeo-check:last-child {
+  padding-bottom: 6px;
+}
+.oeo-check-name {
+  grid-area: name;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #8e948c;
+}
+.oeo-check.on .oeo-check-name {
+  color: #f3f5f2;
+}
+.oeo-check-note {
+  grid-area: note;
+  margin: 0;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #8e948c;
+}
+.oeo-verdict {
+  grid-area: verdict;
+  justify-self: end;
+  transition: background-color 0.5s cubic-bezier(0.2, 0.7, 0.3, 1), border-color 0.5s cubic-bezier(0.2, 0.7, 0.3, 1),
+    color 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.oeo-verdict.on {
+  background: #1fa85f;
+  border-color: #1fa85f;
+  color: #04140c;
+}
+.oeo-routes-label {
+  margin-top: 56px;
+}
+.oeo-routes {
+  margin-top: 56px;
+}
+.oeo-routes-label + .oeo-routes {
+  margin-top: 18px;
+}
+.oeo-status {
+  margin: 28px 0 0;
+  max-width: 640px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #8e948c;
+}
+
 /* platform chips */
 .oeo-chips {
   margin-top: 56px;
@@ -1757,6 +1966,10 @@
      line now, matching the /stack tiles. */
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 14px;
+}
+/* A short stack gets fewer, wider tiles (three across at full width). */
+.oeo-chips--wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
 }
 .oeo-chip--tool {
   display: flex;
@@ -2011,7 +2224,8 @@
   }
   .oeo-card,
   .oeo-chip,
-  .oeo-pcard {
+  .oeo-pcard,
+  .oeo-verdict {
     transition: none;
   }
   .oeo-scroller {
@@ -2022,6 +2236,26 @@
 @media (max-width: 980px) {
   .oeo-sticky {
     position: static;
+  }
+}
+/* Scorecard: two across, the ratio tile on its own row last. This starts
+   above the 720px step because five across stops fitting near 810px: the
+   columns get narrower than the 112px ring and the longest labels. */
+@media (max-width: 860px) {
+  .oeo-results--wide-lead {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .oeo-gauges {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 16px;
+  }
+  .oeo-gauge--ratio {
+    grid-column: 1 / -1;
+  }
+  /* on its own row there are no ring centres to line up with */
+  .oeo-gauge--ratio .oeo-gauge-dial {
+    aspect-ratio: auto;
   }
 }
 @media (max-width: 720px) {
@@ -2051,8 +2285,29 @@
   .oeo-chart-card {
     padding: 24px 20px 20px;
   }
+  .oeo-gauge-dial {
+    width: min(88px, 100%);
+  }
+  .oeo-gauge-n {
+    font-size: 26px;
+  }
+  /* finding rows stack: name and pill on one line, the note underneath */
+  .oeo-check {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "name verdict"
+      "note note";
+    align-items: center;
+    gap: 10px 16px;
+    padding: 20px 0;
+  }
   .oeo-phase {
     padding: 40px 0;
+  }
+}
+@media (max-width: 560px) {
+  .oeo-results--wide-lead {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -2564,6 +2819,19 @@ a.abt-tile--ig:hover img {
 }
 .abt-tile--case {
   min-height: 280px;
+}
+/* Photo backgrounds only: a scrim rising from the foot of the tile, where the
+   industry, name and metric sit, so they keep their contrast over a bright
+   photograph. Gradient tiles are already dark and don't get it. */
+.abt-tile--photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(0deg, rgba(10, 11, 10, 0.88) 0%, rgba(10, 11, 10, 0.7) 45%, rgba(10, 11, 10, 0) 85%);
+}
+.abt-tile--photo > * {
+  position: relative;
 }
 .abt-case-industry {
   font-size: 11px;

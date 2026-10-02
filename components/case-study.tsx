@@ -4,6 +4,7 @@
 //
 //   /work/ontario-education-online → lib/oeo.ts
 //   /work/roadpost                 → lib/roadpost.ts
+//   /work/casa-nina-flamingo       → lib/casa-nina.ts
 //
 // Built from the design handoff in `design_handoff_oeo_case_study`. Structure,
 // section order and behaviour follow the reference; none of its styling does —
@@ -29,7 +30,7 @@ import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import SiteFooter from "@/components/site-footer";
 import { MobileMenu, NavCta } from "@/components/site-nav";
-import type { BarGroup, CaseStudy as CaseStudyData, PageBuild } from "@/lib/case-study";
+import type { BarGroup, CaseStudy as CaseStudyData, PageBuild, Platform } from "@/lib/case-study";
 
 const EASE = "cubic-bezier(0.2, 0.7, 0.3, 1)"; // the site's easing, used everywhere
 
@@ -40,7 +41,10 @@ function prefersReducedMotion() {
 /* ----------------------------------------------------------------- motion */
 
 // One observer for the whole page. Mirrors the reference runtime: reveals,
-// bar widths, SVG line draws and the chart's gradient area.
+// bar widths, SVG line draws and the chart's gradient area, plus the finding's
+// verdict flip. The selected verdict pill ships green; it's set neutral here and
+// turns green again on intersect, after its data-delay (the transition itself is
+// .oeo-verdict in marked.css).
 function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
   React.useEffect(() => {
     const root = rootRef.current;
@@ -69,6 +73,12 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
       el.style.transition = "opacity 1.1s ease";
       el.style.transitionDelay = `${el.dataset.delay || 900}ms`;
     });
+    root.querySelectorAll<HTMLElement>("[data-flip]").forEach((el) => {
+      el.style.background = "transparent";
+      el.style.borderColor = C.line;
+      el.style.color = C.muted;
+      el.style.transitionDelay = `${el.dataset.delay || 0}ms`;
+    });
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -82,12 +92,17 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
           if (t.hasAttribute("data-bar")) t.style.width = `${t.dataset.bar}%`;
           if (t.hasAttribute("data-draw")) t.style.strokeDashoffset = "0";
           if (t.hasAttribute("data-fade")) t.style.opacity = "1";
+          if (t.hasAttribute("data-flip")) {
+            t.style.background = "";
+            t.style.borderColor = "";
+            t.style.color = "";
+          }
           io.unobserve(t); // animate once
         });
       },
       { threshold: 0.2, rootMargin: "0px 0px -6% 0px" }
     );
-    root.querySelectorAll("[data-rev],[data-bar],[data-draw],[data-fade]").forEach((el) => io.observe(el));
+    root.querySelectorAll("[data-rev],[data-bar],[data-draw],[data-fade],[data-flip]").forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [rootRef]);
 }
@@ -201,6 +216,14 @@ function Bar({ pct, delay, accent }: { pct: number; delay?: number; accent?: boo
   );
 }
 
+// Grounds for the run of tinted sections after the results. The first one in
+// the run opens on full top padding; every one after it shares that ground, so
+// it joins the section above with a hairline instead (.oeo-sec--joined). Which
+// section opens the run depends on which optional sections the data carries.
+function tinted(joined: boolean) {
+  return `oeo-sec oeo-sec--tint${joined ? " oeo-sec--joined" : ""}`;
+}
+
 /* ------------------------------------------------------------------ chrome */
 
 function Nav() {
@@ -239,12 +262,23 @@ function Footer() {
 
 function Hero({ d }: { d: CaseStudyData }) {
   const h = d.headlineStat;
-  const meta: [string, string][] = [
+  const meta: [string, React.ReactNode][] = [
     ["CLIENT", d.client],
     ["INDUSTRY", d.industry],
     ["SERVICES", d.services],
     ["TIMELINE", d.timeline],
   ];
+  // rel="noopener" without "noreferrer", so the client's analytics still sees
+  // the referral from this page.
+  if (d.site) {
+    meta.push([
+      "LIVE SITE",
+      <a key="site" className="oeo-site-link" href={d.site.href} target="_blank" rel="noopener">
+        {d.site.label}
+        <span className="oeo-sr"> (opens in a new tab)</span>
+      </a>,
+    ]);
+  }
   return (
     <section className="oeo-hero">
       <div className="oeo-wrap">
@@ -342,6 +376,87 @@ function Objectives({ d }: { d: CaseStudyData }) {
 
 /* ---------------------------------------------------------- 02 the results */
 
+// Scorecard gauge geometry, in viewBox units; CSS sets the drawn size
+// (.oeo-gauge-dial). The ring starts at 12 o'clock and runs clockwise.
+const GAUGE = { size: 120, r: 56, stroke: 8 };
+
+// The arc covering `value`% of the ring, as a path so the page's existing
+// path[data-draw] reveal draws it. A single arc can't close a full circle, so
+// 100 is drawn as two half arcs.
+function gaugeArc(value: number) {
+  const { size, r } = GAUGE;
+  const c = size / 2;
+  const top = `${c},${c - r}`;
+  if (value >= 100) return `M${top} A${r},${r} 0 1 1 ${c},${c + r} A${r},${r} 0 1 1 ${top}`;
+  const a = (Math.max(0, value) / 100) * 2 * Math.PI;
+  const x = (c + r * Math.sin(a)).toFixed(2);
+  const y = (c - r * Math.cos(a)).toFixed(2);
+  return `M${top} A${r},${r} 0 ${value > 50 ? 1 : 0} 1 ${x},${y}`;
+}
+
+// A tool scorecard in the language of the tool's own report: Google
+// Lighthouse's gauges, with flat caps so a 98 visibly stops short of closing.
+// The rings and the visible figures are hidden from assistive tech; each tile
+// carries one plain sentence instead.
+function Scorecard({ s }: { s: NonNullable<CaseStudyData["results"]["scorecard"]> }) {
+  const { size, r, stroke } = GAUGE;
+  const c = size / 2;
+  return (
+    <div data-rev data-delay={160} className="oeo-chart-card oeo-score">
+      <div className="oeo-chart-head oeo-mono">
+        <span>{s.head}</span>
+        <span>{s.meta}</span>
+      </div>
+      <ul className="oeo-gauges">
+        {s.scores.map((g, i) => (
+          <li key={g.label} className="oeo-gauge">
+            <div aria-hidden="true" className="oeo-gauge-vis">
+              <div className="oeo-gauge-dial">
+                <svg viewBox={`0 0 ${size} ${size}`}>
+                  <circle cx={c} cy={c} r={r - stroke / 2} style={{ fill: C.accent, fillOpacity: 0.08 }} />
+                  <circle cx={c} cy={c} r={r} style={{ fill: "none", stroke: C.line, strokeWidth: stroke }} />
+                  {g.value > 0 ? (
+                    <path
+                      data-draw
+                      data-delay={300 + i * 80}
+                      d={gaugeArc(g.value)}
+                      style={{ fill: "none", stroke: C.accent, strokeWidth: stroke, strokeLinecap: "butt" }}
+                    />
+                  ) : null}
+                </svg>
+                <span className="oeo-gauge-n">
+                  <CountStat value={g.value} duration={1600} />
+                </span>
+              </div>
+              <Label style={{ color: C.muted }}>{g.label}</Label>
+            </div>
+            <span className="oeo-sr">{`${g.label}: ${g.value} out of 100`}</span>
+          </li>
+        ))}
+        {s.ratio ? (
+          <li className="oeo-gauge oeo-gauge--ratio">
+            <div aria-hidden="true" className="oeo-gauge-vis">
+              <div className="oeo-gauge-dial">
+                <span className="oeo-ratio">
+                  <i />
+                  {`${s.ratio.passed}/${s.ratio.total}`}
+                </span>
+              </div>
+              <Label style={{ color: C.muted }}>{s.ratio.label}</Label>
+            </div>
+            <span className="oeo-sr">{`${s.ratio.label}: ${s.ratio.passed} of ${s.ratio.total} checks passed`}</span>
+          </li>
+        ) : null}
+      </ul>
+      {s.note ? (
+        <div className="oeo-score-foot">
+          <p className="oeo-score-note">{s.note}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function Results({ d }: { d: CaseStudyData }) {
   const r = d.results;
   return (
@@ -351,7 +466,9 @@ function Results({ d }: { d: CaseStudyData }) {
         <h2 data-rev data-delay={80} className="oeo-h2">
           {r.heading}
         </h2>
-        <div className="oeo-results">
+        {r.scorecard ? <Scorecard s={r.scorecard} /> : null}
+        {/* Five figures: the lead takes the whole first row (marked.css). */}
+        <div className={`oeo-results${r.items.length === 5 ? " oeo-results--wide-lead" : ""}`}>
           {r.items.map((item, i) => (
             <div key={item.label} data-rev data-delay={i * 60}>
               <Label style={{ color: C.muted }}>{item.label}</Label>
@@ -377,8 +494,9 @@ const CH = { w: 1000, h: 388, base: 340, top: 66 };
 const yFor = (v: number, max: number) => CH.base - (v * (CH.base - CH.top)) / max;
 const xFor = (i: number, n: number) => (i * CH.w) / (n - 1);
 
-function RevenueChart({ d }: { d: CaseStudyData }) {
-  const { series, engagementIndex: ei, gridlines, rangeLabel, heading, body, kicker, chartHead, ariaLabel, baseLabel, markerLabel, endLabel } = d.revenue;
+// Always the first section of the tinted run when it renders, so it never joins.
+function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
+  const { series, engagementIndex: ei, gridlines, rangeLabel, heading, body, kicker, chartHead, ariaLabel, baseLabel, markerLabel, endLabel } = r;
   const scaleMax = gridlines[gridlines.length - 1];
   const yAt = (v: number) => yFor(v, scaleMax);
   const n = series.length;
@@ -506,10 +624,9 @@ function Bars({
   );
 }
 
-function Split({ d }: { d: CaseStudyData }) {
-  const s = d.split;
+function Split({ s, joined }: { s: NonNullable<CaseStudyData["split"]>; joined: boolean }) {
   return (
-    <section className="oeo-sec oeo-sec--tint oeo-sec--joined">
+    <section className={tinted(joined)}>
       <div className="oeo-wrap">
         <div className="oeo-traffic">
           <div>
@@ -546,12 +663,97 @@ function Split({ d }: { d: CaseStudyData }) {
   );
 }
 
+/* ------------------------------------------------------------- the finding */
+
+// Row reveal stagger, and when the selected verdict turns green: once the last
+// row has landed (its delay plus the .9s reveal), and a beat after that.
+const CHECK_STEP = 120;
+const FLIP_BEAT = 250;
+
+function Finding({ f, joined }: { f: NonNullable<CaseStudyData["finding"]>; joined: boolean }) {
+  const flipAt = (f.checks.length - 1) * CHECK_STEP + 900 + FLIP_BEAT;
+  return (
+    <section className={tinted(joined)}>
+      <div className="oeo-wrap">
+        <div className="oeo-head">
+          <div data-rev>
+            <Kicker>{f.kicker}</Kicker>
+            <h2 className="oeo-h2">{f.heading}</h2>
+          </div>
+          <p data-rev data-delay={120} className="oeo-lede">
+            {f.body}
+          </p>
+        </div>
+
+        {/* The card itself doesn't reveal: its rows do, one by one, and
+            nesting the two would fade each row against a fading parent. */}
+        <div className="oeo-chart-card oeo-checks-card">
+          <div data-rev className="oeo-chart-head oeo-mono">
+            <span>{f.cardHead}</span>
+            <span>{f.cardMeta}</span>
+          </div>
+          <ul className="oeo-checks">
+            {f.checks.map((c, i) => (
+              <li key={c.name} data-rev data-delay={i * CHECK_STEP} className={`oeo-check${c.selected ? " on" : ""}`}>
+                <h3 className="oeo-check-name">{c.name}</h3>
+                {/* The verdict is text, so the green is never the only signal. */}
+                <span
+                  className={`oeo-mono oeo-period oeo-verdict${c.selected ? " on" : ""}`}
+                  {...(c.selected ? { "data-flip": true, "data-delay": flipAt } : {})}
+                >
+                  {c.verdict}
+                </span>
+                <p className="oeo-check-note">{c.note}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {f.routes?.length ? (
+          <>
+            {f.routesLabel ? (
+              <div data-rev className="oeo-routes-label">
+                <Label>{f.routesLabel}</Label>
+              </div>
+            ) : null}
+            <div className="oeo-cards oeo-routes">
+              {f.routes.map((r, i) => (
+                <div key={r.name} data-rev data-delay={i * 80} className="oeo-card">
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                    <h3 style={{ fontSize: 20, fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>{r.name}</h3>
+                    <span className="oeo-mono oeo-period">{r.role}</span>
+                  </div>
+                  <p style={{ margin: "12px 0 0", fontSize: 15, lineHeight: 1.6, color: C.muted }}>{r.body}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : null}
+
+        {f.status ? (
+          <p data-rev className="oeo-status">
+            {f.status}
+          </p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 /* ------------------------------------------------------------ 05 the stack */
 
-function Stack({ d }: { d: CaseStudyData }) {
+// A platform's tile: its STACK_TOOLS entry, with any fields the case study
+// states itself laid over it (see Platform in lib/case-study.ts).
+function resolvePlatform(p: Platform) {
+  const own = typeof p === "string" ? { name: p } : p;
+  const tool = { ...STACK_TOOLS.find((t) => t.name === own.name), ...own };
+  return tool.role && tool.color && tool.mono ? { ...tool, role: tool.role, color: tool.color, mono: tool.mono } : null;
+}
+
+function Stack({ d, joined }: { d: CaseStudyData; joined: boolean }) {
   const s = d.stack;
   return (
-    <section className="oeo-sec oeo-sec--tint oeo-sec--joined">
+    <section className={tinted(joined)}>
       <div className="oeo-wrap">
         <div className="oeo-head">
           <div data-rev>
@@ -564,12 +766,14 @@ function Stack({ d }: { d: CaseStudyData }) {
         </div>
         {/* Same tile anatomy as /stack — brand-tinted logo chip, name, role —
             resolved from STACK_TOOLS so a platform looks identical on both. */}
-        <div className="oeo-chips">
-          {s.platforms.map((name, i) => {
-            const tool = STACK_TOOLS.find((t) => t.name === name);
+        {/* Six or fewer: wider tiles, so long names like "Google Search
+            Console" fit beside the logo instead of truncating. */}
+        <div className={`oeo-chips${s.platforms.length <= 6 ? " oeo-chips--wide" : ""}`}>
+          {s.platforms.map((p, i) => {
+            const tool = resolvePlatform(p);
             if (!tool) return null;
             return (
-              <div key={name} data-rev data-delay={i * 40} className="oeo-chip oeo-chip--tool">
+              <div key={tool.name} data-rev data-delay={i * 40} className="oeo-chip oeo-chip--tool">
                 <ToolLogo tool={tool} size={44} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -595,7 +799,7 @@ function Thumb({ page }: { page: PageBuild }) {
     return (
       <div className="oeo-thumb oeo-thumb--img">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={page.image} alt="" />
+        <img src={page.image} alt="" loading="lazy" />
       </div>
     );
   }
@@ -892,9 +1096,10 @@ export default function CaseStudy({ data }: { data: CaseStudyData }) {
       <Hero d={data} />
       <Objectives d={data} />
       <Results d={data} />
-      <RevenueChart d={data} />
-      <Split d={data} />
-      <Stack d={data} />
+      {data.revenue ? <RevenueChart r={data.revenue} /> : null}
+      {data.split ? <Split s={data.split} joined={!!data.revenue} /> : null}
+      {data.finding ? <Finding f={data.finding} joined={!!(data.revenue || data.split)} /> : null}
+      <Stack d={data} joined={!!(data.revenue || data.split || data.finding)} />
       <Shipped d={data} />
       <Approach d={data} />
       {data.quote ? <Quote q={data.quote} /> : null}

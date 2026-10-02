@@ -12,5 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/stack`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/work/ontario-education-online`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.7 },
     { url: `${base}/work/roadpost`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.7 },
+    { url: `${base}/work/casa-nina-flamingo`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.7 },
   ];
 }

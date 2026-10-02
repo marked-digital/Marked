@@ -196,10 +196,11 @@ export const C = {
   accentInk: "#04140C",
 };
 
-// Homepage "Selected work" — the scroll-stacked case-study cards. The first is
-// the real Ontario Education Online engagement and links to its case study; the
-// rest are still placeholders. Swap title / tags / metric / href for the real
-// ones and the section needs no other change.
+// Homepage "Selected work" — the scroll-stacked case-study cards. The first
+// three are real engagements (Ontario Education Online, Roadpost, Casa Nina
+// Flamingo), each linking to its case study. VELA and HALCYON are still
+// placeholders, flagged `placeholder: true`: swap title / tags / metric / href
+// for a real engagement, drop the flag, and the section needs no other change.
 //
 // `bg` is the temporary card artwork — a CSS gradient in the Signal palette
 // standing in for 1920×1080 case photography. When real photos land, replace it
@@ -212,6 +213,9 @@ export type WorkItem = {
   metric: string;
   href: string;
   bg: string;
+  /** Stand-in card with no case study yet. Placeholders don't link from the
+   *  About page and stay off its proof list. */
+  placeholder?: boolean;
 };
 
 export const WORK: WorkItem[] = [
@@ -224,7 +228,12 @@ export const WORK: WorkItem[] = [
     // Must match OEO.headlineStat / OEO.results.items[0] in lib/oeo.ts.
     metric: "+548% revenue",
     href: "/work/ontario-education-online",
-    bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
+    // Photo under a dark vignette, 0.77 behind the copy and 0.5 at the edges:
+    // lighter than Casa Nina's because this photo is darker to begin with. With
+    // the card's 0.3 shade on top, white text holds at least 11:1 and the green
+    // label and metric at least 5:1. Positioned at 70% so the subject stays in
+    // frame on narrow, portrait cards.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.77), rgba(10,11,10,0.5)), url(/work/ontario-education-online/card.webp) 70% center / cover no-repeat, #0A0B0A",
   },
   {
     // Real results, led by our own team — badges mirror the case study hero:
@@ -240,12 +249,22 @@ export const WORK: WorkItem[] = [
     bg: "radial-gradient(100% 110% at 88% 6%, rgba(31,168,95,0.12), transparent 56%), radial-gradient(90% 80% at 8% 92%, rgba(243,245,242,0.05), transparent 60%), linear-gradient(165deg, #121412 0%, #0A0B0A 74%)",
   },
   {
-    title: "LUMEN",
-    industry: "Beauty & Personal Care",
-    tags: ["UK → APAC", "AI marketing", "CRO"],
-    metric: "3.1× revenue",
-    href: "/work/lumen",
-    bg: "radial-gradient(105% 90% at 82% 12%, rgba(243,245,242,0.07), transparent 55%), linear-gradient(205deg, #10120F 0%, #0A0B0A 78%)",
+    // Real engagement. Badges mirror the case study hero: the move in its H1,
+    // then the SERVICES line.
+    title: "CASA NINA FLAMINGO",
+    industry: "Vacation Rental",
+    tags: ["Email link → direct booking", "Web build", "SEO and AEO", "Booking platform"],
+    // Must match CASA_NINA.headlineStat / CASA_NINA.results.items[0] in
+    // lib/casa-nina.ts.
+    metric: "45 days to launch",
+    href: "/work/casa-nina-flamingo",
+    // The villa, from the hero of casaninaflamingo.com, under a dark vignette:
+    // darkest behind the copy (0.82), lighter toward the edges (0.62) so the
+    // photo still reads. With the card's own 0.3 shade on top, white text holds
+    // at least 10:1 and the green label and metric at least 4.5:1 over the
+    // brightest part of the photo. Retune both stops together if the photo
+    // changes.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.82), rgba(10,11,10,0.62)), url(/work/casa-nina-flamingo/home-hero.jpg) center / cover no-repeat, #0A0B0A",
   },
   {
     title: "VELA",
@@ -253,6 +272,7 @@ export const WORK: WorkItem[] = [
     tags: ["LATAM entry", "Storefront build", "Logistics"],
     metric: "7-week launch",
     href: "/work/vela",
+    placeholder: true,
     bg: "radial-gradient(120% 100% at 50% 108%, rgba(31,168,95,0.13), transparent 62%), linear-gradient(180deg, #0F110F 0%, #0A0B0A 100%)",
   },
   {
@@ -261,6 +281,7 @@ export const WORK: WorkItem[] = [
     tags: ["MENA", "Lifecycle & retention", "Paid + organic"],
     metric: "+168% AOV",
     href: "/work/halcyon",
+    placeholder: true,
     bg: "radial-gradient(90% 120% at 78% 82%, rgba(39,190,110,0.2), transparent 60%), radial-gradient(80% 70% at 12% 0%, rgba(31,168,95,0.1), transparent 60%), linear-gradient(150deg, #141614 0%, #0A0B0A 70%)",
   },
 ];
