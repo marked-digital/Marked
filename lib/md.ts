@@ -253,7 +253,13 @@ export const WORK: WorkItem[] = [
     // lib/casa-nina.ts.
     metric: "58 days to launch",
     href: "/work/casa-nina-flamingo",
-    bg: "radial-gradient(105% 90% at 82% 12%, rgba(243,245,242,0.07), transparent 55%), linear-gradient(205deg, #10120F 0%, #0A0B0A 78%)",
+    // The villa, from the hero of casaninaflamingo.com, under a dark vignette:
+    // darkest behind the copy (0.82), lighter toward the edges (0.62) so the
+    // photo still reads. With the card's own 0.3 shade on top, white text holds
+    // at least 10:1 and the green label and metric at least 4.5:1 over the
+    // brightest part of the photo. Retune both stops together if the photo
+    // changes.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.82), rgba(10,11,10,0.62)), url(/work/casa-nina-flamingo/home-hero.jpg) center / cover no-repeat, #0A0B0A",
   },
   {
     title: "VELA",

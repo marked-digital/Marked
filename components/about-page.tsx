@@ -92,8 +92,11 @@ function Foot({ variant }: { variant: "split" | "stack" }) {
 // Case-study art tile. Real engagements link to their case studies; WORK
 // entries flagged `placeholder` have no route yet, so they render as plain
 // (non-link) tiles until their case studies exist.
+// A tile whose `bg` carries a photograph also gets a bottom scrim
+// (.abt-tile--photo), since its copy sits at the foot of the tile.
 function CaseTile({ item, wide, link }: { item: (typeof WORK)[number]; wide?: boolean; link?: boolean }) {
-  const cls = `abt-tile abt-tile--case${wide ? " abt-tile--wide" : ""}`;
+  const photo = item.bg.includes("url(");
+  const cls = `abt-tile abt-tile--case${wide ? " abt-tile--wide" : ""}${photo ? " abt-tile--photo" : ""}`;
   const inner = (
     <>
       <div className="abt-case-industry">{item.industry}</div>

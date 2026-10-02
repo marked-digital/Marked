@@ -2798,6 +2798,19 @@ a.abt-tile--ig:hover img {
 .abt-tile--case {
   min-height: 280px;
 }
+/* Photo backgrounds only: a scrim rising from the foot of the tile, where the
+   industry, name and metric sit, so they keep their contrast over a bright
+   photograph. Gradient tiles are already dark and don't get it. */
+.abt-tile--photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(0deg, rgba(10, 11, 10, 0.88) 0%, rgba(10, 11, 10, 0.7) 45%, rgba(10, 11, 10, 0) 85%);
+}
+.abt-tile--photo > * {
+  position: relative;
+}
 .abt-case-industry {
   font-size: 11px;
   letter-spacing: 0.13em;
