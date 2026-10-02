@@ -1,11 +1,18 @@
 // The shape of a case study page. One data object per engagement (lib/oeo.ts,
-// lib/roadpost.ts) drives components/case-study.tsx end to end: every heading,
-// kicker, label and figure on the page comes from here, so a new case study is
-// a data file plus a route and nothing else.
+// lib/roadpost.ts, lib/casa-nina.ts) drives components/case-study.tsx end to
+// end: every heading, kicker, label and figure on the page comes from here, so
+// a new case study is a data file plus a route and nothing else.
+//
+// Optional sections: the hero's live-site link (`site`), the results scorecard
+// (`results.scorecard`), the revenue chart (`revenue`), the channel split
+// (`split`), the research finding (`finding`), the shipped section's "+N more"
+// card and before/after slider (`shipped.more`, `shipped.compare`) and the
+// closing quote (`quote`). Leave one out and the section isn't rendered; the
+// tinted sections that follow the results re-join themselves around the gap.
 //
 // The template was built for Ontario Education Online first and generalised for
-// Roadpost, which is why the stylesheet block in app/marked.css still carries
-// the `.oeo-` prefix. Same classes, both pages.
+// Roadpost and then Casa Nina Flamingo, which is why the stylesheet block in
+// app/marked.css still carries the `.oeo-` prefix. Same classes, every page.
 
 export type Objective = { n: string; title: string; body: string };
 
@@ -51,6 +58,19 @@ export type PageBuild = {
   image?: string;
 };
 
+/** One gauge on a scorecard, scored 0 to 100. */
+export type Score = { label: string; value: number };
+
+/** A category reported as checks passed rather than a score, e.g. "3/3". */
+export type ScoreRatio = { label: string; passed: number; total: number };
+
+/** One option checked against the client's constraint, e.g. a payment gateway.
+ *  `selected` marks the one that passed; it carries the section's only accent. */
+export type Check = { name: string; verdict: string; note: string; selected?: boolean };
+
+/** A documented route or option, rendered as a card under the checks. */
+export type Route = { name: string; role: string; body: string };
+
 export type Phase = {
   n: string;
   title: string;
@@ -67,6 +87,8 @@ export type CaseStudy = {
   industry: string;
   services: string;
   timeline: string;
+  /** Optional live-site link, rendered as a fifth hero meta cell. */
+  site?: { label: string; href: string };
   /** The H1, split so the middle phrase can carry the drawn underline. */
   h1: { before: string; underlined: string; after: string };
   sub: string;
@@ -91,10 +113,22 @@ export type CaseStudy = {
   results: {
     kicker: string;
     heading: string;
+    /** Optional tool scorecard, e.g. Google Lighthouse, shown between the
+     *  heading and the results grid. */
+    scorecard?: {
+      /** Left and right lines of the card head: tool and page, then date. */
+      head: string;
+      meta: string;
+      scores: Score[];
+      ratio?: ScoreRatio;
+      /** One plain sentence under the gauges, e.g. what a new category means. */
+      note?: string;
+    };
     items: Result[];
   };
 
-  revenue: {
+  /** Optional. Omit it for an engagement with no revenue curve to publish. */
+  revenue?: {
     kicker: string;
     heading: string;
     body: string;
@@ -121,8 +155,9 @@ export type CaseStudy = {
   };
 
   /** The two-column bar section: a split of the whole on the left, a
-   *  per-channel or per-property breakdown on the right. */
-  split: {
+   *  per-channel or per-property breakdown on the right. Optional, like
+   *  `revenue`. */
+  split?: {
     kicker: string;
     heading: string;
     body: string;
@@ -130,10 +165,26 @@ export type CaseStudy = {
     secondary: BarGroup;
   };
 
+  /** A research finding rendered as a checked list plus option cards, for
+   *  engagements whose story is a decision rather than a growth curve. */
+  finding?: {
+    kicker: string;
+    heading: string;
+    body: string;
+    /** Top-left and top-right lines inside the card, like the chart head. */
+    cardHead: string;
+    cardMeta: string;
+    checks: Check[];
+    routesLabel?: string;
+    routes?: Route[];
+    /** What is live today versus still to follow. */
+    status?: string;
+  };
+
   stack: {
     kicker: string;
-    /** The platform count in the heading is written by hand — keep it equal to
-     *  `platforms.length`. */
+    /** A platform count in the heading is written by hand: when the heading
+     *  carries one, keep it equal to `platforms.length`. */
     heading: string;
     body: string;
     platforms: Platform[];
