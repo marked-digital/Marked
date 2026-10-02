@@ -102,7 +102,7 @@ export const CASA_NINA: CaseStudy = {
     },
     items: [
       { label: "PROPOSAL TO LAUNCH", value: 58, suffix: " days", sub: "Proposal on 30 Jul 2026, live on its own domain on 26 Sep 2026", lead: true },
-      { label: "PAGES LIVE", value: 8, sub: "Hand-built and live since 26 Sep 2026, with GA4 on every one" },
+      { label: "PAGES LIVE", value: 7, sub: "Hand-built and live since 26 Sep 2026, with GA4 on every one" },
       { label: "FAQ ANSWERS", value: 40, sub: "Confirmed by the client before launch, all 40 in FAQPage schema" },
       { label: "PHOTOGRAPHS", value: 84, sub: "Placed and described across eight rooms, at launch" },
     ],
@@ -145,7 +145,7 @@ export const CASA_NINA: CaseStudy = {
 
   shipped: {
     kicker: "/ 05 · Shipped",
-    heading: "Eight pages, built by hand.",
+    heading: "Seven pages, built by hand.",
     body: "HTML, CSS and vanilla JavaScript, no framework. Every claim on the site traces to an approved facts bank, and anything unconfirmed stayed off it.",
     scrollHint: "Scroll →",
     pages: [
@@ -176,7 +176,7 @@ export const CASA_NINA: CaseStudy = {
         title: "Engineer",
         period: "Aug to Sep 2026",
         body: "Every page was written to one voice prompt and built by hand, down to a seasonal calendar checked against 26 sources. The client's review round logged 43 changes, all applied before launch.",
-        bullets: ["8 PAGES, NO FRAMEWORK", "SCHEMA FROM ONE ENTITY FILE", "43 REVIEW CHANGES APPLIED"],
+        bullets: ["7 PAGES, NO FRAMEWORK", "SCHEMA FROM ONE ENTITY FILE", "43 REVIEW CHANGES APPLIED"],
       },
       {
         n: "03",
