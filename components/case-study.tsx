@@ -30,7 +30,7 @@ import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import SiteFooter from "@/components/site-footer";
 import { MobileMenu, NavCta } from "@/components/site-nav";
-import type { BarGroup, CaseStudy as CaseStudyData, PageBuild } from "@/lib/case-study";
+import type { BarGroup, CaseStudy as CaseStudyData, PageBuild, Platform } from "@/lib/case-study";
 
 const EASE = "cubic-bezier(0.2, 0.7, 0.3, 1)"; // the site's easing, used everywhere
 
@@ -467,7 +467,8 @@ function Results({ d }: { d: CaseStudyData }) {
           {r.heading}
         </h2>
         {r.scorecard ? <Scorecard s={r.scorecard} /> : null}
-        <div className="oeo-results">
+        {/* Five figures: the lead takes the whole first row (marked.css). */}
+        <div className={`oeo-results${r.items.length === 5 ? " oeo-results--wide-lead" : ""}`}>
           {r.items.map((item, i) => (
             <div key={item.label} data-rev data-delay={i * 60}>
               <Label style={{ color: C.muted }}>{item.label}</Label>
@@ -741,6 +742,14 @@ function Finding({ f, joined }: { f: NonNullable<CaseStudyData["finding"]>; join
 
 /* ------------------------------------------------------------ 05 the stack */
 
+// A platform's tile: its STACK_TOOLS entry, with any fields the case study
+// states itself laid over it (see Platform in lib/case-study.ts).
+function resolvePlatform(p: Platform) {
+  const own = typeof p === "string" ? { name: p } : p;
+  const tool = { ...STACK_TOOLS.find((t) => t.name === own.name), ...own };
+  return tool.role && tool.color && tool.mono ? { ...tool, role: tool.role, color: tool.color, mono: tool.mono } : null;
+}
+
 function Stack({ d, joined }: { d: CaseStudyData; joined: boolean }) {
   const s = d.stack;
   return (
@@ -757,12 +766,14 @@ function Stack({ d, joined }: { d: CaseStudyData; joined: boolean }) {
         </div>
         {/* Same tile anatomy as /stack — brand-tinted logo chip, name, role —
             resolved from STACK_TOOLS so a platform looks identical on both. */}
-        <div className="oeo-chips">
-          {s.platforms.map((name, i) => {
-            const tool = STACK_TOOLS.find((t) => t.name === name);
+        {/* Six or fewer: wider tiles, so long names like "Google Search
+            Console" fit beside the logo instead of truncating. */}
+        <div className={`oeo-chips${s.platforms.length <= 6 ? " oeo-chips--wide" : ""}`}>
+          {s.platforms.map((p, i) => {
+            const tool = resolvePlatform(p);
             if (!tool) return null;
             return (
-              <div key={name} data-rev data-delay={i * 40} className="oeo-chip oeo-chip--tool">
+              <div key={tool.name} data-rev data-delay={i * 40} className="oeo-chip oeo-chip--tool">
                 <ToolLogo tool={tool} size={44} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

@@ -43,10 +43,20 @@ export type Bar = { label: string; pct: number; note?: string };
  *  0–100: shares of a total work, growth rates only if they stay under 100. */
 export type BarGroup = { label: string; bars: Bar[]; footnote?: string };
 
-/** Name of an entry in STACK_TOOLS (lib/md.ts) — the case study renders the
- *  platform's real logo, colour and role from the same source as /stack. An
- *  unmatched name renders nothing, so spelling has to match exactly. */
-export type Platform = string;
+/** A platform on the case study's stack. A name resolves against STACK_TOOLS
+ *  (lib/md.ts), so the tile shows the platform's real logo, colour and role
+ *  from the same source as /stack. An unmatched name renders nothing, so
+ *  spelling has to match exactly.
+ *
+ *  An object is for a platform the engagement used that isn't on the /stack
+ *  roster, or for a listed tool whose role was different on this engagement.
+ *  Its fields lay over the STACK_TOOLS entry of the same name, if there is
+ *  one; without one it needs `role`, `color` and `mono` to render. It never
+ *  joins STACK_TOOLS, whose length is the platform count quoted across the
+ *  brand. */
+export type Platform =
+  | string
+  | { name: string; role?: string; color?: string; mono?: string; icon?: string; localLogo?: string };
 
 /** A shipped page or project. Drop a screenshot path into `image` and it
  *  replaces the schematic thumbnail — production needs ~500×380 @2x for the

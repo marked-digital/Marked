@@ -52,6 +52,8 @@ import {
   siAirtable,
   siConfluence,
   siInstagram,
+  siGooglesearchconsole,
+  siSpaceship,
 } from "simple-icons";
 
 // slug -> SVG path data (viewBox 0 0 24 24)
@@ -100,6 +102,10 @@ export const ICON_PATHS: Record<string, string> = {
   googlebigquery: siGooglebigquery.path,
   airtable: siAirtable.path,
   confluence: siConfluence.path,
+  // Platforms a case study names that aren't on the /stack roster (see
+  // Platform in lib/case-study.ts).
+  googlesearchconsole: siGooglesearchconsole.path,
+  spaceship: siSpaceship.path,
   // Social glyphs for the site's own profiles (About page, footers).
   // Instagram comes from Simple Icons; LinkedIn was removed from Simple Icons
   // at the owner's request, so its ubiquitous 24×24 "in" mark is inlined here
