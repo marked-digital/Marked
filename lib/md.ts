@@ -228,7 +228,12 @@ export const WORK: WorkItem[] = [
     // Must match OEO.headlineStat / OEO.results.items[0] in lib/oeo.ts.
     metric: "+548% revenue",
     href: "/work/ontario-education-online",
-    bg: "radial-gradient(115% 95% at 18% 8%, rgba(31,168,95,0.14), transparent 58%), linear-gradient(155deg, #141614 0%, #0A0B0A 72%)",
+    // Photo under a dark vignette, 0.77 behind the copy and 0.5 at the edges:
+    // lighter than Casa Nina's because this photo is darker to begin with. With
+    // the card's 0.3 shade on top, white text holds at least 11:1 and the green
+    // label and metric at least 5:1. Positioned at 70% so the subject stays in
+    // frame on narrow, portrait cards.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.77), rgba(10,11,10,0.5)), url(/work/ontario-education-online/card.webp) 70% center / cover no-repeat, #0A0B0A",
   },
   {
     // Real results, led by our own team — badges mirror the case study hero:
