@@ -32,8 +32,10 @@
 // testimonial, verbatim, attributed "OWNER, CASA NINA FLAMINGO" with no
 // personal name.
 //
-// Screenshots: once the client approves reuse, drop 500×380 captures into
-// public/work/casa-nina-flamingo/ and set `image` on each shipped page card.
+// Screenshots: each shipped page card shows a 500×380 capture of that page's
+// first screen at 1280×973, taken from the built site on 2 Oct 2026, in
+// public/work/casa-nina-flamingo/. When the site changes, recapture the set
+// whole rather than mixing old and new captures.
 
 import type { CaseStudy } from "@/lib/case-study";
 
@@ -147,14 +149,13 @@ export const CASA_NINA: CaseStudy = {
     body: "HTML, CSS and vanilla JavaScript, no framework. Every claim on the site traces to an approved facts bank, and anything unconfirmed stayed off it.",
     scrollHint: "Scroll →",
     pages: [
-      { name: "Home", type: "CORE SITE", thumb: "hero" },
-      { name: "The casa", type: "FLOOR-BY-FLOOR TOUR", thumb: "split" },
-      { name: "Gallery", type: "84 PHOTOS, 8 ROOMS", thumb: "grid" },
-      { name: "Book", type: "LIVE CALENDAR + ENQUIRY", thumb: "form" },
-      { name: "FAQ", type: "40 ANSWERS IN SCHEMA", thumb: "list" },
-      { name: "Explore", type: "5-CHAPTER GUIDE", thumb: "dark" },
-      { name: "Location", type: "SETTING + DISTANCES", thumb: "split" },
-      { name: "Concierge", type: "WHAT EVERY STAY INCLUDES", thumb: "profile" },
+      { name: "Home", type: "CORE SITE", thumb: "hero", image: "/work/casa-nina-flamingo/home.jpg" },
+      { name: "The casa", type: "FLOOR-BY-FLOOR TOUR", thumb: "split", image: "/work/casa-nina-flamingo/the-casa.jpg" },
+      { name: "Gallery", type: "84 PHOTOS, 8 ROOMS", thumb: "grid", image: "/work/casa-nina-flamingo/gallery.jpg" },
+      { name: "Book", type: "LIVE CALENDAR + ENQUIRY", thumb: "form", image: "/work/casa-nina-flamingo/book.jpg" },
+      { name: "FAQ", type: "40 ANSWERS IN SCHEMA", thumb: "list", image: "/work/casa-nina-flamingo/faq.jpg" },
+      { name: "Explore", type: "5-CHAPTER GUIDE", thumb: "dark", image: "/work/casa-nina-flamingo/explore.jpg" },
+      { name: "Concierge", type: "WHAT EVERY STAY INCLUDES", thumb: "profile", image: "/work/casa-nina-flamingo/concierge.jpg" },
     ],
   },
 

@@ -788,7 +788,7 @@ function Thumb({ page }: { page: PageBuild }) {
     return (
       <div className="oeo-thumb oeo-thumb--img">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={page.image} alt="" />
+        <img src={page.image} alt="" loading="lazy" />
       </div>
     );
   }
