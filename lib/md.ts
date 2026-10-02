@@ -256,7 +256,7 @@ export const WORK: WorkItem[] = [
     tags: ["Email link → direct booking", "Web build", "SEO and AEO", "Booking platform"],
     // Must match CASA_NINA.headlineStat / CASA_NINA.results.items[0] in
     // lib/casa-nina.ts.
-    metric: "58 days to launch",
+    metric: "45 days to launch",
     href: "/work/casa-nina-flamingo",
     // The villa, from the hero of casaninaflamingo.com, under a dark vignette:
     // darkest behind the copy (0.82), lighter toward the edges (0.62) so the

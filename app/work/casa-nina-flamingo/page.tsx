@@ -3,7 +3,7 @@ import CaseStudy from "@/components/case-study";
 import { CASA_NINA } from "@/lib/casa-nina";
 
 const DESCRIPTION =
-  "How Casa Nina Flamingo, a Costa Rica villa that sleeps 14, went from an email link to a direct-booking vacation rental website in 58 days.";
+  "How Casa Nina Flamingo, a Costa Rica villa that sleeps 14, went from an email link to a direct-booking vacation rental website in 45 days.";
 const SOCIAL_TITLE = "Casa Nina Flamingo: from an email link to direct booking";
 
 export const metadata: Metadata = {
