@@ -89,8 +89,9 @@ function Foot({ variant }: { variant: "split" | "stack" }) {
 /* mobile rails                                                        */
 /* ------------------------------------------------------------------ */
 
-// Case-study art tile. Only the first two WORK entries have real routes, so
-// the rest render as plain (non-link) tiles until their case studies exist.
+// Case-study art tile. Real engagements link to their case studies; WORK
+// entries flagged `placeholder` have no route yet, so they render as plain
+// (non-link) tiles until their case studies exist.
 function CaseTile({ item, wide, link }: { item: (typeof WORK)[number]; wide?: boolean; link?: boolean }) {
   const cls = `abt-tile abt-tile--case${wide ? " abt-tile--wide" : ""}`;
   const inner = (
@@ -266,10 +267,10 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
       {ig(3)}
       {ig(4)}
 
-      <CaseTile item={WORK[2]} />
-      <CaseTile item={WORK[3]} />
+      <CaseTile item={WORK[2]} link={!WORK[2].placeholder} />
+      <CaseTile item={WORK[3]} link={!WORK[3].placeholder} />
       <MetricTile m={MD.metrics[2]} />
-      <CaseTile item={WORK[4]} />
+      <CaseTile item={WORK[4]} link={!WORK[4].placeholder} />
 
       {ig(5, true)}
 
@@ -346,8 +347,8 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
           compounding system, obsesses over your numbers like they&apos;re our own, and answers for revenue. Not impressions. Not a channel report. Revenue.
         </p>
         <Rail label="Selected work">
-          {WORK.map((w, i) => (
-            <CaseTile key={w.href} item={w} link={i < 2} />
+          {WORK.map((w) => (
+            <CaseTile key={w.href} item={w} link={!w.placeholder} />
           ))}
         </Rail>
       </section>
@@ -396,7 +397,7 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
           ))}
         </div>
         {/* Real engagements only — placeholders stay off the proof list. */}
-        {WORK.slice(0, 2).map((w) => (
+        {WORK.filter((w) => !w.placeholder).map((w) => (
           <Link key={w.href} href={w.href} className="abt-proof-case">
             <span className="abt-proof-name">{w.title}</span>
             <span className="abt-proof-metric">{w.metric}</span>
