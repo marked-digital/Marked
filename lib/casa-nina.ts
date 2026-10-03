@@ -47,7 +47,7 @@ export const CASA_NINA: CaseStudy = {
   slug: "casa-nina-flamingo",
   kicker: "Case study · Web build",
   industry: "Vacation rental",
-  services: "Web build · SEO and AEO · Booking platform",
+  services: "Web build · SEO, AEO and GEO · Booking platform",
   timeline: "Since Aug 2026",
   site: { label: "casaninaflamingo.com", href: "https://casaninaflamingo.com" },
 
