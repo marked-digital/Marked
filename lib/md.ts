@@ -246,7 +246,12 @@ export const WORK: WorkItem[] = [
     // lib/roadpost.ts.
     metric: "$20.9M revenue",
     href: "/work/roadpost",
-    bg: "radial-gradient(100% 110% at 88% 6%, rgba(31,168,95,0.12), transparent 56%), radial-gradient(90% 80% at 8% 92%, rgba(243,245,242,0.05), transparent 60%), linear-gradient(165deg, #121412 0%, #0A0B0A 74%)",
+    // Earth at night, under the same dark vignette as Casa Nina's card: 0.82
+    // behind the copy, 0.62 at the edges. With the card's 0.3 shade on top,
+    // white text holds at least 10:1 and the green label and metric at least
+    // 4.5:1 over the city lights. The photo is 1000px square, so keep it
+    // centred: wide cards crop its top and bottom, tall ones its sides.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.82), rgba(10,11,10,0.62)), url(/work/roadpost/card.jpg) center / cover no-repeat, #0A0B0A",
   },
   {
     // Real engagement. Badges mirror the case study hero: the move in its H1,
