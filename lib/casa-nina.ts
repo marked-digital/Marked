@@ -52,7 +52,7 @@ export const CASA_NINA: CaseStudy = {
   site: { label: "casaninaflamingo.com", href: "https://casaninaflamingo.com" },
 
   h1: { before: "From another Listing, to Discovered and ", underlined: "Recommended", after: "." },
-  sub: "Casa Nina Flamingo sleeps 14 in Playa Flamingo, Costa Rica, and almost no villa nearby can match it. Every booking still went through Airbnb, because “Book direct” opened an email. We gave it a clear position, a site built for booking direct, and a payment route its Costa Rican company can use.",
+  sub: "Casa Nina Flamingo sleeps 14 in Playa Flamingo, Costa Rica, and almost no villa nearby can match it. Yet every booking went through Airbnb, so it was another listing. We brought it to life on its own premium site, built to be discovered and recommended, and to encourage direct bookings.",
 
   // The headline number, repeated as the first cell of results.items.
   headlineStat: { value: 45, suffix: " days", label: ["BREAKING GROUND TO LAUNCH", "12 AUG TO 26 SEP 2026"] },
@@ -71,7 +71,7 @@ export const CASA_NINA: CaseStudy = {
       {
         n: "02",
         title: "Convert direct bookings",
-        body: "Lead with what almost no villa nearby can match: room for 14 across two independent units. Then replace the email link with a live calendar, an enquiry form and a payment route the company can use.",
+        body: "Lead with what almost no villa nearby can match: room for 14 across two independent units. Then give guests a clear way to book direct, with a live availability calendar and an enquiry form.",
       },
       {
         n: "03",
