@@ -1530,8 +1530,11 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+/* The floor is fluid below ~425px (10.8vw) so the longest single word in a
+   headline, like "Recommended" or "international", still fits a narrow phone
+   with its full stop. A fixed 46px floor pushed it past the edge. */
 .oeo-h1 {
-  font-size: clamp(46px, 6.2vw, 92px);
+  font-size: clamp(min(46px, 10.8vw), 6.2vw, 92px);
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.03em;
