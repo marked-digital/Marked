@@ -2003,6 +2003,11 @@
   padding-bottom: 20px;
   scroll-snap-type: x proximity;
   overscroll-behavior-x: contain;
+  /* Thin and dark, so it doesn't read as a white bar under the cards on
+     Windows, but kept visible: mouse users without a trackpad drag it to
+     scroll sideways. */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
 }
 .oeo-pcard {
   flex: 0 0 250px;
@@ -2017,6 +2022,42 @@
   transform: translateY(-4px);
   border-color: #1fa85f;
   box-shadow: 0 22px 48px -22px rgba(0, 0, 0, 0.7);
+}
+/* A shipped card that links to its live page. Focus gets the hover lift plus
+   the focus ring, drawn inside the border: the scroller clips both axes, so a
+   ring outside the card would be cut off at its edges. */
+.oeo-pcard--link {
+  display: block;
+}
+.oeo-pcard--link:focus-visible {
+  transform: translateY(-4px);
+  border-color: #1fa85f;
+  box-shadow: 0 22px 48px -22px rgba(0, 0, 0, 0.7);
+  outline: 2px solid #1fa85f;
+  outline-offset: -2px;
+}
+.oeo-pcard-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+/* External-link cue: the shared arrow turned to point up and right. */
+.oeo-pcard-arrow {
+  display: inline-flex;
+  flex: none;
+  color: #8e948c;
+  transform: rotate(-45deg);
+  transition: color 0.22s, transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.oeo-pcard-arrow svg {
+  width: 14px;
+  height: 14px;
+}
+.oeo-pcard--link:hover .oeo-pcard-arrow,
+.oeo-pcard--link:focus-visible .oeo-pcard-arrow {
+  color: #f3f5f2;
+  transform: translate(2px, -2px) rotate(-45deg);
 }
 /* Schematic stand-ins for the real page screenshots. The three greys are the
    card surface stepped up, so a real 500×380 capture can drop straight in. */
@@ -2230,6 +2271,14 @@
   }
   .oeo-scroller {
     scroll-behavior: auto;
+  }
+  /* the arrow still turns white, but doesn't move */
+  .oeo-pcard-arrow {
+    transition: color 0.22s;
+  }
+  .oeo-pcard--link:hover .oeo-pcard-arrow,
+  .oeo-pcard--link:focus-visible .oeo-pcard-arrow {
+    transform: rotate(-45deg);
   }
 }
 

@@ -27,7 +27,7 @@
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
-import { MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
+import { ArrowIcon, MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import SiteFooter from "@/components/site-footer";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import type { BarGroup, CaseStudy as CaseStudyData, PageBuild, Platform } from "@/lib/case-study";
@@ -40,6 +40,11 @@ function prefersReducedMotion() {
 
 /* ----------------------------------------------------------------- motion */
 
+// After a reveal plays, these inline styles come off again, so the stylesheet
+// owns the element from then on: inline values beat :hover, and left in place
+// they would cancel every card's hover lift.
+const REVEAL_PROPS = ["opacity", "transform", "transition", "transition-delay"];
+
 // One observer for the whole page. Mirrors the reference runtime: reveals,
 // bar widths, SVG line draws and the chart's gradient area, plus the finding's
 // verdict flip. The selected verdict pill ships green; it's set neutral here and
@@ -49,6 +54,7 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root || prefersReducedMotion()) return;
+    const timers: number[] = [];
 
     root.querySelectorAll<HTMLElement>("[data-rev]").forEach((el) => {
       el.style.opacity = "0";
@@ -88,6 +94,20 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
           if (t.hasAttribute("data-rev")) {
             t.style.opacity = "1";
             t.style.transform = "none";
+            // Hand the element back to the stylesheet once the reveal ends,
+            // with a fallback in case transitionend never fires.
+            let timer = 0;
+            const settle = () => {
+              t.removeEventListener("transitionend", onEnd);
+              window.clearTimeout(timer);
+              REVEAL_PROPS.forEach((prop) => t.style.removeProperty(prop));
+            };
+            const onEnd = (ev: TransitionEvent) => {
+              if (ev.target === t && ev.propertyName === "transform") settle();
+            };
+            t.addEventListener("transitionend", onEnd);
+            timer = window.setTimeout(settle, (Number(t.dataset.delay) || 0) + 1000);
+            timers.push(timer);
           }
           if (t.hasAttribute("data-bar")) t.style.width = `${t.dataset.bar}%`;
           if (t.hasAttribute("data-draw")) t.style.strokeDashoffset = "0";
@@ -103,7 +123,10 @@ function useScrollMotion(rootRef: React.RefObject<HTMLDivElement | null>) {
       { threshold: 0.2, rootMargin: "0px 0px -6% 0px" }
     );
     root.querySelectorAll("[data-rev],[data-bar],[data-draw],[data-fade],[data-flip]").forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      timers.forEach((id) => window.clearTimeout(id));
+    };
   }, [rootRef]);
 }
 
@@ -977,6 +1000,13 @@ function Compare({ c }: { c: NonNullable<CaseStudyData["shipped"]["compare"]> })
   );
 }
 
+// Keyboard focus can land on a linked card the scroller only partly shows, and
+// browsers leave a partly visible element where it is. Bring it fully in, for
+// keyboard focus only: a click or tap shouldn't move the row under the pointer.
+function showFocusedCard(e: React.FocusEvent<HTMLElement>) {
+  if (e.currentTarget.matches(":focus-visible")) e.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
 function Shipped({ d }: { d: CaseStudyData }) {
   const s = d.shipped;
   return (
@@ -994,15 +1024,45 @@ function Shipped({ d }: { d: CaseStudyData }) {
         </div>
 
         <div className="oeo-scroller">
-          {s.pages.map((p, i) => (
-            <div key={p.name} data-rev data-delay={i * 60} className="oeo-pcard">
-              <Thumb page={p} />
-              <div style={{ padding: "16px 18px" }}>
-                <div style={{ fontSize: 15, fontWeight: 600 }}>{p.name}</div>
-                <Label style={{ marginTop: 5, fontSize: 10, letterSpacing: "0.14em" }}>{p.type}</Label>
+          {s.pages.map((p, i) =>
+            // With a live URL the whole card is one link to the real page, in a
+            // new tab. rel="noopener" without "noreferrer", like the hero's
+            // live-site link, so the client's analytics sees the referral.
+            p.href ? (
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noopener"
+                data-rev
+                data-delay={i * 60}
+                className="oeo-pcard oeo-pcard--link"
+                onFocus={showFocusedCard}
+              >
+                <Thumb page={p} />
+                <div style={{ padding: "16px 18px" }}>
+                  <div className="oeo-pcard-name">
+                    <span style={{ fontSize: 15, fontWeight: 600 }}>
+                      {p.name}
+                      <span className="oeo-sr"> (opens in a new tab)</span>
+                    </span>
+                    <span className="oeo-pcard-arrow" aria-hidden="true">
+                      <ArrowIcon />
+                    </span>
+                  </div>
+                  <Label style={{ marginTop: 5, fontSize: 10, letterSpacing: "0.14em" }}>{p.type}</Label>
+                </div>
+              </a>
+            ) : (
+              <div key={p.name} data-rev data-delay={i * 60} className="oeo-pcard">
+                <Thumb page={p} />
+                <div style={{ padding: "16px 18px" }}>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{p.name}</div>
+                  <Label style={{ marginTop: 5, fontSize: 10, letterSpacing: "0.14em" }}>{p.type}</Label>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
           {s.more ? (
             <div data-rev data-delay={s.pages.length * 60} className="oeo-pcard oeo-pcard--more">
               <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.03em" }}>+{s.more.count}</div>
