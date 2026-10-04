@@ -3,11 +3,11 @@ import CaseStudy from "@/components/case-study";
 import { CASA_NINA } from "@/lib/casa-nina";
 
 const DESCRIPTION =
-  "How Casa Nina Flamingo, a Costa Rica villa that sleeps 14, went from an email link to a direct-booking vacation rental website in 45 days.";
-const SOCIAL_TITLE = "Casa Nina Flamingo: from an email link to direct booking";
+  "How a Costa Rica villa that sleeps 14 went from another Airbnb listing to a premium site of its own in 45 days, built to be discovered and booked direct.";
+const SOCIAL_TITLE = "Casa Nina Flamingo: from another listing to discovered and recommended";
 
 export const metadata: Metadata = {
-  title: "Casa Nina Flamingo: built for direct booking",
+  title: "Casa Nina Flamingo: from listing to discovered",
   description: DESCRIPTION,
   alternates: { canonical: "/work/casa-nina-flamingo" },
   // Re-declares the layout's openGraph and twitter fields in case this Next

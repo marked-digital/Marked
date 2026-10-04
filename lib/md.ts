@@ -259,7 +259,7 @@ export const WORK: WorkItem[] = [
     // then the SERVICES line.
     title: "CASA NINA FLAMINGO",
     industry: "Vacation Rental",
-    tags: ["Email link → direct booking", "Web build", "SEO, AEO and GEO", "Booking platform"],
+    tags: ["Another listing → discovered", "Web build", "SEO, AEO and GEO", "Booking platform"],
     // Must match CASA_NINA.headlineStat / CASA_NINA.results.items[0] in
     // lib/casa-nina.ts.
     metric: "45 days to launch",
