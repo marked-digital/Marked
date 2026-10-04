@@ -66,6 +66,9 @@ export type PageBuild = {
   type: string;
   thumb: "hero" | "split" | "form" | "grid" | "dark" | "profile" | "list";
   image?: string;
+  /** Live URL of the page. When set, the whole card links to it in a new tab
+   *  so visitors can try the real page. */
+  href?: string;
 };
 
 /** One gauge on a scorecard, scored 0 to 100. */
