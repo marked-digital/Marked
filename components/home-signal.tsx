@@ -114,7 +114,7 @@ const WORK_BLUR_MIN_W = 768; // px
 // scales 1 → 0.8 and blurs 0 → 5px linearly with coverage. The last card is
 // never covered, so it's left alone.
 function SelectedWork() {
-  const cardsRef = React.useRef<(HTMLAnchorElement | null)[]>([]);
+  const cardsRef = React.useRef<(HTMLElement | null)[]>([]);
   const [headRef, headSeen] = useInView<HTMLDivElement>({ threshold: 0.25 });
   const syncRef = useScrollSync();
 
@@ -171,7 +171,7 @@ function SelectedWork() {
 
   // Cursor-following "View" pill. Mouse only — the pill is hidden on touch by
   // the (hover: hover) media query, so there's nothing to move there.
-  const trackCursor = (e: React.PointerEvent<HTMLAnchorElement>) => {
+  const trackCursor = (e: React.PointerEvent<HTMLElement>) => {
     if (e.pointerType !== "mouse") return;
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
@@ -200,43 +200,57 @@ function SelectedWork() {
       </div>
 
       <div className="sg-work-stack">
-        {WORK.map((item, i) => (
-          <Link
-            key={item.title}
-            href={item.href}
-            prefetch={false}
-            className="sg-work-card"
-            ref={(el) => {
-              cardsRef.current[i] = el;
-            }}
-            style={{ background: item.bg }}
-            onPointerMove={trackCursor}
-            aria-label={`${item.title}. ${item.industry}. ${item.tags.join(", ")}. ${item.metric}`}
-          >
-            <span className="sg-work-texture" aria-hidden="true" />
-            {/* Kept in the DOM so real case photography drops in behind it. */}
-            <span className="sg-work-shade" aria-hidden="true" />
-            <span className="sg-work-body">
-              <span className="sg-work-n">{String(i + 1).padStart(2, "0")}</span>
-              {/* The display size is tuned for short wordmarks. A full company
-                  name set at that scale wraps to three lines and swallows the
-                  card, so long titles step down a size. */}
-              <span className={"sg-work-title" + (item.title.length > 12 ? " sg-work-title--long" : "")}>{item.title}</span>
-              <span className="sg-work-industry">{item.industry}</span>
-              <span className="sg-work-meta">
-                {item.tags.map((t) => (
-                  <span key={t} className="sg-work-pill">
-                    {t}
-                  </span>
-                ))}
-                <span className="sg-work-metric">{item.metric}</span>
+        {WORK.map((item, i) => {
+          const setRef = (el: HTMLElement | null) => {
+            cardsRef.current[i] = el;
+          };
+          const body = (
+            <>
+              <span className="sg-work-texture" aria-hidden="true" />
+              {/* Kept in the DOM so real case photography drops in behind it. */}
+              <span className="sg-work-shade" aria-hidden="true" />
+              <span className="sg-work-body">
+                <span className="sg-work-n">{String(i + 1).padStart(2, "0")}</span>
+                {/* The display size is tuned for short wordmarks. A full company
+                    name set at that scale wraps to three lines and swallows the
+                    card, so long titles step down a size. */}
+                <span className={"sg-work-title" + (item.title.length > 12 ? " sg-work-title--long" : "")}>{item.title}</span>
+                <span className="sg-work-industry">{item.industry}</span>
+                <span className="sg-work-meta">
+                  {item.tags.map((t) => (
+                    <span key={t} className="sg-work-pill">
+                      {t}
+                    </span>
+                  ))}
+                  <span className="sg-work-metric">{item.metric}</span>
+                </span>
               </span>
-            </span>
-            <span className="sg-work-cursor" aria-hidden="true">
-              View →
-            </span>
-          </Link>
-        ))}
+            </>
+          );
+          // No case study yet (no href): a plain card that links nowhere, so
+          // it also drops the "View" cursor pill.
+          return item.href ? (
+            <Link
+              key={item.title}
+              href={item.href}
+              prefetch={false}
+              className="sg-work-card"
+              ref={setRef}
+              style={{ background: item.bg }}
+              onPointerMove={trackCursor}
+              aria-label={`${item.title}. ${item.industry}. ${item.tags.join(", ")}. ${item.metric}`}
+            >
+              {body}
+              <span className="sg-work-cursor" aria-hidden="true">
+                View →
+              </span>
+            </Link>
+          ) : (
+            <div key={item.title} className="sg-work-card sg-work-card--static" ref={setRef} style={{ background: item.bg }}>
+              {body}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

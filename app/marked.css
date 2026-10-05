@@ -669,6 +669,11 @@
 .sg-work-card:hover .sg-work-shade {
   opacity: 0.42;
 }
+/* A card with no case study yet links nowhere, so it keeps the resting shade
+   on hover rather than suggesting a click. */
+.sg-work-card--static:hover .sg-work-shade {
+  opacity: 0.3;
+}
 .sg-work-body {
   position: relative;
   display: block;
@@ -2499,6 +2504,15 @@
   .sg-work-metric {
     font-size: 12px;
     padding: 6px 12px;
+  }
+}
+/* Single-word titles on small phones. At 13vw a ten-letter wordmark like
+   "AscenteVMS" runs past the card's padding (and "ROADPOST" does at 320px),
+   so below 480px the size tracks the narrower column instead. Multi-word
+   titles already step down via .sg-work-title--long. */
+@media (max-width: 480px) {
+  .sg-work-title:not(.sg-work-title--long) {
+    font-size: 11vw;
   }
 }
 @media (max-width: 560px) {

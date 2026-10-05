@@ -89,12 +89,12 @@ function Foot({ variant }: { variant: "split" | "stack" }) {
 /* mobile rails                                                        */
 /* ------------------------------------------------------------------ */
 
-// Case-study art tile. Real engagements link to their case studies; WORK
-// entries flagged `placeholder` have no route yet, so they render as plain
-// (non-link) tiles until their case studies exist.
+// Case-study art tile. Entries with an `href` link to their case studies; the
+// rest (a client still onboarding, a placeholder) render as plain, non-link
+// tiles until their case studies exist.
 // A tile whose `bg` carries a photograph also gets a bottom scrim
 // (.abt-tile--photo), since its copy sits at the foot of the tile.
-function CaseTile({ item, wide, link }: { item: (typeof WORK)[number]; wide?: boolean; link?: boolean }) {
+function CaseTile({ item, wide }: { item: (typeof WORK)[number]; wide?: boolean }) {
   const photo = item.bg.includes("url(");
   const cls = `abt-tile abt-tile--case${wide ? " abt-tile--wide" : ""}${photo ? " abt-tile--photo" : ""}`;
   const inner = (
@@ -104,7 +104,7 @@ function CaseTile({ item, wide, link }: { item: (typeof WORK)[number]; wide?: bo
       <div className="abt-case-metric">{item.metric}</div>
     </>
   );
-  return link ? (
+  return item.href ? (
     <Link href={item.href} className={cls} style={{ background: item.bg }}>
       {inner}
     </Link>
@@ -256,24 +256,24 @@ function Mosaic({ igPosts }: { igPosts: IgPost[] }) {
       {ig(0)}
       {ig(1)}
 
-      <CaseTile item={WORK[0]} wide link />
+      <CaseTile item={WORK[0]} wide />
 
       <ApproachTile />
       <MetricTile m={MD.metrics[3]} />
 
       {ig(2, true)}
 
-      <CaseTile item={WORK[1]} wide link />
+      <CaseTile item={WORK[1]} wide />
 
       <StackTile />
 
       {ig(3)}
       {ig(4)}
 
-      <CaseTile item={WORK[2]} link={!WORK[2].placeholder} />
-      <CaseTile item={WORK[3]} link={!WORK[3].placeholder} />
+      <CaseTile item={WORK[2]} />
+      <CaseTile item={WORK[3]} />
       <MetricTile m={MD.metrics[2]} />
-      <CaseTile item={WORK[4]} link={!WORK[4].placeholder} />
+      <CaseTile item={WORK[4]} />
 
       {ig(5, true)}
 
@@ -351,7 +351,7 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
         </p>
         <Rail label="Selected work">
           {WORK.map((w) => (
-            <CaseTile key={w.href} item={w} link={!w.placeholder} />
+            <CaseTile key={w.title} item={w} />
           ))}
         </Rail>
       </section>
@@ -399,14 +399,17 @@ function Narrative({ igPosts }: { igPosts: IgPost[] }) {
             </div>
           ))}
         </div>
-        {/* Real engagements only — placeholders stay off the proof list. */}
-        {WORK.filter((w) => !w.placeholder).map((w) => (
-          <Link key={w.href} href={w.href} className="abt-proof-case">
-            <span className="abt-proof-name">{w.title}</span>
-            <span className="abt-proof-metric">{w.metric}</span>
-            <ArrowIcon />
-          </Link>
-        ))}
+        {/* Case studies only: cards with no case study yet stay off the
+            proof list. */}
+        {WORK.map((w) =>
+          w.href ? (
+            <Link key={w.href} href={w.href} className="abt-proof-case">
+              <span className="abt-proof-name">{w.title}</span>
+              <span className="abt-proof-metric">{w.metric}</span>
+              <ArrowIcon />
+            </Link>
+          ) : null
+        )}
         <p className="abt-body" style={{ marginTop: 18, fontSize: 14.5 }}>
           Full breakdowns live in the case studies: the strategy, the build, and the numbers behind every claim.
         </p>

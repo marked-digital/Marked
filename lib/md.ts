@@ -198,9 +198,10 @@ export const C = {
 
 // Homepage "Selected work" — the scroll-stacked case-study cards. The first
 // three are real engagements (Ontario Education Online, Roadpost, Casa Nina
-// Flamingo), each linking to its case study. VELA and HALCYON are still
-// placeholders, flagged `placeholder: true`: swap title / tags / metric / href
-// for a real engagement, drop the flag, and the section needs no other change.
+// Flamingo), each linking to its case study. AscenteVMS is a client still
+// onboarding, with no case study yet, and HALCYON is a placeholder: neither has
+// an `href`, so neither card links anywhere. Give an entry an `href` once its
+// case study ships and it links from the homepage and the About page.
 //
 // `bg` is the temporary card artwork — a CSS gradient in the Signal palette
 // standing in for 1920×1080 case photography. When real photos land, replace it
@@ -211,11 +212,11 @@ export type WorkItem = {
   industry: string;
   tags: string[];
   metric: string;
-  href: string;
+  /** The case study's route. Leave it out for a card with no case study yet:
+   *  it then links nowhere, on the homepage or the About page, and stays off
+   *  the About proof list. */
+  href?: string;
   bg: string;
-  /** Stand-in card with no case study yet. Placeholders don't link from the
-   *  About page and stay off its proof list. */
-  placeholder?: boolean;
 };
 
 export const WORK: WorkItem[] = [
@@ -273,21 +274,25 @@ export const WORK: WorkItem[] = [
     bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.82), rgba(10,11,10,0.62)), url(/work/casa-nina-flamingo/home-hero.jpg) center / cover no-repeat, #0A0B0A",
   },
   {
-    title: "VELA",
-    industry: "Outdoor & Apparel",
-    tags: ["LATAM entry", "Storefront build", "Logistics"],
-    metric: "7-week launch",
-    href: "/work/vela",
-    placeholder: true,
-    bg: "radial-gradient(120% 100% at 50% 108%, rgba(31,168,95,0.13), transparent 62%), linear-gradient(180deg, #0F110F 0%, #0A0B0A 100%)",
+    // Real client, still onboarding: no case study yet, so no href and the card
+    // links nowhere. The status rides in the accent pill, where the other
+    // cards carry their headline result.
+    title: "AscenteVMS",
+    industry: "B2B - SaaS",
+    tags: ["Web Development", "Digital Presence", "Digital Advertising"],
+    metric: "Status: On-boarding",
+    // Photo under a dark vignette, 0.86 behind the copy and 0.66 at the edges:
+    // with the card's 0.3 shade on top, white text holds at least 9:1 and the
+    // green label and metric at least 4.9:1 over the bright laptop screen.
+    // The photo is 1024×512, so it's soft on wide, high-density screens.
+    bg: "radial-gradient(75% 65% at 50% 50%, rgba(10,11,10,0.86), rgba(10,11,10,0.66)), url(/work/ascentevms/card.jpg) center / cover no-repeat, #0A0B0A",
   },
   {
+    // Placeholder, not a real engagement: no href, so it links nowhere.
     title: "HALCYON",
     industry: "Home & Lifestyle",
     tags: ["MENA", "Lifecycle & retention", "Paid + organic"],
     metric: "+168% AOV",
-    href: "/work/halcyon",
-    placeholder: true,
     bg: "radial-gradient(90% 120% at 78% 82%, rgba(39,190,110,0.2), transparent 60%), radial-gradient(80% 70% at 12% 0%, rgba(31,168,95,0.1), transparent 60%), linear-gradient(150deg, #141614 0%, #0A0B0A 70%)",
   },
 ];
