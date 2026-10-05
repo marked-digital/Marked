@@ -242,14 +242,14 @@ export default function Reviews({ feed }: { feed: ReviewFeed }) {
           </p>
           <div className="sg-rev-actions">
             {feed.writeReviewUrl && (
-              <a className="sg-btn sg-btn--g sg-rev-btn" href={feed.writeReviewUrl} target="_blank" rel="noopener">
+              <a className="sg-btn sg-btn--g" href={feed.writeReviewUrl} target="_blank" rel="noopener">
                 Leave a review
                 <span className="sg-sr"> (opens in a new tab)</span>
               </a>
             )}
-            <a className="sg-btn sg-btn--g sg-rev-btn" href={feed.profileUrl} target="_blank" rel="noopener">
+            <a className="sg-btn sg-btn--p" href={feed.profileUrl} target="_blank" rel="noopener">
               Read on Google
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                 <path d="M7 17 17 7M8 7h9v9" />
               </svg>
               <span className="sg-sr"> (opens in a new tab)</span>
