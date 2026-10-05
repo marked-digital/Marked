@@ -610,6 +610,423 @@
   line-height: 1.45;
   margin: 0;
 }
+/* --------------------------------------- Reviews ("In their words")
+   components/home-reviews.tsx: a scoreboard with Google's rating beside a
+   spotlight that shows one review at a time. Every slide sits in the same grid
+   cell, so the panel takes the height of the longest review and switching
+   never moves the layout. Motion is opt-in: the component sets
+   data-motion="on" after hydration unless the visitor prefers reduced motion,
+   so without JS, or with reduced motion, all of this renders at rest. */
+.sg-rev-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 20px;
+  align-items: stretch;
+}
+.sg-rev-score,
+.sg-rev-spot {
+  position: relative;
+  min-width: 0;
+  background: #0f110f;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 18px;
+}
+.sg-rev-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 36px 36px 32px;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* The same soft light as the Architecture canvas, pooled behind the figure. */
+.sg-rev-score::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(85% 65% at 0% 0%, rgba(31, 168, 95, 0.15), transparent 70%);
+  pointer-events: none;
+}
+.sg-rev-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #8e948c;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sg-rev-g {
+  display: block;
+  flex: none;
+}
+.sg-rev-big {
+  display: block;
+  margin-top: 26px;
+  color: #f3f5f2;
+  font-size: clamp(76px, 8.4vw, 128px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  /* Every digit the same width, so the count-up doesn't wobble. */
+  font-variant-numeric: tabular-nums;
+}
+.sg-rev-stars {
+  display: block;
+  margin-top: 22px;
+}
+.sg-rev-starfill {
+  transform-box: fill-box;
+  transform-origin: 0 0;
+}
+.sg-rev-basis {
+  margin: 14px 0 0;
+  color: #8e948c;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.sg-rev-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 36px;
+}
+.sg-btn.sg-rev-btn {
+  gap: 8px;
+  padding: 11px 18px;
+  font-size: 14px;
+}
+.sg-rev .sg-btn:focus-visible,
+.sg-rev-nav:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 3px;
+}
+.sg-rev-spot {
+  display: flex;
+  flex-direction: column;
+  padding: 38px 40px 26px;
+}
+.sg-rev-glyph {
+  display: block;
+  flex: none;
+  color: #1fa85f;
+}
+.sg-rev-slides {
+  display: grid;
+  flex: 1 1 auto;
+  margin-top: 26px;
+  /* Horizontal swipes step through the reviews; vertical ones still scroll
+     the page, and pinch zoom still works. */
+  touch-action: pan-y pinch-zoom;
+}
+.sg-rev-slide {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+.sg-rev-slide.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.55s ease 0.15s, visibility 0s;
+}
+/* With motion, the incoming review also rises into place. The outgoing one
+   only fades, and drops back down once it's out of sight. */
+.sg-rev[data-motion="on"] .sg-rev-slide:not(.is-on) {
+  transform: translateY(14px);
+  transition: opacity 0.35s ease, transform 0s linear 0.35s, visibility 0s linear 0.35s;
+}
+.sg-rev[data-motion="on"] .sg-rev-slide.is-on {
+  transition: opacity 0.55s ease 0.15s, transform 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) 0.15s, visibility 0s;
+}
+.sg-rev-quote {
+  margin: 0;
+  color: #d7dbd5;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.sg-rev-quote p {
+  margin: 0;
+}
+.sg-rev-quote--l {
+  font-size: clamp(24px, 2.35vw, 36px);
+  line-height: 1.28;
+}
+.sg-rev-quote--m {
+  font-size: clamp(21px, 1.95vw, 29px);
+  line-height: 1.34;
+}
+.sg-rev-quote--s {
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1.42;
+}
+/* The phrase a review is remembered by, underlined in the accent. The line is
+   a background, so it follows the phrase across line breaks; with motion it
+   draws in, left to right, once the review is showing. */
+.sg-rev-mark {
+  color: #f3f5f2;
+  background: linear-gradient(#1fa85f, #1fa85f) no-repeat 0 100% / 100% 0.085em;
+  padding-bottom: 0.05em;
+}
+.sg-rev[data-motion="on"] .sg-rev-mark {
+  background-size: 0% 0.085em;
+  transition: background-size 0.3s ease;
+}
+.sg-rev[data-motion="on"] .sg-rev-slide.is-drawn .sg-rev-mark {
+  background-size: 100% 0.085em;
+  transition: background-size 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.8s;
+}
+/* Attribution sits right under its quote; a shorter review leaves its spare
+   height below, above the controls. */
+.sg-rev-by {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 30px;
+}
+.sg-rev-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(31, 168, 95, 0.12);
+  border: 1px solid rgba(31, 168, 95, 0.35);
+  color: #1fa85f;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  object-fit: cover;
+}
+.sg-rev-who {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.sg-rev-name {
+  color: #f3f5f2;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.sg-rev-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  color: #8e948c;
+  font-size: 13.5px;
+}
+.sg-rev-meta > svg {
+  display: block;
+}
+.sg-rev-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.085);
+}
+.sg-rev-count {
+  flex: none;
+  color: #8e948c;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+.sg-rev-count b {
+  color: #f3f5f2;
+  font-weight: 600;
+}
+.sg-rev-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.sg-rev-fill {
+  position: absolute;
+  inset: 0;
+  background: #1fa85f;
+  transform-origin: 0 50%;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+/* The timer. Its duration (long enough to read the review) and its play
+   state (paused on hover, off screen or in a hidden tab) are set inline. */
+.sg-rev-fill.is-timed {
+  animation-name: sg-rev-prog;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  transition: none;
+}
+@keyframes sg-rev-prog {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.sg-rev-btns {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+.sg-rev-nav {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: #f3f5f2;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.sg-rev-nav:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+}
+.sg-rev-nav:active {
+  transform: scale(0.94);
+}
+/* Entrance: the scoreboard slides in from the left and the spotlight from the
+   right (as .mk-reveal does elsewhere), while the figure counts up and the
+   stars fill on the same ease-out. Transitions only run on the way in, so the
+   panels hide instantly when motion switches on above the fold. */
+.sg-rev[data-motion="on"] .sg-rev-grid:not(.is-in) .sg-rev-score {
+  opacity: 0;
+  transform: translateX(-44px);
+}
+.sg-rev[data-motion="on"] .sg-rev-grid:not(.is-in) .sg-rev-spot {
+  opacity: 0;
+  transform: translateX(44px);
+}
+.sg-rev[data-motion="on"] .sg-rev-grid.is-in .sg-rev-score,
+.sg-rev[data-motion="on"] .sg-rev-grid.is-in .sg-rev-spot {
+  transition: opacity 0.7s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.sg-rev[data-motion="on"] .sg-rev-grid.is-in .sg-rev-spot {
+  transition-delay: 0.08s;
+}
+.sg-rev[data-motion="on"] .sg-rev-grid:not(.is-in) .sg-rev-stars .sg-rev-starfill {
+  transform: scaleX(0);
+}
+.sg-rev[data-motion="on"] .sg-rev-grid.is-in .sg-rev-stars .sg-rev-starfill {
+  transition: transform 1.3s cubic-bezier(0.33, 1, 0.68, 1);
+}
+/* Stacked: the scoreboard becomes a strip, figure left, stars and count
+   right, the button underneath. */
+@media (max-width: 980px) {
+  .sg-rev-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .sg-rev-score {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "label label"
+      "big stars"
+      "big basis"
+      "act act";
+    column-gap: 28px;
+    padding: 30px 30px 28px;
+  }
+  .sg-rev-label {
+    grid-area: label;
+  }
+  .sg-rev-big {
+    grid-area: big;
+    align-self: center;
+    margin-top: 20px;
+  }
+  .sg-rev-stars {
+    grid-area: stars;
+    align-self: end;
+    margin-top: 20px;
+  }
+  .sg-rev-basis {
+    grid-area: basis;
+    align-self: start;
+    margin-top: 8px;
+  }
+  .sg-rev-actions {
+    grid-area: act;
+    padding-top: 26px;
+  }
+}
+@media (max-width: 720px) {
+  .sg-rev-score {
+    padding: 26px 24px 24px;
+  }
+  .sg-rev-spot {
+    padding: 28px 24px 20px;
+  }
+  .sg-rev-glyph {
+    width: 36px;
+    height: 28px;
+  }
+  .sg-rev-slides {
+    margin-top: 20px;
+  }
+  .sg-rev-quote--l {
+    font-size: clamp(20px, 5.6vw, 26px);
+  }
+  .sg-rev-quote--m {
+    font-size: clamp(18px, 4.8vw, 22px);
+  }
+  .sg-rev-quote--s {
+    font-size: clamp(16.5px, 4.3vw, 19px);
+  }
+  .sg-rev-by {
+    padding-top: 24px;
+  }
+  .sg-rev-ctrl {
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+}
+/* Small phones: the timer bar takes its own row above the count and buttons. */
+@media (max-width: 480px) {
+  .sg-rev-score {
+    column-gap: 20px;
+  }
+  .sg-rev-big {
+    font-size: clamp(54px, 17vw, 76px);
+  }
+  .sg-rev-stars {
+    width: 108px;
+    height: 18px;
+  }
+  .sg-rev-ctrl {
+    flex-wrap: wrap;
+    row-gap: 16px;
+  }
+  .sg-rev-track {
+    order: -1;
+    flex: 1 0 100%;
+  }
+  .sg-rev-count {
+    margin-right: auto;
+  }
+}
 /* ------------------------------- Selected work (scroll-stacked case cards)
    The stack is pure CSS: every card is sticky at the same offset, so later
    cards scroll up and over the pinned one. The scale/blur depth cue is applied
@@ -1522,9 +1939,10 @@
   font-weight: 700;
 }
 /* Visually hidden, still read: the full sentence behind a figure that is
-   drawn for sighted readers (scorecard gauges, the live-site link's "opens in
-   a new tab"). */
-.oeo-sr {
+   drawn for sighted readers (scorecard gauges, star ratings, a link's "opens
+   in a new tab"). */
+.oeo-sr,
+.sg-sr {
   position: absolute;
   width: 1px;
   height: 1px;
