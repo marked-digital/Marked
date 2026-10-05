@@ -11,6 +11,8 @@ import { ArrowIcon, CountUp, MarkLogo, ScrollGlobe, Swap, useInView, useMagnetic
 import { ExpansionPlanner, GrowthCalc, WorkflowField } from "@/components/interactive";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import SiteFooter from "@/components/site-footer";
+import Reviews from "@/components/home-reviews";
+import type { ReviewFeed } from "@/lib/reviews";
 
 function Nav() {
   return (
@@ -494,7 +496,7 @@ function Footer() {
   return <SiteFooter />;
 }
 
-export default function HomeSignal() {
+export default function HomeSignal({ reviews }: { reviews: ReviewFeed }) {
   const root = useReveal<HTMLDivElement>();
   return (
     <div className="sg" ref={root}>
@@ -502,6 +504,7 @@ export default function HomeSignal() {
       <Hero />
       <SelectedWork />
       <Services />
+      <Reviews feed={reviews} />
       <Architecture />
       <Interactive />
       <Approach />
