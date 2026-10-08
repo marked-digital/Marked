@@ -6,11 +6,11 @@
 //     body, word for word. The page shows the first nine and a "Show all"
 //     toggle reveals the rest; all 46 are in the server HTML.
 //   · the four year-over-year results (results.items): revenue +1,183%,
-//     orders +618%, sessions +1,400%, qualified leads +713%
+//     orders +944%, sessions +938%, qualified leads +1,026% (+1,025.8%,
+//     shown to the whole percent like the others)
 //
-// Revenue (+1,183%) compares Jan to Sep 2026 with the same months in 2025,
-// from the client's sales report. Orders, sessions and qualified leads still
-// compare Jan to Jul; each result's `sub` names its window. Revenue is the
+// All four compare Jan to Sep 2026 with the same months in 2025, from the
+// client's reports; each result's `sub` names its window. Revenue is the
 // single headline number and must read the same in the hero, the results grid,
 // the revenue chart and the homepage work slider (lib/md.ts → WORK[0].metric).
 // The client's dollar figures stay out of this file: the repo is public.
@@ -330,10 +330,9 @@ export const OEO: CaseStudy = {
     // REAL: all four figures are client-reported, year over year.
     items: [
       { label: "REVENUE", value: 1183, prefix: "+", suffix: "%", sub: "Jan to Sep 2026 vs. 2025, all markets", lead: true },
-      { label: "ORDERS", value: 618, prefix: "+", suffix: "%", sub: "Course enrolments, Jan to Jul 2026 vs. 2025" },
-      // Same figure as +1,400%, abbreviated: the full form overflowed its cell.
-      { label: "SESSIONS", value: 1.4, prefix: "+", suffix: "K%", decimals: 1, sub: "Sitewide traffic, Jan to Jul 2026 vs. 2025" },
-      { label: "QUALIFIED LEADS", value: 713, prefix: "+", suffix: "%", sub: "Marketing-qualified, Jan to Jul 2026 vs. 2025" },
+      { label: "ORDERS", value: 944, prefix: "+", suffix: "%", sub: "Course enrolments, Jan to Sep 2026 vs. 2025" },
+      { label: "SESSIONS", value: 938, prefix: "+", suffix: "%", sub: "Sitewide traffic, Jan to Sep 2026 vs. 2025" },
+      { label: "QUALIFIED LEADS", value: 1026, prefix: "+", suffix: "%", sub: "Marketing-qualified, Jan to Sep 2026 vs. 2025" },
     ],
   },
 
@@ -380,7 +379,7 @@ export const OEO: CaseStudy = {
 
   split: {
     kicker: "/ 04 · Traffic",
-    heading: "Sessions up 1,400% YoY.",
+    heading: "Sessions up 938% YoY.",
     body: "Paid search and social opened the new markets. Organic and email keep compounding them. International traffic went from 4% of sessions to the majority inside seven months.",
     // PLACEHOLDER: market split and the at-start footnote.
     primary: {
