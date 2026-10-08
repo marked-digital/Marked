@@ -1,0 +1,22 @@
+/* The brief's "Show all" toggle (components/show-all.tsx). Only what the toggle
+   needs: the cards and the grid keep their own styles from app/marked.css. */
+
+/* Collapsed: cards past the first few stay in the HTML, out of view. */
+.grid[data-collapsed] > [data-more] {
+  display: none;
+}
+
+/* The case study's focus ring, for keyboard focus only: on the card that takes
+   focus when the grid expands, and on the button. */
+.grid > :focus-visible,
+.toggle:focus-visible {
+  outline: 2px solid #1fa85f;
+  outline-offset: 4px;
+}
+
+/* Below the grid. overflow-anchor: none stops the browser from pinning the view
+   to the button while the cards above it expand. */
+.bar {
+  margin-top: 28px;
+  overflow-anchor: none;
+}
