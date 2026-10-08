@@ -380,7 +380,7 @@ export const OEO: CaseStudy = {
   split: {
     kicker: "/ 04 · Traffic",
     heading: "Sessions up 938% YoY.",
-    body: "Paid search and social opened the new markets. Organic and email keep compounding them. International traffic went from 4% of sessions to the majority inside seven months.",
+    body: "Paid search and social opened the new markets. Organic and email keep compounding them.",
     // PLACEHOLDER: market split and the at-start footnote.
     primary: {
       label: "Sessions by market",
@@ -431,7 +431,7 @@ export const OEO: CaseStudy = {
   shipped: {
     kicker: "/ 06 · Shipped",
     // PLACEHOLDER: build count and card names.
-    heading: "26 page builds in seven months.",
+    heading: "26 page builds in nine months.",
     body: "Every course launch, market and campaign got its own page, designed, shipped and instrumented by the same team.",
     scrollHint: "Scroll →",
     more: { count: 19, label: "More pages" },
