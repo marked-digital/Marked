@@ -32,8 +32,8 @@ export const OEO: CaseStudy = {
   // Engagement began January 2026; this date drives the chart marker too.
   timeline: "Since Jan 2026",
 
-  h1: { before: "From provincial, to ", underlined: "international", after: "." },
-  sub: "Ontario Education Online had never run a digital marketing program. Nine months after launching its first one with Marked, a provincial course provider was selling to students worldwide.",
+  h1: { before: "From first search, to ", underlined: "enrolment", after: "." },
+  sub: "Ontario Education Online had never run a digital marketing program. In nine months, Marked built the whole system: search ads for every course, AI discovery that gets the school cited by ChatGPT and other assistants, a website rebuilt to convert, and tracking that shows which channels produce enrolments.",
 
   // REAL: the headline number, repeated as the first cell of results.items.
   headlineStat: { value: 1183, prefix: "+", suffix: "%", label: ["REVENUE", "YEAR OVER YEAR"] },

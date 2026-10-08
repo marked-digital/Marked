@@ -221,11 +221,11 @@ export type WorkItem = {
 
 export const WORK: WorkItem[] = [
   {
-    // Real engagement — the badges mirror the case study's hero: the market
-    // motion from its H1, the SERVICES line, and the headline YoY revenue stat.
+    // Real engagement. The badges mirror the case study's hero: the move in its
+    // H1, the SERVICES line, and the headline YoY revenue stat.
     title: "ONTARIO EDUCATION ONLINE",
     industry: "Online Educational Services",
-    tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
+    tags: ["First search → enrolment", "Digital marketing", "Web builds", "AI optimization"],
     // Must match OEO.headlineStat / OEO.results.items[0] in lib/oeo.ts.
     metric: "+1,183% revenue",
     href: "/work/ontario-education-online",
