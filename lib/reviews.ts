@@ -1,6 +1,7 @@
-// Client reviews for the homepage "In their words" section, from Marked's
-// Google Business Profile. Rendered by components/home-reviews.tsx; fetched in
-// app/page.tsx.
+// Client reviews for the "In their words" section, from Marked's Google
+// Business Profile. Rendered by components/home-reviews.tsx; fetched by each
+// page that shows it: the homepage (app/page.tsx) and the Ontario Education
+// Online case study (app/work/ontario-education-online/page.tsx).
 //
 // Two sources, one shape (ReviewFeed):
 //
@@ -10,9 +11,9 @@
 //        GBP_CLIENT_ID, GBP_CLIENT_SECRET, GBP_REFRESH_TOKEN
 //        GBP_LOCATION (optional): "accounts/…/locations/…", which skips
 //          looking up the profile's account and location
-//      The homepage rebuilds at most every 6 hours (app/page.tsx), and each
-//      rebuild fetches a fresh access token and the reviews, so visitors never
-//      wait on Google.
+//      Those pages rebuild at most every 6 hours (`revalidate` in each), and
+//      each rebuild fetches a fresh access token and the reviews, so visitors
+//      never wait on Google.
 //   2. The reviews below, copied verbatim from the profile. They're used until
 //      the API is set up, and whenever a live fetch fails, so the section
 //      never breaks.

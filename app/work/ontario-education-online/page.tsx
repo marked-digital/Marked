@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import CaseStudy from "@/components/case-study";
 import { OEO } from "@/lib/oeo";
+import { getReviews } from "@/lib/reviews";
 
 export const metadata: Metadata = {
   title: "Ontario Education Online: from first search to enrolment",
@@ -9,6 +10,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/work/ontario-education-online" },
 };
 
-export default function OntarioEducationOnline() {
-  return <CaseStudy data={OEO} />;
+// Rebuilt at most every 6 hours, like the homepage, so the reviews section
+// that closes the page picks up new Google reviews (lib/reviews.ts).
+export const revalidate = 21600;
+
+export default async function OntarioEducationOnline() {
+  const reviews = await getReviews();
+  return <CaseStudy data={OEO} reviews={reviews} />;
 }

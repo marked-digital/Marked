@@ -1,9 +1,11 @@
 "use client";
 
-// Homepage "In their words": client reviews from Marked's Google Business
-// Profile (lib/reviews.ts, fetched in app/page.tsx). A scoreboard with Google's
-// average and count sits beside a spotlight that shows one review at a time
-// and steps through them on its own.
+// "In their words": client reviews from Marked's Google Business Profile
+// (lib/reviews.ts). On the homepage after What we do (app/page.tsx), and at the
+// end of the Ontario Education Online case study in place of a client quote
+// (app/work/ontario-education-online/page.tsx), each page fetching the feed and
+// passing it in. A scoreboard with Google's average and count sits beside a
+// spotlight that shows one review at a time and steps through them on its own.
 //
 // Built for any number of reviews. All of them render into the server HTML, so
 // crawlers and answer engines read every one. They're stacked in one grid cell,
@@ -180,7 +182,18 @@ function QuoteText({ review }: { review: Review }) {
 
 /* ------------------------------------------------------------- section */
 
-export default function Reviews({ feed }: { feed: ReviewFeed }) {
+export default function Reviews({
+  feed,
+  className,
+  style = { paddingTop: 4, paddingBottom: 72, scrollMarginTop: 96 },
+}: {
+  feed: ReviewFeed;
+  /** Extra classes on the section, e.g. a page's own section spacing. */
+  className?: string;
+  /** The section's inline style. The default spaces it for the homepage,
+   *  where the section above ends on the same ground. */
+  style?: React.CSSProperties;
+}) {
   const { reviews } = feed;
   const n = reviews.length;
   const motionOK = useMotionOK();
@@ -219,9 +232,9 @@ export default function Reviews({ feed }: { feed: ReviewFeed }) {
   return (
     <section
       id="reviews"
-      className="sg-wrap sg-rev"
+      className={"sg-wrap sg-rev" + (className ? ` ${className}` : "")}
       data-motion={motionOK ? "on" : undefined}
-      style={{ paddingTop: 4, paddingBottom: 72, scrollMarginTop: 96 }}
+      style={style}
     >
       <div className="sg-sec-head">
         <h2 style={{ fontSize: 15, fontWeight: 500, color: C.accent, letterSpacing: "0.04em", margin: 0 }}>IN THEIR WORDS</h2>
