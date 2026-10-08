@@ -227,7 +227,7 @@ export const WORK: WorkItem[] = [
     industry: "Online Educational Services",
     tags: ["Provincial → international", "Digital marketing", "Web builds", "AI optimization"],
     // Must match OEO.headlineStat / OEO.results.items[0] in lib/oeo.ts.
-    metric: "+548% revenue",
+    metric: "+1,183% revenue",
     href: "/work/ontario-education-online",
     // Photo under a dark vignette, 0.77 behind the copy and 0.5 at the edges:
     // lighter than Casa Nina's because this photo is darker to begin with. With

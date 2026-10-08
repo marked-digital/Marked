@@ -159,7 +159,7 @@ export type CaseStudy = {
      *  accent line and its gradient area start here. */
     engagementIndex: number;
     markerLabel: string;
-    /** Label pinned to the final point, e.g. "+548%" or "$20.9M". */
+    /** Label pinned to the final point, e.g. "+1,183%" or "$20.9M". */
     endLabel: string;
     /** Horizontal reference lines, in index units. The largest one sets the
      *  vertical scale; points above it use the chart's headroom. */

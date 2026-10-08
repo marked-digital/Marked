@@ -516,6 +516,11 @@ function Results({ d }: { d: CaseStudyData }) {
 const CH = { w: 1000, h: 388, base: 340, top: 66 };
 const yFor = (v: number, max: number) => CH.base - (v * (CH.base - CH.top)) / max;
 const xFor = (i: number, n: number) => (i * CH.w) / (n - 1);
+// Baseline of the marker label, near the top of the plot.
+const MARKER_Y = 66;
+// Chart units as a share of the plot box, for the HTML copies of the labels.
+const pctX = (x: number) => `${(x / CH.w) * 100}%`;
+const pctY = (y: number) => `${(y / CH.h) * 100}%`;
 
 // Always the first section of the tinted run when it renders, so it never joins.
 function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
@@ -555,54 +560,88 @@ function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
             <span>{chartHead}</span>
             <span>{rangeLabel}</span>
           </div>
-          <svg viewBox={`0 0 ${CH.w} ${CH.h}`} role="img" aria-label={ariaLabel}>
-            <defs>
-              <linearGradient id="oeoRev" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor={C.accent} stopOpacity="0.22" />
-                <stop offset="1" stopColor={C.accent} stopOpacity="0" />
-              </linearGradient>
-            </defs>
+          <div className="oeo-chart-plot">
+            <svg viewBox={`0 0 ${CH.w} ${CH.h}`} preserveAspectRatio="none" role="img" aria-label={ariaLabel}>
+              <defs>
+                <linearGradient id="oeoRev" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor={C.accent} stopOpacity="0.22" />
+                  <stop offset="1" stopColor={C.accent} stopOpacity="0" />
+                </linearGradient>
+              </defs>
 
-            {gridlines.map((g) => (
-              <line key={g} x1="0" y1={yAt(g)} x2={CH.w} y2={yAt(g)} style={{ stroke: C.line }} />
-            ))}
-            <line x1="0" y1={CH.base} x2={CH.w} y2={CH.base} style={{ stroke: "rgba(255,255,255,0.16)" }} />
-            {gridlines.map((g) => (
-              <text key={g} x="0" y={yAt(g) - 8} style={{ ...mono, fontSize: 12, fill: C.faint }}>
-                {g}
+              {gridlines.map((g) => (
+                <line key={g} x1="0" y1={yAt(g)} x2={CH.w} y2={yAt(g)} style={{ stroke: C.line }} />
+              ))}
+              <line x1="0" y1={CH.base} x2={CH.w} y2={CH.base} style={{ stroke: "rgba(255,255,255,0.16)" }} />
+              {gridlines.map((g) => (
+                <text key={g} x="0" y={yAt(g) - 8} style={{ ...mono, fontSize: 12, fill: C.faint }}>
+                  {g}
+                </text>
+              ))}
+
+              <line x1={markerX} y1="40" x2={markerX} y2={CH.base} style={{ stroke: C.faint, strokeDasharray: "3 7" }} />
+              <text x={markerX + 11} y={MARKER_Y} style={{ ...mono, fontSize: 11.5, letterSpacing: "0.14em", fill: C.accent, fontWeight: 600 }}>
+                {markerLabel}
               </text>
-            ))}
 
-            <line x1={markerX} y1="40" x2={markerX} y2={CH.base} style={{ stroke: C.faint, strokeDasharray: "3 7" }} />
-            <text x={markerX + 11} y="66" style={{ ...mono, fontSize: 11.5, letterSpacing: "0.14em", fill: C.accent, fontWeight: 600 }}>
-              {markerLabel}
-            </text>
+              <path data-fade data-delay={1000} d={areaD} style={{ fill: "url(#oeoRev)" }} />
+              <path data-draw data-delay={200} d={preD} style={{ fill: "none", stroke: C.faint, strokeWidth: 2.5 }} />
+              <path data-draw data-delay={600} d={postD} style={{ fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinejoin: "round" }} />
 
-            <path data-fade data-delay={1000} d={areaD} style={{ fill: "url(#oeoRev)" }} />
-            <path data-draw data-delay={200} d={preD} style={{ fill: "none", stroke: C.faint, strokeWidth: 2.5 }} />
-            <path data-draw data-delay={600} d={postD} style={{ fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinejoin: "round" }} />
-
-            {baseLabel ? (
-              <text x={markerX + 11} y={yAt(series[ei].value) + 26} style={{ ...mono, fontSize: 12, fill: C.faint }}>
-                {baseLabel}
+              {/* Above the flat baseline, left of the marker: the rising line
+                  fills the space to the right, and on a tall scale the base value
+                  sits too close to the axis for a label underneath. */}
+              {baseLabel ? (
+                <text x={markerX - 11} y={yAt(series[ei].value) - 12} textAnchor="end" style={{ ...mono, fontSize: 12, fill: C.faint }}>
+                  {baseLabel}
+                </text>
+              ) : null}
+              <circle className="oeo-pulse" cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
+              <circle cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
+              <text x={CH.w - 10} y={yAt(last.value) - 19} textAnchor="end" style={{ ...mono, fontSize: 13, fontWeight: 600, fill: C.text }}>
+                {endLabel}
               </text>
-            ) : null}
-            <circle className="oeo-pulse" cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
-            <circle cx={CH.w} cy={yAt(last.value)} r="5.5" style={{ fill: C.accent }} />
-            <text x={CH.w - 10} y={yAt(last.value) - 19} textAnchor="end" style={{ ...mono, fontSize: 13, fontWeight: 600, fill: C.text }}>
-              {endLabel}
-            </text>
 
-            <text x="0" y="380" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
-              {series[0].label}
-            </text>
-            <text x={markerX} y="380" textAnchor="middle" style={{ ...mono, fontSize: 11.5, fill: C.accent }}>
-              {series[ei].label}
-            </text>
-            <text x={CH.w} y="380" textAnchor="end" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
-              {last.label}
-            </text>
-          </svg>
+              <text x="0" y="380" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
+                {series[0].label}
+              </text>
+              <text x={markerX} y="380" textAnchor="middle" style={{ ...mono, fontSize: 11.5, fill: C.accent }}>
+                {series[ei].label}
+              </text>
+              <text x={CH.w} y="380" textAnchor="end" style={{ ...mono, fontSize: 11.5, fill: C.faint }}>
+                {last.label}
+              </text>
+            </svg>
+            {/* Below 900px the SVG has scaled down with the card, and its text
+                with it, to about 4px on a phone. These copies of the labels
+                hold a fixed size at the same chart coordinates, placed as
+                percentages of the plot; marked.css shows one set or the other.
+                The SVG's aria-label already describes the chart. */}
+            <div className="oeo-chart-labels" aria-hidden="true">
+              {gridlines.map((g) => (
+                <span key={g} className="oeo-cl oeo-cl--grid" style={{ top: pctY(yAt(g)) }}>
+                  {g}
+                </span>
+              ))}
+              <span className="oeo-cl oeo-cl--marker" style={{ left: pctX(markerX), top: pctY(MARKER_Y) }}>
+                {markerLabel}
+              </span>
+              {baseLabel ? (
+                <span className="oeo-cl oeo-cl--base" style={{ left: pctX(markerX), top: pctY(yAt(series[ei].value)) }}>
+                  {baseLabel}
+                </span>
+              ) : null}
+              <span className="oeo-cl-dot" style={{ top: pctY(yAt(last.value)) }} />
+              <span className="oeo-cl oeo-cl--end" style={{ top: pctY(yAt(last.value)) }}>
+                {endLabel}
+              </span>
+              <span className="oeo-cl oeo-cl--x">{series[0].label}</span>
+              <span className="oeo-cl oeo-cl--x oeo-cl--mid" style={{ left: pctX(markerX) }}>
+                {series[ei].label}
+              </span>
+              <span className="oeo-cl oeo-cl--x oeo-cl--last">{last.label}</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

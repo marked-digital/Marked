@@ -2024,8 +2024,10 @@
   height: 0.2em;
   overflow: visible;
 }
+/* The floor eases below ~355px (18vw) so a seven-character figure like
+   "+1,183%" still fits a 320px phone; wider screens are unchanged. */
 .oeo-hero-stat {
-  font-size: clamp(64px, 8vw, 118px);
+  font-size: clamp(min(64px, 18vw), 8vw, 118px);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -2128,12 +2130,13 @@
   background: #0a0b0a;
   padding: 40px 30px;
 }
-/* Sized to the widest stat ("+1.4K%") against the narrowest cell the 4-up grid
-   produces at the 1240px container — the reference's 64px step overflowed every
-   cell, not just the long one. */
+/* Sized to the widest stat ("+1,183%") against the narrowest cell the 4-up
+   grid produces at the 1240px container. The cells stop growing there while
+   3.5vw keeps going, so the cap holds the widest figure inside its cell; the
+   reference's 64px step overflowed every cell, not just the long one. */
 .oeo-stat {
   margin-top: 14px;
-  font-size: clamp(38px, 3.5vw, 54px);
+  font-size: clamp(38px, 3.5vw, 50px);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -2166,14 +2169,119 @@
   letter-spacing: 0.16em;
   color: #5c625b;
 }
-/* Direct child only: the scorecard reuses this card and draws its gauges in
-   SVGs of their own. */
-.oeo-chart-card > svg {
+/* The revenue chart's plot: its SVG, plus HTML copies of the labels for
+   narrow screens (RevenueChart in components/case-study.tsx). */
+.oeo-chart-plot {
+  position: relative;
+  margin-top: 26px;
+}
+.oeo-chart-plot > svg {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
-  margin-top: 26px;
+}
+.oeo-chart-labels,
+.oeo-cl-dot {
+  display: none;
+}
+/* Below 980px the SVG's own text has shrunk with the card (to about 4px on a
+   phone), so it gives way to the HTML copies, which keep a fixed size at the
+   same chart coordinates. Each copy is offset from its point the way the SVG
+   text is. */
+@media (max-width: 979px) {
+  .oeo-chart-plot svg text {
+    display: none;
+  }
+  .oeo-chart-labels {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    color: #5c625b;
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+    line-height: 1;
+  }
+  .oeo-cl {
+    position: absolute;
+    white-space: nowrap;
+  }
+  .oeo-cl--grid {
+    left: 0;
+    transform: translateY(calc(-100% - 6px));
+  }
+  /* Wraps onto a second line when the space between the marker and the end
+     dot runs out (a long label on a narrow phone). The first line keeps the
+     SVG text's baseline; a second one grows downward, away from the end
+     label. */
+  .oeo-cl--marker {
+    right: 14px;
+    margin-left: 10px;
+    white-space: normal;
+    line-height: 1.25;
+    transform: translateY(-1em);
+    color: #1fa85f;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+  .oeo-cl--base {
+    transform: translate(calc(-100% - 10px), calc(-100% - 9px));
+  }
+  .oeo-cl--end {
+    right: 0;
+    transform: translateY(calc(-100% - 13px));
+    color: #f3f5f2;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .oeo-cl--x {
+    left: 0;
+    bottom: 0;
+  }
+  .oeo-cl--mid {
+    transform: translateX(-50%);
+    color: #1fa85f;
+  }
+  .oeo-cl--last {
+    left: auto;
+    right: 0;
+  }
+}
+/* Phones: at 1000:388 the plot would be about 110px tall, so it stretches
+   taller (the SVG's preserveAspectRatio is "none"; above this it keeps its
+   own proportions). Strokes keep their width while it stretches, and the end
+   dot is drawn in HTML so it stays round. */
+@media (max-width: 600px) {
+  .oeo-chart-plot > svg {
+    height: clamp(200px, 56vw, 280px);
+  }
+  .oeo-chart-plot svg path,
+  .oeo-chart-plot svg line {
+    vector-effect: non-scaling-stroke;
+  }
+  .oeo-chart-plot svg circle {
+    display: none;
+  }
+  .oeo-cl-dot {
+    display: block;
+    position: absolute;
+    right: 0;
+    width: 11px;
+    height: 11px;
+    margin: -5.5px -5.5px 0 0;
+    border-radius: 50%;
+    background: #1fa85f;
+  }
+  .oeo-cl-dot::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: inherit;
+    animation: oeo-pulse 2.2s ease-out infinite;
+  }
 }
 .oeo-pulse {
   transform-box: fill-box;
@@ -2201,15 +2309,12 @@
   margin-top: 18px;
 }
 /* When the two head lines don't fit side by side, the date drops under the
-   left line instead of either one breaking mid-phrase. (Scorecard and finding
-   cards only, so the revenue chart is unchanged.) */
-.oeo-score > .oeo-chart-head,
-.oeo-checks-card > .oeo-chart-head {
+   left line instead of either one breaking mid-phrase. */
+.oeo-chart-card > .oeo-chart-head {
   flex-wrap: wrap;
   row-gap: 6px;
 }
-.oeo-score > .oeo-chart-head > :last-child,
-.oeo-checks-card > .oeo-chart-head > :last-child {
+.oeo-chart-card > .oeo-chart-head > :last-child {
   white-space: nowrap;
 }
 .oeo-gauges {
@@ -2685,7 +2790,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .oeo-cue > i,
-  .oeo-pulse {
+  .oeo-pulse,
+  .oeo-cl-dot::before {
     animation: none;
   }
   .oeo-card,
