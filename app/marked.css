@@ -2024,8 +2024,10 @@
   height: 0.2em;
   overflow: visible;
 }
+/* The floor eases below ~355px (18vw) so a seven-character figure like
+   "+1,183%" still fits a 320px phone; wider screens are unchanged. */
 .oeo-hero-stat {
-  font-size: clamp(64px, 8vw, 118px);
+  font-size: clamp(min(64px, 18vw), 8vw, 118px);
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -2128,12 +2130,13 @@
   background: #0a0b0a;
   padding: 40px 30px;
 }
-/* Sized to the widest stat ("+1.4K%") against the narrowest cell the 4-up grid
-   produces at the 1240px container — the reference's 64px step overflowed every
-   cell, not just the long one. */
+/* Sized to the widest stat ("+1,183%") against the narrowest cell the 4-up
+   grid produces at the 1240px container. The cells stop growing there while
+   3.5vw keeps going, so the cap holds the widest figure inside its cell; the
+   reference's 64px step overflowed every cell, not just the long one. */
 .oeo-stat {
   margin-top: 14px;
-  font-size: clamp(38px, 3.5vw, 54px);
+  font-size: clamp(38px, 3.5vw, 50px);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;

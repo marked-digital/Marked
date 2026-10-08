@@ -3,13 +3,15 @@
 //
 // REAL, client-provided. Do not reword without sign-off:
 //   · the four objective titles (brief.objectives[].title)
-//   · the four year-over-year results (results.items): revenue +548%,
+//   · the four year-over-year results (results.items): revenue +1,183%,
 //     orders +618%, sessions +1,400%, qualified leads +713%
 //
-// The reporting window for every YoY figure is Jan to Jul 2026 vs. the same
-// months in 2025. Revenue (+548%) is the single headline number and must read
-// the same in the hero, the results grid, the revenue chart and the homepage
-// work slider (lib/md.ts → WORK[0].metric).
+// Revenue (+1,183%) compares Jan to Sep 2026 with the same months in 2025,
+// from the client's sales report. Orders, sessions and qualified leads still
+// compare Jan to Jul; each result's `sub` names its window. Revenue is the
+// single headline number and must read the same in the hero, the results grid,
+// the revenue chart and the homepage work slider (lib/md.ts → WORK[0].metric).
+// The client's dollar figures stay out of this file: the repo is public.
 //
 // PLACEHOLDER. Everything else numeric on the page lives in this file and is
 // marked below — the revenue series, the market/channel splits, the platform
@@ -29,10 +31,10 @@ export const OEO: CaseStudy = {
   timeline: "Since Jan 2026",
 
   h1: { before: "From provincial, to ", underlined: "international", after: "." },
-  sub: "Ontario Education Online had never run a digital marketing program. Seven months after launching its first one with Marked, a provincial course provider was selling to students worldwide.",
+  sub: "Ontario Education Online had never run a digital marketing program. Nine months after launching its first one with Marked, a provincial course provider was selling to students worldwide.",
 
   // REAL — the headline number, repeated as the first cell of results.items.
-  headlineStat: { value: 548, prefix: "+", suffix: "%", label: ["REVENUE", "YEAR OVER YEAR"] },
+  headlineStat: { value: 1183, prefix: "+", suffix: "%", label: ["REVENUE", "YEAR OVER YEAR"] },
   scrollCue: "Scroll to the brief",
 
   brief: {
@@ -69,38 +71,39 @@ export const OEO: CaseStudy = {
 
   results: {
     kicker: "/ 02 · The results",
-    heading: "Seven months in.",
+    heading: "Nine months in.",
     // REAL — all four figures are client-reported, year over year.
     items: [
-      { label: "REVENUE", value: 548, prefix: "+", suffix: "%", sub: "Jan to Jul 2026 vs. 2025, all markets", lead: true },
+      { label: "REVENUE", value: 1183, prefix: "+", suffix: "%", sub: "Jan to Sep 2026 vs. 2025, all markets", lead: true },
       { label: "ORDERS", value: 618, prefix: "+", suffix: "%", sub: "Course enrolments, Jan to Jul 2026 vs. 2025" },
       // Same figure as +1,400%, abbreviated: the full form overflowed its cell.
-      { label: "SESSIONS", value: 1.4, prefix: "+", suffix: "K%", decimals: 1, sub: "Sitewide traffic, year over year" },
-      { label: "QUALIFIED LEADS", value: 713, prefix: "+", suffix: "%", sub: "Marketing-qualified, year over year" },
+      { label: "SESSIONS", value: 1.4, prefix: "+", suffix: "K%", decimals: 1, sub: "Sitewide traffic, Jan to Jul 2026 vs. 2025" },
+      { label: "QUALIFIED LEADS", value: 713, prefix: "+", suffix: "%", sub: "Marketing-qualified, Jan to Jul 2026 vs. 2025" },
     ],
   },
 
   revenue: {
     kicker: "/ 03 · Revenue",
-    // REAL — +548% between Jan 2026 and Jul 2026, the engagement to date. Same
-    // number as the headline stat and results.items[0]; the chart must not tell
-    // a different story from the grid above it.
-    heading: "Revenue up 548% in seven months.",
-    body: "The first campaigns went live in January, the course pages were rebuilt through the spring, and AI optimization went on top of both. By July, monthly revenue was running at 6.5 times its pre-engagement baseline.",
+    // REAL — +1,183%, Jan to Sep 2026 vs. the same months in 2025 (12.8 times
+    // the revenue). Same number as the headline stat and results.items[0]; the
+    // chart must not tell a different story from the grid above it.
+    heading: "Revenue up 1,183% year over year.",
+    body: "The first campaigns went live in January, the course pages were rebuilt through the spring, and AI optimization went on top of both. January to September brought in 12.8 times the revenue of the same months in 2025.",
     chartHead: "Online revenue, indexed. Engagement start = 100",
-    rangeLabel: "JUL 2025 TO JUL 2026",
+    rangeLabel: "JUL 2025 TO SEP 2026",
     ariaLabel:
-      "Monthly online revenue indexed to 100 at the January 2026 engagement start, July 2025 to July 2026, rising to +548% by July 2026.",
+      "Monthly online revenue indexed to 100 at the January 2026 engagement start, July 2025 to September 2026, rising to +1,183% by September 2026.",
     // Indexed, not absolute — 100 is the monthly run rate at engagement start
     // (Jan 2026, index 6). Everything before it is the flat baseline. The final
-    // point is 648, i.e. +548% — it must stay consistent with `endLabel`. To
-    // publish real figures, keep them indexed: divide each month by the
-    // Jan 2026 month and multiply by 100.
+    // point is 1283, i.e. +1,183% — it must stay consistent with `endLabel`.
+    // PLACEHOLDER — the months in between are illustrative. To publish real
+    // figures, keep them indexed: divide each month by the Jan 2026 month and
+    // multiply by 100.
     baseLabel: "INDEX 100",
     engagementIndex: 6,
     markerLabel: "ENGAGEMENT BEGINS",
-    endLabel: "+548%",
-    gridlines: [200, 400, 600],
+    endLabel: "+1,183%",
+    gridlines: [400, 800, 1200],
     series: [
       { label: "JUL '25", value: 96 },
       { label: "AUG '25", value: 100 },
@@ -115,6 +118,8 @@ export const OEO: CaseStudy = {
       { label: "MAY '26", value: 352 },
       { label: "JUN '26", value: 476 },
       { label: "JUL '26", value: 648 },
+      { label: "AUG '26", value: 905 },
+      { label: "SEP '26", value: 1283 },
     ],
   },
 

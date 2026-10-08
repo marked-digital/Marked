@@ -582,8 +582,11 @@ function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
             <path data-draw data-delay={200} d={preD} style={{ fill: "none", stroke: C.faint, strokeWidth: 2.5 }} />
             <path data-draw data-delay={600} d={postD} style={{ fill: "none", stroke: C.accent, strokeWidth: 3.5, strokeLinejoin: "round" }} />
 
+            {/* Above the flat baseline, left of the marker: the rising line
+                fills the space to the right, and on a tall scale the base value
+                sits too close to the axis for a label underneath. */}
             {baseLabel ? (
-              <text x={markerX + 11} y={yAt(series[ei].value) + 26} style={{ ...mono, fontSize: 12, fill: C.faint }}>
+              <text x={markerX - 11} y={yAt(series[ei].value) - 12} textAnchor="end" style={{ ...mono, fontSize: 12, fill: C.faint }}>
                 {baseLabel}
               </text>
             ) : null}
