@@ -14,7 +14,9 @@
 // Roadpost and then Casa Nina Flamingo, which is why the stylesheet block in
 // app/marked.css still carries the `.oeo-` prefix. Same classes, every page.
 
-export type Objective = { n: string; title: string; body: string };
+/** A card in the brief. `group` is optional: with one, the card's eyebrow
+ *  reads "/ 02 · AI Search"; without, just "/ 02". */
+export type Objective = { n: string; group?: string; title: string; body: string };
 
 export type Result = {
   label: string;
@@ -22,10 +24,10 @@ export type Result = {
   value: number;
   prefix?: string;
   suffix?: string;
-  /** Decimal places to hold while counting — e.g. 1 for "$20.9M". */
+  /** Decimal places to hold while counting, e.g. 1 for "$20.9M". */
   decimals?: number;
   sub: string;
-  /** Accent-tinted headline cell — the lead figure opens the grid. */
+  /** Accent-tinted headline cell: the lead figure opens the grid. */
   lead?: boolean;
 };
 
@@ -33,14 +35,14 @@ export type Result = {
  * One point on the revenue chart, indexed rather than absolute. Publishing a
  * client's real monthly dollars is rarely allowed; the index carries the same
  * shape and growth rate without disclosing them. `label` is the axis tick
- * (a month, a quarter, a fiscal period — whatever the series is cut by).
+ * (a month, a quarter, a fiscal period: whatever the series is cut by).
  */
 export type SeriesPoint = { label: string; value: number };
 
 export type Bar = { label: string; pct: number; note?: string };
 
 /** A titled set of bars. `pct` sets the bar width, so every value has to be
- *  0–100: shares of a total work, growth rates only if they stay under 100. */
+ *  0 to 100: shares of a total work, growth rates only if they stay under 100. */
 export type BarGroup = { label: string; bars: Bar[]; footnote?: string };
 
 /** A platform on the case study's stack. A name resolves against STACK_TOOLS
@@ -59,7 +61,7 @@ export type Platform =
   | { name: string; role?: string; color?: string; mono?: string; icon?: string; localLogo?: string };
 
 /** A shipped page or project. Drop a screenshot path into `image` and it
- *  replaces the schematic thumbnail — production needs ~500×380 @2x for the
+ *  replaces the schematic thumbnail; production needs ~500×380 @2x for the
  *  250×190 slot. */
 export type PageBuild = {
   name: string;
@@ -147,7 +149,7 @@ export type CaseStudy = {
     body: string;
     /** Top-left line inside the chart card, stating what the index means. */
     chartHead: string;
-    /** Top-right line inside the chart card — the period covered. */
+    /** Top-right line inside the chart card: the period covered. */
     rangeLabel: string;
     /** Full sentence describing the chart for screen readers. */
     ariaLabel: string;

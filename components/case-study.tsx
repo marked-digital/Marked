@@ -7,7 +7,7 @@
 //   /work/casa-nina-flamingo       → lib/casa-nina.ts
 //
 // Built from the design handoff in `design_handoff_oeo_case_study`. Structure,
-// section order and behaviour follow the reference; none of its styling does —
+// section order and behaviour follow the reference; none of its styling does:
 // every colour, type step and surface comes from the Signal tokens in lib/md.ts
 // and the `.oeo` block in app/marked.css, which documents the mapping. That
 // block keeps its original prefix now that the template is shared: same
@@ -18,17 +18,20 @@
 //
 // Motion is progressive enhancement, the way the reference does it: the markup
 // carries the final values, and the effect below sets the initial states on
-// mount and animates them in on intersect. With JS off — or reduced motion on —
+// mount and animates them in on intersect. With JS off, or reduced motion on,
 // the page renders complete and static. Nothing here is load-bearing for
 // legibility. The effect mutates inline styles directly, which is safe because
 // this tree never re-renders: the only stateful pieces are the isolated
-// <CountStat> spans and the uncontrolled comparison slider.
+// <CountStat> spans, the uncontrolled comparison slider, and the brief's
+// <ShowAll> toggle, which re-renders only its own wrapper and button (the
+// cards come in as children, so React leaves them alone).
 
 import React from "react";
 import Link from "next/link";
 import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { ArrowIcon, MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import SiteFooter from "@/components/site-footer";
+import ShowAll from "@/components/show-all";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import type { BarGroup, CaseStudy as CaseStudyData, PageBuild, Platform } from "@/lib/case-study";
 
@@ -276,7 +279,7 @@ function Nav() {
   );
 }
 
-// The shared footer (components/site-footer.tsx) — same on every page.
+// The shared footer (components/site-footer.tsx): same on every page.
 function Footer() {
   return <SiteFooter />;
 }
@@ -367,8 +370,40 @@ function Hero({ d }: { d: CaseStudyData }) {
 
 /* ------------------------------------------------------------ 01 the brief */
 
+// How many brief cards show before "Show all". A list this long or shorter
+// renders as a plain grid with no toggle.
+const BRIEF_VISIBLE = 9;
+
 function Objectives({ d }: { d: CaseStudyData }) {
   const b = d.brief;
+  const long = b.objectives.length > BRIEF_VISIBLE;
+  // Past the first BRIEF_VISIBLE, cards carry data-more (hidden while the grid
+  // is collapsed) and the first of them takes focus when it expands. In a long
+  // list the reveal staggers across each row of three rather than down the
+  // whole list, which would hold card 46 back by 3.6s.
+  const cards = b.objectives.map((o, i) => (
+    <div
+      key={o.n}
+      data-rev
+      data-delay={(long ? i % 3 : i) * 80}
+      data-more={long && i >= BRIEF_VISIBLE ? "" : undefined}
+      tabIndex={long && i === BRIEF_VISIBLE ? -1 : undefined}
+      className="oeo-card"
+    >
+      {/* "/ 02 · AI Search", in the case it's written: with a group the
+          eyebrow drops .oeo-mono's uppercase. Number-only eyebrows are
+          unchanged. */}
+      <div
+        className="oeo-mono"
+        style={o.group ? { fontSize: 13, fontWeight: 600, color: C.accent, textTransform: "none" } : { fontSize: 13, fontWeight: 600, color: C.accent }}
+      >
+        / {o.n}
+        {o.group ? ` · ${o.group}` : null}
+      </div>
+      <h3 style={{ fontSize: 20, fontWeight: 700, margin: "16px 0 10px", letterSpacing: "-0.01em" }}>{o.title}</h3>
+      <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: C.muted }}>{o.body}</p>
+    </div>
+  ));
   return (
     <section className="oeo-sec oeo-sec--tint">
       <div className="oeo-wrap">
@@ -381,17 +416,13 @@ function Objectives({ d }: { d: CaseStudyData }) {
             {b.lede}
           </p>
         </div>
-        <div className="oeo-cards">
-          {b.objectives.map((o, i) => (
-            <div key={o.n} data-rev data-delay={i * 80} className="oeo-card">
-              <div className="oeo-mono" style={{ fontSize: 13, fontWeight: 600, color: C.accent }}>
-                / {o.n}
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, margin: "16px 0 10px", letterSpacing: "-0.01em" }}>{o.title}</h3>
-              <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: C.muted }}>{o.body}</p>
-            </div>
-          ))}
-        </div>
+        {long ? (
+          <ShowAll id="brief-cards" first={BRIEF_VISIBLE} className="oeo-cards">
+            {cards}
+          </ShowAll>
+        ) : (
+          <div className="oeo-cards">{cards}</div>
+        )}
       </div>
     </section>
   );
@@ -554,7 +585,7 @@ function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
         </div>
 
         <div data-rev data-delay={160} className="oeo-chart-card">
-          {/* Indexed, not absolute — the client's real monthly figures are not
+          {/* Indexed, not absolute: the client's real monthly figures are not
               published. The index carries the same curve and growth rate. */}
           <div className="oeo-chart-head oeo-mono">
             <span>{chartHead}</span>
@@ -652,7 +683,7 @@ function RevenueChart({ r }: { r: NonNullable<CaseStudyData["revenue"]> }) {
 
 // `reveal` puts a reveal on each row, for the right-hand column where the rows
 // arrive one by one. The left column reveals as a block from its container
-// instead, so its rows stay plain — nesting the two would fade a row in against
+// instead, so its rows stay plain; nesting the two would fade a row in against
 // an already-fading parent.
 function Bars({
   group,
@@ -826,7 +857,7 @@ function Stack({ d, joined }: { d: CaseStudyData; joined: boolean }) {
             {s.body}
           </p>
         </div>
-        {/* Same tile anatomy as /stack — brand-tinted logo chip, name, role —
+        {/* Same tile anatomy as /stack (brand-tinted logo chip, name, role),
             resolved from STACK_TOOLS so a platform looks identical on both. */}
         {/* Six or fewer: wider tiles, so long names like "Google Search
             Console" fit beside the logo instead of truncating. */}
@@ -855,7 +886,7 @@ function Stack({ d, joined }: { d: CaseStudyData; joined: boolean }) {
 /* ---------------------------------------------------------- 06 the shipped */
 
 // Schematic stand-ins for real page captures. When `image` is set on a build in
-// the data file the screenshot renders instead — no other change needed.
+// the data file the screenshot renders instead; no other change needed.
 function Thumb({ page }: { page: PageBuild }) {
   if (page.image) {
     return (
@@ -915,7 +946,7 @@ function Thumb({ page }: { page: PageBuild }) {
         </div>
       );
     case "dark":
-      // The one dark-thumbnail card in the reference — a campaign landing page.
+      // The one dark-thumbnail card in the reference: a campaign landing page.
       return (
         <div className="oeo-thumb" style={{ background: "#050605", gap: 10, justifyContent: "center" }}>
           <div style={{ height: 14, width: "80%", background: "rgba(243,245,242,0.85)" }} />
@@ -959,7 +990,7 @@ function Compare({ c }: { c: NonNullable<CaseStudyData["shipped"]["compare"]> })
     <div data-rev style={{ marginTop: 70 }}>
       <Label>{c.label}</Label>
       <div className="oeo-compare" ref={ref}>
-        {/* BEFORE — the cluttered legacy page */}
+        {/* BEFORE: the cluttered legacy page */}
         <div className="oeo-compare-layer oeo-compare-before">
           {c.beforeImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -991,7 +1022,7 @@ function Compare({ c }: { c: NonNullable<CaseStudyData["shipped"]["compare"]> })
           )}
         </div>
 
-        {/* AFTER — the rebuilt template, revealed by the divider */}
+        {/* AFTER: the rebuilt template, revealed by the divider */}
         <div className="oeo-compare-layer oeo-compare-after" style={{ gap: 14 }}>
           {c.afterImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -1145,7 +1176,7 @@ function Approach({ d }: { d: CaseStudyData }) {
                 <div className="oeo-mono" style={{ marginTop: 22, display: "grid", gap: 10, fontSize: 11, letterSpacing: "0.14em", color: C.muted }}>
                   {p.bullets.map((b) => (
                     <div key={b} style={{ display: "flex", gap: 10 }}>
-                      {/* "/" rather than a dash — same marker the section
+                      {/* "/" rather than a dash: the same marker the section
                           kickers and objective numbers use. */}
                       <span style={{ color: C.accent }}>/</span>
                       <span>{b}</span>
