@@ -17,8 +17,11 @@
 //
 // PLACEHOLDER. Everything else numeric on the page lives in this file and is
 // marked below: the revenue series, the market/channel splits, the platform
-// list, the page-build count and names, the testimonial, and the hero meta.
-// Swap the values here and the page needs no other edit.
+// list, the page-build count and names, and the hero meta. Swap the values
+// here and the page needs no other edit.
+//
+// No client quote: the page closes with the Google reviews section from the
+// homepage, fed in by app/work/ontario-education-online/page.tsx.
 
 import type { CaseStudy } from "@/lib/case-study";
 
@@ -482,12 +485,5 @@ export const OEO: CaseStudy = {
         bullets: ["WEEKLY TEST CADENCE", "NEW MARKETS QUARTERLY", "WINS REINVESTED INTO MEDIA"],
       },
     ],
-  },
-
-  // PLACEHOLDER: replace with a real, approved quote and named attribution
-  // before launch.
-  quote: {
-    body: "Marked doesn't run campaigns for us, they run a system. Every quarter has built on the last, and international enrolment is now our biggest driver.",
-    attribution: "[CLIENT NAME] · DIRECTOR, ONTARIO EDUCATION ONLINE",
   },
 };

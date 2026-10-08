@@ -22,9 +22,10 @@
 // the page renders complete and static. Nothing here is load-bearing for
 // legibility. The effect mutates inline styles directly, which is safe because
 // this tree never re-renders: the only stateful pieces are the isolated
-// <CountStat> spans, the uncontrolled comparison slider, and the brief's
-// <ShowAll> toggle, which re-renders only its own wrapper and button (the
-// cards come in as children, so React leaves them alone).
+// <CountStat> spans, the uncontrolled comparison slider, the brief's <ShowAll>
+// toggle, which re-renders only its own wrapper and button (the cards come in
+// as children, so React leaves them alone), and the closing <Reviews>, which
+// runs its own motion and carries none of the attributes the effect animates.
 
 import React from "react";
 import Link from "next/link";
@@ -32,8 +33,10 @@ import { MD, C, STACK_TOOLS, navHref } from "@/lib/md";
 import { ArrowIcon, MarkLogo, ToolLogo, useScrollSync } from "@/components/shared";
 import SiteFooter from "@/components/site-footer";
 import ShowAll from "@/components/show-all";
+import Reviews from "@/components/home-reviews";
 import { MobileMenu, NavCta } from "@/components/site-nav";
 import type { BarGroup, CaseStudy as CaseStudyData, PageBuild, Platform } from "@/lib/case-study";
+import type { ReviewFeed } from "@/lib/reviews";
 
 const EASE = "cubic-bezier(0.2, 0.7, 0.3, 1)"; // the site's easing, used everywhere
 
@@ -1216,7 +1219,10 @@ function Quote({ q }: { q: NonNullable<CaseStudyData["quote"]> }) {
 
 /* ------------------------------------------------------------------- page */
 
-export default function CaseStudy({ data }: { data: CaseStudyData }) {
+// `reviews`: the Google reviews section from the homepage, closing the page
+// after the approach (and after the quote, if there is one). The page fetches
+// the feed (lib/reviews.ts) and passes it in.
+export default function CaseStudy({ data, reviews }: { data: CaseStudyData; reviews?: ReviewFeed }) {
   const root = React.useRef<HTMLDivElement | null>(null);
   useScrollMotion(root);
   return (
@@ -1233,6 +1239,9 @@ export default function CaseStudy({ data }: { data: CaseStudyData }) {
       <Shipped d={data} />
       <Approach d={data} />
       {data.quote ? <Quote q={data.quote} /> : null}
+      {/* Spaced like the quote it stands in for: the case study's section
+          padding, and 130px before the footer. */}
+      {reviews ? <Reviews feed={reviews} className="oeo-sec" style={{ paddingBottom: 130, scrollMarginTop: 96 }} /> : null}
       <Footer />
     </div>
   );
